@@ -45,22 +45,58 @@
                 <img src="JabulbaRender1.png" alt="JabulbaRender1" style="width: 100%">
                 <br><br>
                 - Blub, 4th May 2025
-            </div>
-            <h2 class="w3-center">🎟 Commissions Tickets 🎟</h2>
-            <div class="w3-row-padding">
+            </div>            <div class="w3-panel w3-leftbar w3-sand">
+                <h3 class="w3-xxlarge w3-serif">If you want to keep track of the comissions I have done already. </h3>
+                <sub>Here is a link to the public trello board that I use for comissions:</sub>
+                <br><p><a href="https://trello.com/b/Y6xX7M3D/blub">Comissions Trello Board</a></p>
+            </div>            
+                <h2 class="w3-center">🎟 Commissions Tickets 🎟</h2>
                 <div class="w3-container w3-card-4">
-                    <h3>Commissions Form</h3>
-                    <div class="w3-section">
-                        <input class="w3-input" type="text" required />
-                        <label>Fursona / Name</label>
-                    </div>
-                    
-                    <div class="w3-section">
-                        <input class="w3-input" type="text" required />
-                        <label>Discord UserName</label>
-                    </div>
+                <h3>Commissions Form</h3>
+                <div class="w3-section">
+                    <input class="w3-input" type="text" required />
+                    <label>Fursona / Name:</label>
                 </div>
+                
+                <div class="w3-section">
+                    <input class="w3-input" type="text" required />
+                    <label>Discord UserName:</label>
+                </div>
+                
+                <div class="w3-section">
+                    <label>Commission Type:</label><br>
+                    <input class="w3-radio" type="radio" name="commission_type" value="new_render" checked>
+                    <label>New Render</label><br>
+                    <input class="w3-radio" type="radio" name="commission_type" value="premade_scene">
+                    <label>Pre-made Scene (YCH)</label>
+                </div>
+
+                <div class="w3-section">
+                    <label for="new_models">Number of New Models (if applicable):</label>
+                    <input class="w3-input" type="number" id="new_models" name="new_models" value="0" min="0">
+                </div>
+
+                <div class="w3-section">
+                    <input class="w3-check" type="checkbox" name="custom_texture" value="yes">
+                    <label>I need a custom texture made (requires ref sheet)</label>
+                </div>
+
+                <div class="w3-section">
+                    <input class="w3-check" type="checkbox" name="scene_reuse" value="yes">
+                    <label>Allow scene to be used for other people's renders (-$50)</label>
+                </div>
+
+                <div class="w3-section">
+                    <p>Note: If a license is required for your avatar's base model, 50% of the base cost will be added.</p>
+                </div>
+                <div class="w3-section">
+                    <button class="w3-button w3-black w3-hover-amber" type="submit">Submit</button>
+                </div>
+             </div>
+             <div class="w3-container w3-padding w3-large">
+                 <p>Estimated Total: $<span id="totalCost">0</span></p>
             </div>
+ 
         </main>
         <!--- Footer (sit at the bottom) -->
         <div id="footer-placeholder"></div>
@@ -79,5 +115,52 @@
             });
         </script>
         <script src="javascript.js" type="text/javascript"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('.w3-card-4');
+                const totalCostSpan = document.getElementById('totalCost');
+
+                const basePrices = {
+                    new_render: 250,
+                    premade_scene: 75
+                };
+
+                function calculateTotal() {
+                    let total = 0;
+                    const commissionType = form.querySelector('input[name="commission_type"]:checked').value;
+                    total += basePrices[commissionType];
+
+                    const newModelsInput = form.querySelector('#new_models');
+                    const newModels = parseInt(newModelsInput.value) || 0;
+                    total += newModels * 50;
+
+                    const customTextureCheckbox = form.querySelector('input[name="custom_texture"]');
+                    if (customTextureCheckbox.checked) {
+                        total += 30;
+                    }
+
+                    const sceneReuseCheckbox = form.querySelector('input[name="scene_reuse"]');
+                    if (sceneReuseCheckbox.checked) {
+                        total -= 50;
+                    }
+
+                    // Licensing cost is mentioned as 50% of base cost, but there's no input for it.
+                    // If you add a checkbox for licensing, you would add a similar logic here.
+                    // Example (if you add a checkbox with name="licensing"):
+                    // const licensingCheckbox = form.querySelector('input[name="licensing"]');
+                    // if (licensingCheckbox.checked) {
+                    //     total += basePrices[commissionType] * 0.5;
+                    // }
+
+                    totalCostSpan.textContent = total;
+                }
+
+                // Add event listeners to relevant form elements
+                form.querySelectorAll('input[type="radio"], input[type="number"], input[type="checkbox"]').forEach(element => {
+                    element.addEventListener('change', calculateTotal);
+                });
+                calculateTotal(); // Calculate initial total on page load
+            });
+        </script>
     </body>
 </html>
