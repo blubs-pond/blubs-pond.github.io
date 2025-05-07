@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Blubs' Commissions</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+        <script src="https://kit.fontawesome.com/5b343a76ac.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="deafult.css">
+        
+    </head>
+    <body>
+        <!-- Navbar (sit on top) -->
+        <div id="nav-placeholder"></div>
+        <header class="bgimg-1 w3-display-container w3-grayscale-min" id="home">
+            <!-- added header here --> 
+            <div class="w3-display-left w3-rows" style="padding:48px">
+                <span class="w3-jumbo w3-hide-medium w3-hide-small">Blubs' Commissions</span>
+                <span class="w3-xxlarge w3-hide-large w3-hide-small">Blubs' Commissions</span>
+                <span class="w3-hide-large w3-hide-medium" style="font-size: xx-large">Blubs' Commissions</span>
+                <br><span class="w3-large">Fed this fish :3</span>
+            </div>
+        </header>
+        <main>
+            <!-- Page conetnt go here -->
+            <div class="w3-panel w3-leftbar w3-sand">
+                <h3 class="w3-xxlarge w3-serif">Commissions are now open for renders</h3>
+                <sub>Here is the render I made for Jabulba. first paid commission is 50% off, dm me if youre interested in getting a render :3</sub>
+                <br><p>
+                Pricing (usd)<br>
+                Base price for commission will be $250<br>
+                Base price for pre-made scene $75 (YCH scenes) (I can still modify the scenes for you within reason :3)
+                <br><br>
+                Modifiers:<br>
+                +$50 per new model in a scene (if it is a pre-made scene with 2 people, and you don't want the models changed, it will not cause any extra costs)<br>
+                +$30 if I need to make your texture, availability option for people only with a ref sheet (per person)<br>
+                -$50 if I get to make the scene a pre-made scene and use it for other peoples renders<br>
+                <br><br>
+                If I need to buy a licence for the base model to do your avi, 50% of the base cost will be added to the price<br>
+                <br><br>
+                eg:<br>
+                If you want a new render of just your vrc avi, it will be $200-$250 on average<br>
+                2 people with 1 texture made by me would be $330<br>
+                Pre-made scene of you and your BF/company (no changes): $75.</p>
+                <img src="JabulbaRender1.png" alt="JabulbaRender1" style="width: 100%">
+                <br><br>
+                - Blub, 4th May 2025
+            </div>
+        </main>
+        <!--- Footer (sit at the bottom) -->
+        <div id="footer-placeholder"></div>
+        <script>
+            fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById('footer-placeholder').innerHTML = data;
+            });
+        </script>
+        <script>
+            fetch('nav.html')
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById('nav-placeholder').innerHTML = data;
+            });
+        </script>
+        <script src="javascript.js" type="text/javascript"></script>
+    </body>
+</html>
