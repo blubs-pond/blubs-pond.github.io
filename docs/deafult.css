@@ -1,0 +1,16 @@
+.logo{
+    width: 25px;
+    height: auto;
+}
+
+.nav-link {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color:black;
+    font-weight: bold;
+    text-shadow: 2px 2px white;
+}
