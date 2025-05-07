@@ -14,3 +14,13 @@
     font-weight: bold;
     text-shadow: 2px 2px white;
 }
+
+.bgimg-1 {
+    background-position: center;
+    background-size: cover;
+    background-color: aqua;
+    min-height: 50%;
+    color: aliceblue;
+    text-shadow: 2px 2px black;
+    height: 250px;
+}
