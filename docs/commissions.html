@@ -45,11 +45,13 @@
                 <img src="JabulbaRender1.png" alt="JabulbaRender1" style="width: 100%">
                 <br><br>
                 - Blub, 4th May 2025
-            </div>            <div class="w3-panel w3-leftbar w3-sand">
+                <br><br>
+            </div>
+            <!-- <div class="w3-panel w3-leftbar w3-sand">
                 <h3 class="w3-xxlarge w3-serif">If you want to keep track of the comissions I have done already. </h3>
                 <sub>Here is a link to the public trello board that I use for comissions:</sub>
                 <br><p><a href="https://trello.com/b/Y6xX7M3D/blub">Comissions Trello Board</a></p>
-            </div>            
+            </div> -->       
                 <h2 class="w3-center">🎟 Commissions Tickets 🎟</h2>
                 <div class="w3-container w3-card-4">
                 <h3>Commissions Form</h3>
@@ -88,6 +90,8 @@
 
                 <div class="w3-section">
                     <p>Note: If a license is required for your avatar's base model, 50% of the base cost will be added.</p>
+                    <input class="w3-check" type="checkbox" name="licensing" value="yes">
+                    <label>My base avatar's model required PAID license.</label>
                 </div>
                 <div class="w3-section">
                     <button class="w3-button w3-black w3-hover-amber" type="submit">Submit</button>
@@ -144,13 +148,10 @@
                         total -= 50;
                     }
 
-                    // Licensing cost is mentioned as 50% of base cost, but there's no input for it.
-                    // If you add a checkbox for licensing, you would add a similar logic here.
-                    // Example (if you add a checkbox with name="licensing"):
-                    // const licensingCheckbox = form.querySelector('input[name="licensing"]');
-                    // if (licensingCheckbox.checked) {
-                    //     total += basePrices[commissionType] * 0.5;
-                    // }
+                     const licensingCheckbox = form.querySelector('input[name="licensing"]');
+                     if (licensingCheckbox.checked) {
+                         total += basePrices[commissionType] * 0.5;
+                    }
 
                     totalCostSpan.textContent = total;
                 }
