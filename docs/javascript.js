@@ -9,5 +9,13 @@ function w3_close() {
 }
 
 function awa() {
+    const awa_sound = new Audio('');
     window.alert("awa");
+    awa_sound.play()
+      .then(() => {
+        console.info('awa success');
+      })
+      .catch(error => {
+        console.error('awa failed:', error);
+      });
 }
