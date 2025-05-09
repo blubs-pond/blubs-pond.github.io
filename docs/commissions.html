@@ -56,7 +56,6 @@
                 <div class="w3-container w3-card-4">
                 <h3>Commissions Form</h3>
                 <div class="w3-section">
-                <form action="submit_commission.php" method="post">
                     <input class="w3-input" type="text" required />
                     <label>Fursona / Name:</label>
                 </div>
@@ -92,7 +91,7 @@
                 <div class="w3-section">
                     <label for="asset_upload">Upload Blender Assets:</label>
                     <input class="w3-input" type="file" id="asset_upload" name="asset_upload" accept=".blend" multiple>
-                </div>
+ +              </div>
 
                 <div class="w3-section">
                     <input class="w3-check" type="checkbox" id="licensing" name="licensing" value="yes">
@@ -103,15 +102,17 @@
                     </div>
                 </div>
                 <div class="w3-section">
-                    <button class="w3-button w3-black w3-hover-amber" type="submit" value="submit">Submit</button>
+                    <button class="w3-button w3-black w3-hover-amber" type="submit">Submit</button>
                 </div>
              </div>
-             </form>
              <div class="w3-container w3-padding w3-large">
                  <p>Estimated Total: $<span id="totalCost">0</span></p>
             </div>
-             <p id="licensingDisclaimer" style="color: red; display: none;">* Estimated total may be inaccurate if avatar price is not provided.</p>
- 
+ +          <p id="licensingDisclaimer" style="color: red; display: none;">* Estimated total may be inaccurate if avatar price is not provided.</p> 
+            <h2 class="w3-center">🎟 Commissions Tickets 🎟</h2>
+            <div class="w3-container w3-padding">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfeL7-2Nq8H9u-s8Vb4i4Z7w4f4t0w0K0V0o0D0k0E0g0d0e0/viewform?embedded=true" width="100%" height="1000" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
         </main>
         <!--- Footer (sit at the bottom) -->
         <div id="footer-placeholder"></div>
