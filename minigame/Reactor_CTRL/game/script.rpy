@@ -19,6 +19,7 @@ init python:
     # Define possible locations in the facility
     locations = ["Camera1", "Camera2", "HallwayA", "ControlRoom"]
 
+    loss_active = True # Flag to indicate if the Loss is an active threat
     # Define predefined monster movement paths
     monster_paths = {
     "Runner": ["HallwayA", "HallwayB", "ControlRoom"],
@@ -47,6 +48,57 @@ init python:
     # Loss Sanity Drain
     haunted_deterioration_multiplier = 2.0 # Adjust the multiplier for faster decay
     loss_sanity_drain_rate_per_second = 1.0 # Adjust the rate as needed
+
+    # Shadow monster mechanics
+    shadow_active = False # Is the Shadow currently active/can appear?
+    shadow_visible = False # Is the Shadow currently visible to the player?
+    shadow_location = None # Where is the Shadow currently?
+    shadow_appearance_sanity_threshold = 20.0 # Sanity level below which Shadow can appear
+    shadow_harm_sanity_threshold = 10.0 # Sanity level below which Shadow can harm
+    shadow_look_sanity_drain = 1.0 # Amount of sanity drained each time player looks at Shadow
+    shadow_manifestation_chance_per_update = 0.02 # Chance for Shadow to manifest if conditions met
+
+
+    def check_look_at_shadow(location_viewed):
+        global shadow_active, shadow_location, shadow_visible, sanity, shadow_look_sanity_drain
+
+        # Check if Shadow is active, has a location, and that location is being viewed via camera
+        if shadow_active and shadow_location is not None and shadow_location == location_viewed:
+            # Shadow is visible because the player is looking at its location
+            shadow_visible = True
+            # Drain sanity from looking at it
+            sanity = max(0.0, sanity - shadow_look_sanity_drain)
+            # Placeholder for visual/auditory cue when seeing Shadow on camera
+            # renpy.notify("You see something disturbing on the camera...") # Optional notification
+
+        else:
+            # Shadow is not in the location being viewed, or is not active
+            shadow_visible = False
+
+    def update_shadow_state(dt):
+        global shadow_active, shadow_location, sanity, shadow_harm_sanity_threshold, in_game_hour, game_over, shadow_manifestation_chance_per_update
+
+        if shadow_active:
+            # Shadow Movement (simple random movement for now)
+            if shadow_location is None or renpy.random.random() < 0.01: # Chance to move or if no location yet
+                 available_locations = [loc for loc in locations if loc != shadow_location]
+                 if available_locations:
+                     shadow_location = renpy.random.choice(available_locations)
+                     # Optional: Notification when Shadow moves (for testing)
+                     # renpy.notify(f"The Shadow shifts in the darkness...")
+
+            # Shadow Manifestation/Attack
+            if sanity < shadow_harm_sanity_threshold and (in_game_hour >= 18 or in_game_hour < 5):
+                 # Chance to manifest and attack if sanity is very low during dark hours
+                 if renpy.random.random() < shadow_manifestation_chance_per_update * dt: # Scale chance by time delta
+                     renpy.notify("The Shadow manifests!")
+                     # --- Start Shadow Attack Placeholder ---
+                     game_over = True # Game over placeholder for attack
+                     renpy.notify("The Shadow consumed you! Game Over.")
+                     # Example: Show a scary image, play a sound
+                     # show shadow_attack_image at full_screen
+                     # play sound "shadow_attack_sound.ogg"
+                     # --- End Shadow Attack Placeholder ---
 
 
     # Experiment entry timer
@@ -80,11 +132,8 @@ init python:
 
             # Check for transformation
             if experiment_containment_level <= experiment_transformation_threshold and "Experiment" in monsters:
-                renpy.notify("The Experiment's containment has failed!")
-                # Transform Experiment into Loss
-                del monsters["Experiment"]
-                monsters["Loss"] = {"location": "ControlRoom"} # Or a random location
-                renpy.notify("The Experiment has transformed into the Loss!")
+ renpy.notify("The Experiment's containment has failed!")
+ # The Experiment is now free to roam (assuming its movement was previously restricted before containment failure)
 
 
     monsters = {
@@ -798,6 +847,15 @@ init python:
         # if door_being_held != "none":
         #     hunger_level += door_hold_hunger_cost_per_second * (dt / 60.0)
 
+        # Activate Shadow if sanity is low enough during darker hours
+        global shadow_active, sanity, shadow_appearance_sanity_threshold, in_game_hour
+        if sanity < shadow_appearance_sanity_threshold and (in_game_hour >= 18 or in_game_hour < 5):
+            shadow_active = True
+            # Optional: Add a notification the first time Shadow becomes active
+            if not shadow_active: # You'd need a separate flag to track first activation
+                renpy.notify("You feel a presence in the darkness...")
+        else:
+            shadow_active = False # Deactivate if sanity is high enough or not dark hours
 
 
         # Add penalties for high hunger/insomnia (will implement effects later)
@@ -805,10 +863,10 @@ init python:
         if caffeine_overdosed:
             # Sanity decreases over time during overdose
             sanity = max(0.0, sanity - (0.05 * (dt / 60.0))) # Decrease sanity by 0.05 per real-life minute
-        #     # Add hunger penalties
-        # if insomnia_level >= 100:
-        #     renpy.notify("You are severely sleep deprived!")
-        #     # Add insomnia penalties
+            # Add hunger penalties
+        if insomnia_level >= 100:
+            renpy.notify("You are severely sleep deprived!")
+            # Add insomnia penalties
 
         # Update hiding abuse counter
         if is_hiding:
@@ -905,6 +963,11 @@ init python:
 
         # Update survival stats
         update_survival_stats(dt)
+
+        # Update Shadow state (movement and manifestation)
+        # This should run whether the Shadow is active or not to reset its state when inactive
+        update_shadow_state(dt)
+
 
         # Decay durability of installed generator parts if the generator is running
         if not core_active and generator_status == "running":
@@ -1109,6 +1172,8 @@ init python:
             check_hide_monster() # Check for the Hide monster during the survival phase
             # update_survival_stats is called within the survival phase logic
         jump game_loop
+
+
     # Initial scene setup (control room background)
     scene black # Start with a black screen or your initial control room image
 

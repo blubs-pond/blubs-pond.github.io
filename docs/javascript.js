@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function awa() {
-    const awa_sound = new Audio('');
+    const awa_sound = new Audio("untitled.wav");
     window.alert("awa");
     awa_sound.play()
       .then(() => {
