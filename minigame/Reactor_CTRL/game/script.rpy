@@ -44,6 +44,8 @@ init python:
 
     # Game Time (Initial Values)
     game_time_in_hours = 0 # In-game hours
+    in_game_hour = 6 # Assuming the game starts at 6:00
+    in_game_minute = 0
     game_time_in_minutes_real = 0.0 # Real-life minutes elapsed
 
     # Game Over Flag
@@ -206,6 +208,15 @@ init python:
     # Action Point variables
     max_action_points = 10 # Maximum action points per fixing phase
     action_points = 0 # Current action points
+ current_phase = "survival" # Assume starting in survival phase
+
+    def start_fixing_phase():
+        global action_points, max_action_points, hunger_level
+        # Calculate action points based on hunger level
+        action_points = max_action_points - (hunger_level * 0.1)
+        # Ensure action points don't go below 0
+        action_points = max(0, action_points)
+        renpy.notify(f"Fixing phase starts. You have {action_points:.1f} action points.")
 
 
     def display_terminal_output(self, message):
@@ -580,15 +591,15 @@ init python:
             return
 
         # Apply time dilation if overdosed
-        if caffeine_overdosed: # dt is already modified in this function
-        dt *= 1.5
+        if caffeine_overdosed:
+            dt *= 1.5
 
         if sanity <= 0:
             game_over = True
             renpy.notify("You have gone insane. Game Over.")
 
         real_life_minutes_elapsed = dt / 60.0 # Convert seconds to minutes
-        game_time_in_minutes_real += real_life_minutes_elapsed
+        game_time_in_minutes_real += real_life_minutes_elapsed # This will track the total real-life time elapsed
 
         # Update lubricant based on real-life time and check for breakdown
         update_lubricant(game_time_in_minutes_real)
@@ -616,13 +627,6 @@ init python:
         # Update reactor power output
         update_reactor_power_output()
 
-        def start_fixing_phase():
-            global action_points, max_action_points, hunger_level
-            # Calculate action points based on hunger level
-            action_points = max_action_points - (hunger_level * 0.1)
-            # Ensure action points don't go below 0
-            action_points = max(0, action_points)
-            renpy.notify(f"Fixing phase starts. You have {action_points:.1f} action points.")
 
 
         # ... other game state updates like creature movement, etc. ...
@@ -707,6 +711,36 @@ init python:
 
     label start:
 
+        label game_loop:
+        python:
+        dt = renpy.update(realtime=True)
+        game_time_in_minutes_real += dt / 60.0
+        # Convert real minutes to in-game time (assuming 48 real minutes = 1 in-game day)
+        # This will need adjustment based on your desired time scale
+        total_in_game_minutes = (game_time_in_minutes_real / 48.0) * (24 * 60)
+        in_game_hour = int((total_in_game_minutes / 60) % 24)
+
+        # Determine the current phase
+        new_phase = "survival" # Default to survival
+        if 6 <= in_game_hour < 13:
+            new_phase = "fixing"
+        elif 13 <= in_game_hour < 24:
+            new_phase = "rest_payment"
+
+        # Check for phase transition
+        if new_phase != current_phase:
+            current_phase = new_phase
+        # Call phase-specific start functions here
+            if current_phase == "fixing":
+                start_fixing_phase()
+            elif current_phase == "rest_payment":
+                # Call function to start rest and payment phase
+                renpy.notify("Entering Rest and Payment Phase.") # Temporary notification
+            elif current_phase == "survival":
+                # Call function to start survival phase
+                renpy.notify("Entering Survival Phase.") # Temporary notification
+                in_game_minute = int(total_in_game_minutes % 60)
+        jump game_loop
     # Initial scene setup (control room background)
     scene black # Start with a black screen or your initial control room image
 
@@ -738,6 +772,7 @@ init python:
     # Define your Python functions for game mechanics here.
     def move_creatures():
     pass # Placeholder for creature movement logic
+
 
 # --------------------
 # End of Script
