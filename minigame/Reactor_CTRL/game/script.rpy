@@ -72,7 +72,8 @@ init python:
 
     # Player resources
     player_money = 1000.0 # Starting money
-    rations = 0
+    rations = [] # Changed to a list to track individual rations
+    ration_spoilage_time = 1440.0 # 24 hours in real-life minutes for spoilage
     coffee_tea = 0 # Number of coffee/tea items
     coffee_tea_uses_left = 0 # Uses left on the current coffee/tea item
 
@@ -85,6 +86,9 @@ init python:
     insomnia_level = 0.0 # Increases over time, reduced by coffee/tea and sleep
     caffeine_effect_timer = 0.0 # Timer for the caffeine buff duration
     caffeine_crash_timer = 0.0 # Timer for when the caffeine crash occurs
+    caffeine_overdosed = False # Flag to indicate if the player is currently overdosed on caffeine
+    sanity = 100.0 # Player's sanity level (starts at 100, game over at 0)
+    consecutive_coffee_tea_uses = 0 # Track consecutive coffee/tea uses for overdose
     # Add variables for hunger/insomnia increase rates
     hunger_increase_rate = 0.1 # Hunger increase per real-life minute
     insomnia_increase_rate = 0.05 # Insomnia increase per real-life minute
@@ -199,6 +203,10 @@ init python:
     # Terminal output variable
     latest_terminal_output = ""
 
+    # Action Point variables
+    max_action_points = 10 # Maximum action points per fixing phase
+    action_points = 0 # Current action points
+
 
     def display_terminal_output(self, message):
         global latest_terminal_output
@@ -221,7 +229,7 @@ init python:
         reactor_temp -= cooling_effect
 
         # Ensure temperature doesn't go below a minimum
-        reactor_temp = max(reactor_temp, 0)
+        reactor_temp = max(reactor_temp, 0.0)
 
         # Check for power cutout (temperature too low)
         if reactor_temp < temp_power_cutout_threshold:
@@ -235,7 +243,7 @@ init python:
 
 
         # Check for core shutdown (pump speed too high for temperature)
-        if pump_speed > pump_speed_overspeed_threshold and reactor_temp < temp_core_shutdown_overspeed_threshold:
+        if pump_speed > pump_speed_overspeed_threshold and reactor_temp < temp_core_shutdown_overspeed_threshold and core_active:
             core_active = False
             # Trigger core shutdown event (need to add this later)
             renpy.notify("Core shutdown due to overspeed! Reactor offline.")
@@ -257,7 +265,7 @@ init python:
     def set_pump_speed(speed):
         global pump_speed
         # Add logic to limit pump speed to a valid range (e.g., 0-100)
-        pump_speed = max(0, min(100, speed))
+        pump_speed = max(0.0, min(100.0, speed))
         renpy.notify("Pump speed set to: " + str(pump_speed))
 
     def restart_core():
@@ -335,7 +343,7 @@ init python:
         # Check if any motor part is broken
         motor_parts = ["pump_basic", "pump_upgraded", "pump_reinforced"] # Assuming 'pump' is the motor part
         for motor_part in motor_parts:
-            # Use .get with a default of 0.0 in case a part isn't in the dictionary (shouldn't happen with current setup, but good practice)
+            # Use .get with a default of 0.0 in case a part isn't in the dictionary
             if installed_generator_parts.get(motor_part, 0.0) <= 0 and generator_status != "broken":
                 generator_status = "broken"
                 renpy.notify(f"The {motor_part.replace('_', ' ')} is broken! The generator has stopped.")
@@ -366,7 +374,7 @@ init python:
                 renpy.notify("Generator lubricant needs replacement.")
 
         # Calculate real-life hours after day 3
-        if generator_lubricant_cycles >= 4:
+        if generator_lubricant_cycles >= 3: # Start breakdown chance increase after day 3 (lubricant cycle 4)
             total_real_life_minutes = game_time_in_minutes_real
             minutes_in_first_3_days = 3 * 48.0
             if total_real_life_minutes > minutes_in_first_3_days:
@@ -387,7 +395,7 @@ init python:
 
             # Ensure breakdown chance doesn't exceed 100%
             current_breakdown_chance = min(current_breakdown_chance, 100.0)
-
+            # renpy.notify(f"Breakdown chance: {current_breakdown_chance:.2f}%") # Debugging line
             # Check for breakdown
             if generator_status != "broken": # Only calculate chance if not already broken
                 if random.random() * 100 < current_breakdown_chance:
@@ -397,7 +405,7 @@ init python:
                     if not core_active:
                         game_over = True
                         renpy.notify("Power lost! Meltdown imminent.")
-        elif generator_status != "broken": # If before day 4 or already broken, breakdown chance is 0 (or not calculated)
+        elif generator_lubricant_cycles < 3 and generator_status != "broken": # Ensure it's explicitly 0 before day 4 if not already broken
             current_breakdown_chance = 0.0 # Ensure it's explicitly 0 before day 4
 
 
@@ -443,7 +451,7 @@ init python:
             renpy.notify("You don't have any rations.")
 
     def use_coffee_tea():
-        global coffee_tea, coffee_tea_uses_left, insomnia_level, caffeine_effect_timer, caffeine_crash_timer
+        global coffee_tea, coffee_tea_uses_left, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, consecutive_coffee_tea_uses
         if coffee_tea > 0 or coffee_tea_uses_left > 0:
             if coffee_tea_uses_left == 0: # Starting a new coffee/tea item
                 if coffee_tea > 0:
@@ -459,6 +467,13 @@ init python:
                 caffeine_effect_timer = 60.0 # Example: Caffeine effect lasts 60 real-life minutes
                 caffeine_crash_timer = caffeine_effect_timer + 30.0 # Example: Crash occurs 30 mins after effect ends
                 renpy.notify("Drank some coffee/tea. Feeling more alert.")
+                consecutive_coffee_tea_uses += 1 # Increment consecutive use count
+
+                if consecutive_coffee_tea_uses >= 10:
+                    renpy.notify("Caffeine overdose!") # Temporary notification
+                    caffeine_overdosed = True # Set overdose flag
+                    consecutive_coffee_tea_uses = 0 # Reset consecutive use count on overdose
+
             # The else case for coffee_tea_uses_left == 0 inside the outer if is handled by the initial coffee_tea > 0 check
         else:
             renpy.notify("You don't have any coffee or tea.")
@@ -466,7 +481,7 @@ init python:
 
     # Function to update survival stats over time
     def update_survival_stats(dt):
-        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate
+        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate, consecutive_coffee_tea_uses
 
         # Increase hunger and insomnia over time
         hunger_level += hunger_increase_rate * (dt / 60.0) # dt is in seconds, convert to minutes
@@ -475,12 +490,15 @@ init python:
         # Update caffeine timers
         if caffeine_effect_timer > 0:
             caffeine_effect_timer = max(0.0, caffeine_effect_timer - (dt / 60.0))
+            # Reset consecutive uses if caffeine effect wears off naturally
             if caffeine_effect_timer == 0:
                 renpy.notify("The caffeine effect is wearing off.")
+                consecutive_coffee_tea_uses = 0
+                # Reset overdose flag when effect timer ends (if crash timer is also done)
+                if caffeine_crash_timer <= 0:
+                    caffeine_overdosed = False
 
-        # Only count down crash timer if effect timer has finished
         if caffeine_effect_timer <= 0 and caffeine_crash_timer > 0:
-            caffeine_crash_timer = max(0.0, caffeine_crash_timer - (dt / 60.0))
             if caffeine_crash_timer == 0:
                 # Implement caffeine crash penalty
                 renpy.notify("Experiencing a caffeine crash!")
@@ -488,11 +506,20 @@ init python:
                 insomnia_level += 40.0 # Example crash penalty
                 # Reset crash timer to prevent repeated penalty
                 caffeine_crash_timer = -1.0 # Use a negative value or None to indicate it's passed
-
+                caffeine_overdosed = False # Also reset overdose flag here
+            else: # Only count down if crash timer is active
+                caffeine_crash_timer = max(0.0, caffeine_crash_timer - (dt / 60.0))
 
         # Add penalties for high hunger/insomnia (will implement effects later)
         # if hunger_level >= 100:
         #     renpy.notify("You are starving!")
+        # Add sanity reduction during overdose
+        if caffeine_overdosed:
+        sanity = max(0.0, sanity) # Ensure sanity doesn't go below 0
+
+        # Reset overdose flag when crash timer ends
+        if caffeine_effect_timer <= 0 and caffeine_crash_timer == 0:
+        caffeine_overdosed = False
         #     # Add hunger penalties
         # if insomnia_level >= 100:
         #     renpy.notify("You are severely sleep deprived!")
@@ -511,9 +538,9 @@ init python:
             elif reactor_temp < 30 or reactor_pressure < 5: # Example: Reduced output at low temp/pressure
                 output *= 0.75
 
-            reactor_power_output = max(0, min(100, output)) # Ensure output is within a range
+            reactor_power_output = max(0.0, min(100.0, output)) # Ensure output is within a range
         else:
-            reactor_power_output = 0 # No significant power output when core is off
+            reactor_power_output = 0.0 # No significant power output when core is off
 
 
     def update_generator_oil():
@@ -535,7 +562,7 @@ init python:
 
 
             backup_generator_oil -= consumption
-            backup_generator_oil = max(0, backup_generator_oil) # Ensure it doesn't go below 0
+            backup_generator_oil = max(0.0, backup_generator_oil) # Ensure it doesn't go below 0
 
             # Check for game over if oil runs out while core is off
             if backup_generator_oil <= 0:
@@ -551,6 +578,14 @@ init python:
 
         if game_over: # Stop updates if the game is over
             return
+
+        # Apply time dilation if overdosed
+        if caffeine_overdosed: # dt is already modified in this function
+        dt *= 1.5
+
+        if sanity <= 0:
+            game_over = True
+            renpy.notify("You have gone insane. Game Over.")
 
         real_life_minutes_elapsed = dt / 60.0 # Convert seconds to minutes
         game_time_in_minutes_real += real_life_minutes_elapsed
@@ -580,6 +615,14 @@ init python:
 
         # Update reactor power output
         update_reactor_power_output()
+
+        def start_fixing_phase():
+            global action_points, max_action_points, hunger_level
+            # Calculate action points based on hunger level
+            action_points = max_action_points - (hunger_level * 0.1)
+            # Ensure action points don't go below 0
+            action_points = max(0, action_points)
+            renpy.notify(f"Fixing phase starts. You have {action_points:.1f} action points.")
 
 
         # ... other game state updates like creature movement, etc. ...
@@ -641,6 +684,12 @@ init python:
                 display_terminal_output(output)
             else:
                 display_terminal_output("Usage: shop list")
+
+        elif action == "repair":
+            # We will add the actual repair logic here later
+            repair_tool_durability -= 5.0 # Decrease durability by a fixed amount
+            repair_tool_durability = max(0.0, repair_tool_durability) # Ensure durability doesn't go below 0
+            renpy.notify(f"Repair tool used. Durability: {repair_tool_durability:.1f}") # Temporary notification
 
         elif action == "use": # Added 'use' command
             if len(command_parts) < 2:
