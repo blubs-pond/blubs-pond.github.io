@@ -45,18 +45,19 @@ init python:
     experiment_transformation_threshold = 10.0 # Threshold below which Experiment becomes Loss
 
     # Loss Sanity Drain
+    haunted_deterioration_multiplier = 2.0 # Adjust the multiplier for faster decay
     loss_sanity_drain_rate_per_second = 1.0 # Adjust the rate as needed
-
-    # Crucifix mechanics
-    crucifix_inventory = 0 # Number of crucifixes the player is carrying
-    placed_crucifixes = {} # Dictionary to store number of placed crucifixes per location { "location_name": count }
-    total_placed_crucifixes = 0
-    sanity_increase_per_placed_crucifix_per_second = 0.1 # Adjust rate as needed
-    max_placed_crucifixes = 3
 
 
     # Experiment entry timer
     experiment_entry_timer = -1.0 # Tracks time since Experiment entered Control Room (-1.0 if not in room)
+
+    # Machine components and their states (Example structure)
+    reactor_components = {
+        "coolant_pump": {"condition": 100, "haunted": False},
+        "moderator_rod_drive": {"condition": 100, "haunted": False},
+        # Add other machines as needed
+    }
 
     def check_hide_monster():
         global hiding_abuse_counter, hide_monster_appear_chance_per_abuse, game_over
@@ -475,7 +476,7 @@ init python:
         pass # Implementation coming later (will consume oil cans)
 
 
-    def calculate_total_breakdown_reduction():
+    def calculate_total_breakdown_reduction(): # calculate total breakdown reduction
         """Calculates the total breakdown chance reduction from installed parts based on their durability."""
         total_reduction = 0.0
         for part_type, current_durability in installed_generator_parts.items():
@@ -655,70 +656,114 @@ init python:
             renpy.notify("You don't have any coffee or tea.")
 
 
-    def update_monster_positions():
+    def update_monster_positions(): # Update monster positions
         global monsters, locations, monster_paths, left_door_state, right_door_state # Added door states
+        global placed_crucifixes, total_placed_crucifixes # Added crucifix variables
         for monster_name, monster_data in monsters.items():
-            # Check if monster exists and has a location
-            if monster_name in ["Runner", "Experiment"]: # Only move these along paths for now
-                # Move Runner and Experiment along their paths
-                current_location = monster_data["location"]
-                if current_location != "ControlRoom": # Don't move if they reached the control room (for now)
-                    path = monster_paths.get(monster_name, [])
-                    if path:
-                        try:
-                            current_index = path.index(current_location)
-                            next_index = (current_index + 1) % len(path) # Loop back to the beginning
-                            new_location = path[next_index]
+            # Check if monster exists and has a location for movement
+            if "location" not in monster_data or not monster_data["location"]:
+                continue # Skip monsters without a defined location
 
-                            # Check if the new location is the Control Room and if the corresponding door is open
-                            can_move_to_control_room = True
-                            if new_location == "ControlRoom":
-                                # Assume left door for Runner, right for Experiment for this example. Adjust as needed.
-                                if monster_name == "Runner" and left_door_state != "open":
-                                    can_move_to_control_room = False
-                                elif monster_name == "Experiment" and right_door_state != "open":
-                                    can_move_to_control_room = False
-
-                            if can_move_to_control_room: # If the door is open or it's not a door location
-                                # Implement a chance to move
-                                if random.random() < 0.3: # 30% chance to move
-                                    monster_data["location"] = new_location
-                                    # Check if the monster entered the Control Room
-                                    if new_location == "ControlRoom":
-                                        renpy.notify(f"{monster_name} entered the Control Room!")
-                                        # Handle consequences of monster entering the Control Room
-                                        if monster_name == "Experiment":
-                                            global experiment_entry_timer
-                                            experiment_entry_timer = 10.0 # Start the 10-second timer for Experiment
-                                            renpy.notify("The Experiment is in the Control Room! You have 10 seconds to hide.")
-                                        # Runner causes instant game over if not hiding
-                                        elif monster_name == "Runner": # Check for Runner after it enters Control Room
-                                            global game_over, is_hiding
-                                            if not is_hiding:
-                                                game_over = True
-                                                renpy.notify("The Runner caught you! Game Over.")
-                                    elif new_location != "ControlRoom": # Only notify if moving to a non-ControlRoom location
-                                        renpy.notify(f"{monster_name} moved to {new_location}.")
-                            except ValueError:
-                                # Monster not on its defined path, maybe handle this error or reset
-                                pass
-                            else:
-                                door_state = left_door_state if monster_name == "Runner" else right_door_state
-                                # Monster is blocked at the door
-                                renpy.notify(f"{monster_name} is at the door, but it is {door_state}.")
-                            
-            elif monster_name.startswith("Abomination"):
-                # Randomly move Abominations
+            if monster_name == "Loss":
                 current_location = monster_data["location"]
+                # Determine a potential new location for the Loss
                 possible_locations = [loc for loc in locations if loc != current_location]
-                if possible_locations and random.random() < 0.1: # 10% chance to move to a random location
-                            monster_data["location"] = random.choice(possible_locations)
-                            renpy.notify(f"{monster_name} moved to {monster_data['location']}.")
+                if possible_locations:
+                    new_location = random.choice(possible_locations)
+
+                    # Check if the new location has placed crucifixes
+                    if new_location in placed_crucifixes and placed_crucifixes[new_location] > 0:
+                    # Loss encounters crucifixes - repel and consume
+                    num_crucifixes = placed_crucifixes[new_location]
+                    consumed = min(num_crucifixes, 1) # Consume at least 1 crucifix, maybe more later
+                    placed_crucifixes[new_location] -= consumed
+                    global total_placed_crucifixes
+                    total_placed_crucifixes -= consumed
+                    renpy.notify(f"A crucifix in {new_location} repelled the Loss!")
+
+                    # Loss moves to a random location different from the current and blocked location
+                    # Ensure there are valid locations to move to
+                    available_locations = [loc for loc in locations if loc != current_location and loc != new_location]
+                    if available_locations:
+                        monster_data["location"] = random.choice(available_locations)
+                    else:
+                        # If no other locations, perhaps it just stays put or is temporarily banished
+                        pass # Or set a banished state
+
+            else:
+                if monster_name in ["Runner", "Experiment"]: # Only move these along paths for now
+                    # Move Runner and Experiment along their paths
+                    if current_location != "ControlRoom": # Don't move if they reached the control room (for now)
+                        path = monster_paths.get(monster_name, [])
+                        if path:
+                            try:
+                                current_index = path.index(current_location)
+                                next_index = (current_index + 1) % len(path) # Loop back to the beginning
+                                new_location = path[next_index]
+
+                                # Check if the new location is the Control Room and if the corresponding door is open
+                                can_move_to_control_room = True
+                                if new_location == "ControlRoom":
+                                    # Assume left door for Runner, right for Experiment for this example. Adjust as needed.
+                                    if monster_name == "Runner" and left_door_state != "open":
+                                        can_move_to_control_room = False
+                                    elif monster_name == "Experiment" and right_door_state != "open":
+                                        can_move_to_control_room = False
+
+                                if can_move_to_control_room: # If the door is open or it's not a door location
+                                    # Implement a chance to move
+                                    if random.random() < 0.3: # 30% chance to move
+                                        monster_data["location"] = new_location
+                                        # Check if the monster entered the Control Room
+                                        if new_location == "ControlRoom":
+                                            renpy.notify(f"{monster_name} entered the Control Room!")
+                                            # Handle consequences of monster entering the Control Room
+                                            if monster_name == "Experiment":
+                                                global experiment_entry_timer
+                                                experiment_entry_timer = 10.0 # Start the 10-second timer for Experiment
+                                                renpy.notify("The Experiment is in the Control Room! You have 10 seconds to hide.")
+                                            # Runner causes instant game over if not hiding
+                                            elif monster_name == "Runner": # Check for Runner after it enters Control Room
+                                                global game_over, is_hiding
+                                                if not is_hiding:
+                                                    game_over = True
+                                                    renpy.notify("The Runner caught you! Game Over.")
+                                        elif new_location != "ControlRoom": # Only notify if moving to a non-ControlRoom location
+                                            renpy.notify(f"{monster_name} moved to {new_location}.")
+                                except ValueError:
+                                    # Monster not on its defined path, maybe handle this error or reset
+                                    pass
+                                else:
+                                    door_state = left_door_state if monster_name == "Runner" else right_door_state
+                                    # Monster is blocked at the door
+                                    renpy.notify(f"{monster_name} is at the door, but it is {door_state}.")
+                elif monster_name == "Loss":
+                    # If the Loss is moving and not blocked by a crucifix, update its location
+                    monster_data["location"] = new_location
+                    renpy.notify(f"The Loss moved to {new_location}.")
+
+                    # After moving, check for haunting chance in the new location
+                    haunting_chance = 0.2 # Example chance, adjust as needed
+                    if renpy.random.random() < haunting_chance:
+                        # Find machines in this location (you'll need a way to map locations to machines)
+                        # For now, let's assume all machines are in the Control Room for haunting purposes
+                        machines_in_location = ["coolant_pump", "moderator_rod_drive"] # Example list of machines
+                        if machines_in_location:
+                            machine_to_haunt = renpy.random.choice(machines_in_location)
+                            global reactor_components
+                            if machine_to_haunt in reactor_components and not reactor_components[machine_to_haunt]["haunted"]:
+                                reactor_components[machine_to_haunt]["haunted"] = True
+                                renpy.notify(f"You feel a chill... The {machine_to_haunt} seems haunted.")
+
+                elif monster_name.startswith("Abomination"):
+                    # Keep existing Abomination movement logic here if it's not path-based
+                    pass # Assuming Abomination movement is handled elsewhere or is random without path
+
 
 
     # Function to update survival stats over time
     def update_survival_stats(dt):
-        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate, consecutive_coffee_tea_uses, sanity, caffeine_overdosed, hiding_abuse_counter, hiding_abuse_increase_rate, hiding_abuse_decay_rate, is_hiding, experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second # Added experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second
+        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate, consecutive_coffee_tea_uses, sanity, caffeine_overdosed, hiding_abuse_counter, hiding_abuse_increase_rate, hiding_abuse_decay_rate, is_hiding, experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second, placed_crucifixes, sanity_increase_per_placed_crucifix_per_second # Added experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second
 
         # Update caffeine timers
         if caffeine_effect_timer > 0:
@@ -782,8 +827,15 @@ init python:
 
         # Sanity drain from Loss (only active during darker hours)
         if "Loss" in monsters and monsters["Loss"]["location"] == "ControlRoom" and (in_game_hour >= 18 or in_game_hour < 5):
- sanity = max(0.0, sanity - loss_sanity_drain_rate_per_second * (dt / 60.0))
+            sanity = max(0.0, sanity - loss_sanity_drain_rate_per_second * (dt / 60.0))
             # renpy.notify(f"Loss is nearby! Sanity draining. Sanity: {sanity:.1f}") # Debugging line
+
+        # Sanity increase from placed crucifixes (in the current location)
+        current_location = "ControlRoom" # Assuming player is in Control Room
+        if current_location in placed_crucifixes:
+            sanity_increase = placed_crucifixes[current_location] * sanity_increase_per_placed_crucifix_per_second * (dt / 60.0)
+            sanity = min(100.0, sanity + sanity_increase) # Assuming max sanity is 100
+
 
     def update_reactor_power_output():
         global reactor_temp, reactor_pressure, reactor_power_output, core_active
@@ -939,6 +991,33 @@ init python:
             repair_tool_durability = max(0.0, repair_tool_durability) # Ensure durability doesn't go below 0
             renpy.notify(f"Repair tool used. Durability: {repair_tool_durability:.1f}") # Temporary notification
 
+        elif action == "place":
+        if len(args) > 0 and args[0].lower() == "crucifix":
+            global crucifix_inventory, placed_crucifixes, total_placed_crucifixes, max_placed_crucifixes
+            current_location = "ControlRoom"  # Assuming player is in Control Room for now
+
+            if crucifix_inventory > 0 and total_placed_crucifixes < max_placed_crucifixes:
+                crucifix_inventory -= 1
+                placed_crucifixes[current_location] = placed_crucifixes.get(current_location, 0) + 1
+                total_placed_crucifixes += 1
+                renpy.notify("You placed a crucifix in the Control Room.")
+            elif crucifix_inventory == 0:
+                renpy.notify("You don't have any crucifixes.")
+            else:
+                renpy.notify("You have placed the maximum number of crucifixes.")
+                # Add else for other placeable items later
+
+            # Remove haunting from machines in this location
+            current_location = "ControlRoom" # Assuming player is in Control Room
+            # You'll need your mapping of locations to machines here
+            # Example placeholder: Get machines in the current location
+            machines_in_location = ["coolant_pump", "moderator_rod_drive"] # Replace with your logic to get machines in current_location
+
+            for machine_name in machines_in_location:
+                if machine_name in reactor_components and reactor_components[machine_name]["haunted"]:
+                    reactor_components[machine_name]["haunted"] = False
+                    renpy.notify(f"The {machine_name} is no longer haunted.") # Notification
+
         elif action == "use": # Added 'use' command
             if len(command_parts) < 2:
                 display_terminal_output("Usage: use [item_name]")
@@ -971,7 +1050,7 @@ init python:
             # Note: Need to uncomment and implement refill_generator_oil logic here
 
 
-            else:
+        else: # Corrected indentation for the final else of the 'use' block
             display_terminal_output(f"Unknown item: {item_to_use}")
                     elif action == "rest":
                         if current_phase == "rest_payment":
