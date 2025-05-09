@@ -14,7 +14,7 @@ define e = Character("Eileen")
 # --------------------
 # Initialize Python variables and game state here.
 init python:
-    import random # Import the random module for breakdown chance
+    import random
 
     # Game state variables (power, reactor parameters, creature locations, etc.)
 
@@ -42,6 +42,34 @@ init python:
     # Reactor Power Output
     reactor_power_output = 100.0 # Initial power output (e.g., in MW or a relative unit)
 
+    # Game Time (Initial Values)
+    game_time_in_hours = 0 # In-game hours
+    game_time_in_minutes_real = 0.0 # Real-life minutes elapsed
+
+    # Game Over Flag
+    game_over = False # Set to True when a game over condition is met
+
+    # Pump speed (e.g., 0-100)
+    pump_speed = 50
+
+    # Temperature change rate modifiers
+    temp_increase_rate = 0.1 # Base rate temperature increases over time
+    temp_cool_rate_multiplier = 0.05 # How much pump speed affects cooling
+
+    # Thresholds
+    temp_meltdown_threshold = 200.0
+    temp_power_cutout_threshold = 20.0
+    temp_core_shutdown_overspeed_threshold = 80.0 # Temp above which high speed is safe
+    pump_speed_overspeed_threshold = 80 # Pump speed that can cause shutdown at low temp
+
+    # Core state
+    core_active = True
+    meltdown_rate = 0.5 # How fast temp increases during meltdown
+
+    # Generator breakdown mechanic variables
+    real_life_hours_after_day_3 = 0.0
+    breakdown_chance_per_hour = 0.5 # Percentage chance increase per real-life hour after day 3
+
     # Player resources
     player_money = 1000.0 # Starting money
     rations = 0
@@ -60,34 +88,6 @@ init python:
     # Add variables for hunger/insomnia increase rates
     hunger_increase_rate = 0.1 # Hunger increase per real-life minute
     insomnia_increase_rate = 0.05 # Insomnia increase per real-life minute
-
-    # Game Time (Initial Values)
-    game_time_in_hours = 0 # In-game hours
-    game_time_in_minutes_real = 0.0 # Real-life minutes elapsed
-
-    # Game Over Flag
-    game_over = False # Set to True when a game over condition is met
-
-    # Pump speed (e.g., 0-100)
-    pump_speed = 50
-
-       # Temperature change rate modifiers
-       temp_increase_rate = 0.1 # Base rate temperature increases over time
-       temp_cool_rate_multiplier = 0.05 # How much pump speed affects cooling
-
-       # Thresholds
-       temp_meltdown_threshold = 200.0
-       temp_power_cutout_threshold = 20.0
-       temp_core_shutdown_overspeed_threshold = 80.0 # Temp above which high speed is safe
-       pump_speed_overspeed_threshold = 80 # Pump speed that can cause shutdown at low temp
-
-       # Core state
-       core_active = True
-       meltdown_rate = 0.5 # How fast temp increases during meltdown
-
-    # Generator breakdown mechanic variables
-    real_life_hours_after_day_3 = 0.0
-    breakdown_chance_per_hour = 0.5 # Percentage chance increase per real-life hour after day 3
 
 
     # Tool durability (Example: a repair tool)
@@ -108,15 +108,7 @@ init python:
         "pipe_reinforced": 0.0,
         "reservoir_reinforced": 0.0,
         "gauge_reinforced": 0.0,
-        "pump_reinforced": 0.0,
-        "pipe_upgraded": 0, # 0% reduction if not installed
-        "reservoir_upgraded": 0,
-        "gauge_upgraded": 0,
-        "pump_upgraded": 0,
-        "pipe_reinforced": 0, # 0% reduction if not installed
-        "reservoir_reinforced": 0,
-        "gauge_reinforced": 0,
-        "pump_reinforced": 0,
+        "pump_reinforced": 0.0
     }
 
     # Define the MAXIMUM durability for each part type
@@ -135,7 +127,7 @@ init python:
         "pump_reinforced": 200.0,
     }
 
-    # Define the breakdown reduction percentage for each part type
+    # Define the breakdown reduction percentage for each part type (still needed for the bonus)
     part_breakdown_reduction = {
         "pipe_basic": 5.0, # Example: Basic pipe reduces chance by 5%
         "reservoir_basic": 5.0,
@@ -154,149 +146,240 @@ init python:
     # Add a variable for lubricant aging impact on oil consumption
     lubricant_aging_oil_multiplier = 0.1 # How much each lubricant cycle increases oil consumption
 
+    # Generator part durability decay
+    generator_part_decay_per_minute = 0.05 # Example: Lose 0.05 durability per real-life minute of generator use
+
+    # Oil and lubricant consumption increase from broken parts
+    broken_part_oil_increase = {
+        "pipe_basic": 0.1, # Example: Broken basic pipe increases oil consumption by 0.1 per minute
+        "reservoir_basic": 0.1,
+        "gauge_basic": 0.1,
+        # Motor parts don't increase oil/lube loss this way
+        "pipe_upgraded": 0.08, # Upgraded parts have less impact when broken
+        "reservoir_upgraded": 0.08,
+        "gauge_upgraded": 0.08,
+        "pipe_reinforced": 0.05, # Reinforced parts have even less impact
+        "reservoir_reinforced": 0.05,
+        "gauge_reinforced": 0.05,
+    }
+
+    broken_part_lubricant_increase_rate = {
+        "pipe_basic": 0.2, # Example: Broken basic pipe increases lubricant aging rate
+        "reservoir_basic": 0.2,
+        "gauge_basic": 0.2,
+        # Motor parts don't increase oil/lube loss this way
+        "pipe_upgraded": 0.15,
+        "reservoir_upgraded": 0.15,
+        "gauge_upgraded": 0.15,
+        "pipe_reinforced": 0.1,
+        "reservoir_reinforced": 0.1,
+        "gauge_reinforced": 0.1,
+    }
+
+    # Shop item costs
+    item_costs = {
+        "oil_can": 50.0,
+        "lubricant_kit": 100.0,
+        "ration": 20.0,
+        "coffee_tea": 30.0,
+        "pipe_basic": 150.0,
+        "reservoir_basic": 150.0,
+        "gauge_basic": 150.0,
+        "pump_basic": 200.0, # Motor parts might be more expensive
+        "pipe_upgraded": 300.0,
+        "reservoir_upgraded": 300.0,
+        "gauge_upgraded": 300.0,
+        "pump_upgraded": 400.0,
+        "pipe_reinforced": 500.0,
+        "reservoir_reinforced": 500.0,
+        "gauge_reinforced": 500.0,
+        "pump_reinforced": 700.0,
+    }
+
+    # Terminal output variable
+    latest_terminal_output = ""
+
+
+    def display_terminal_output(self, message):
+        global latest_terminal_output
+        latest_terminal_output = message
+
     def update_reactor_temp(self):
         global reactor_temp, pump_speed, core_active, game_over, meltdown_rate, generator_status
 
-       if not core_active:
-       # Temperature might slowly decrease when core is off, or stay stable
-       # For now, let's assume it stays relatively stable or decreases slowly
-       # reactor_temp -= 0.05 # Optional: slow cooling when off
+        if not core_active:
+            # Temperature might slowly decrease when core is off, or stay stable
+            # For now, let's assume it stays relatively stable or decreases slowly
+            # reactor_temp -= 0.05 # Optional: slow cooling when off
             return
 
-       # Temperature increases over time
-        reactor_temp += self.temp_increase_rate
+        # Temperature increases over time
+        reactor_temp += temp_increase_rate
 
-       # Temperature cooling based on pump speed
-        cooling_effect = self.pump_speed * self.temp_cool_rate_multiplier
+        # Temperature cooling based on pump speed
+        cooling_effect = pump_speed * temp_cool_rate_multiplier
         reactor_temp -= cooling_effect
 
-       # Ensure temperature doesn't go below a minimum
+        # Ensure temperature doesn't go below a minimum
         reactor_temp = max(reactor_temp, 0)
 
-       # Check for power cutout (temperature too low)
-        if reactor_temp < self.temp_power_cutout_threshold:
-            self.core_active = False
+        # Check for power cutout (temperature too low)
+        if reactor_temp < temp_power_cutout_threshold:
+            core_active = False
             # Trigger power cutout event (need to add this later)
             renpy.notify("Power cutout! Reactor offline.")
             # Game over if power cuts out and generator is broken
-            if self.generator_status == "broken":
-                self.game_over = True
+            if generator_status == "broken":
+                game_over = True
                 renpy.notify("Power lost! Meltdown imminent.")
 
 
-       # Check for core shutdown (pump speed too high for temperature)
-        if self.pump_speed > self.pump_speed_overspeed_threshold and reactor_temp < self.temp_core_shutdown_overspeed_threshold:
-            self.core_active = False
+        # Check for core shutdown (pump speed too high for temperature)
+        if pump_speed > pump_speed_overspeed_threshold and reactor_temp < temp_core_shutdown_overspeed_threshold:
+            core_active = False
             # Trigger core shutdown event (need to add this later)
             renpy.notify("Core shutdown due to overspeed! Reactor offline.")
             # Game over if core shuts down and generator is broken
-            if self.generator_status == "broken":
-                self.game_over = True
+            if generator_status == "broken":
+                game_over = True
                 renpy.notify("Power lost! Meltdown imminent.")
 
 
-       # Check for meltdown (temperature too high)
-        if reactor_temp >= self.temp_meltdown_threshold:
+        # Check for meltdown (temperature too high)
+        if reactor_temp >= temp_meltdown_threshold:
             # Enter meltdown state
-            reactor_temp += self.meltdown_rate # Accelerate temp increase
-            if reactor_temp >= self.temp_meltdown_threshold + 50: # Example: Game over after a certain point in meltdown
-                self.game_over = True
+            reactor_temp += meltdown_rate # Accelerate temp increase
+            if reactor_temp >= temp_meltdown_threshold + 50: # Example: Game over after a certain point in meltdown
+                game_over = True
                 # Trigger game over event (need to add this later)
 
 
-    def set_pump_speed(self, speed):
+    def set_pump_speed(speed):
         global pump_speed
-       # Add logic to limit pump speed to a valid range (e.g., 0-100)
-        self.pump_speed = max(0, min(100, speed))
-        renpy.notify("Pump speed set to: " + str(self.pump_speed))
+        # Add logic to limit pump speed to a valid range (e.g., 0-100)
+        pump_speed = max(0, min(100, speed))
+        renpy.notify("Pump speed set to: " + str(pump_speed))
 
-    def restart_core(self):
+    def restart_core():
         global core_active, backup_generator_oil, generator_status
-        if not self.core_active and self.backup_generator_oil > 0 and self.generator_status != "broken":
-            self.core_active = True
-            self.backup_generator_oil -= 10 # Example: Restarting uses generator oil
+        if not core_active and backup_generator_oil > 0 and generator_status != "broken":
+            core_active = True
+            backup_generator_oil -= 10 # Example: Restarting uses generator oil
             renpy.notify("Core restarting...")
-       # Add a timer for the restart process if needed
-        elif not self.core_active and self.generator_status == "broken":
-            renpy.notify("Cannot restart core: Generator is broken.")
-        elif not self.core_active and self.backup_generator_oil <= 0:
+            # Add a timer for the restart process if needed
+        elif not core_active and backup_generator_oil <= 0:
             renpy.notify("Cannot restart core: Generator oil is low.")
+        elif not core_active and generator_status == "broken":
+            renpy.notify("Cannot restart core: Generator is broken.")
         else:
             renpy.notify("Core is already active.")
 
-    # Function to install a generator part
-    def install_generator_part(self, part_type):
+    # Placeholder for pipe sabotage logic
+    def sabotage_pipe(pipe_id):
         pass # Implementation coming later
 
+    # Placeholder for pipe repair logic
+    def repair_pipe(pipe_id):
+        pass # Implementation coming later
 
-       # Placeholder for pipe sabotage logic
-       def sabotage_pipe(self, pipe_id):
-              pass # Implementation coming later
+    # Placeholder for updating coolant levels
+    def update_coolant_level():
+        pass # Implementation coming later (will factor in leaks)
+    
+    # Placeholder for refilling generator oil
+    def refill_generator_oil():
+        pass # Implementation coming later (will consume oil cans)
 
-       # Placeholder for pipe repair logic
-       def repair_pipe(self, pipe_id):
-              pass # Implementation coming later
 
-       # Placeholder for updating coolant levels
-       def update_coolant_level(self):
-              pass # Implementation coming later (will factor in leaks)
-
-    # Function to refuel generator oil
-       # Placeholder for refilling generator oil
-       def refill_generator_oil(self):
-              pass # Implementation coming later (will consume oil cans)
-
-    def calculate_total_breakdown_reduction(self):
+    def calculate_total_breakdown_reduction():
         """Calculates the total breakdown chance reduction from installed parts based on their durability."""
         total_reduction = 0.0
-        for part_type, current_durability in self.installed_generator_parts.items():
-            if current_durability > 0 and part_type in self.part_breakdown_reduction and part_type in self.max_part_durability:
+        for part_type, current_durability in installed_generator_parts.items():
+            if current_durability > 0 and part_type in part_breakdown_reduction and part_type in max_part_durability:
                 # The reduction is proportional to the remaining durability
-                reduction_factor = current_durability / self.max_part_durability[part_type]
-                total_reduction += self.part_breakdown_reduction[part_type] * reduction_factor
- return total_reduction
+                reduction_factor = current_durability / max_part_durability[part_type]
+                total_reduction += part_breakdown_reduction[part_type] * reduction_factor
+        return total_reduction
 
-    def calculate_and_earn_wage(self):
+    def calculate_and_earn_wage():
         global player_money, reactor_power_output, baseline_power_consumption, money_per_excess_power_unit
 
-        excess_power = max(0.0, self.reactor_power_output - self.baseline_power_consumption)
-        wage_earned = excess_power * self.money_per_excess_power_unit
+        excess_power = max(0.0, reactor_power_output - baseline_power_consumption)
+        wage_earned = excess_power * money_per_excess_power_unit
 
-        self.player_money += wage_earned
+        player_money += wage_earned
         renpy.notify(f"Earned ${wage_earned:.2f} in wages.")
 
-       def update_lubricant(self, current_real_time):
-              global generator_lubricant_cycles, lubricant_replacement_threshold, generator_status, last_day_increment_time, real_life_hours_after_day_3, breakdown_chance_per_hour, game_over
- # import random # Already imported at the top
 
-              # Check if an in-game day has passed (48 real-life minutes)
-              if current_real_time - self.last_day_increment_time >= 48.0:
-                     self.generator_lubricant_cycles += 1
-                     self.last_day_increment_time = current_real_time # Update the last increment time
+    def calculate_broken_part_oil_increase():
+        total_increase = 0.0
+        for part_type, current_durability in installed_generator_parts.items():
+            # Check if the part is broken and is a non-motor part
+            if current_durability <= 0 and part_type in broken_part_oil_increase:
+                total_increase += broken_part_oil_increase[part_type]
+        return total_increase
+
+    def calculate_broken_part_lubricant_increase():
+        total_increase = 0.0
+        for part_type, current_durability in installed_generator_parts.items():
+            # Check if the part is broken and is a non-motor part
+            if current_durability <= 0 and part_type in broken_part_lubricant_increase_rate:
+                total_increase += broken_part_lubricant_increase_rate[part_type]
+        return total_increase
+
+
+    def update_lubricant(current_real_time):
+        global generator_lubricant_cycles, lubricant_replacement_threshold, generator_status, last_day_increment_time, real_life_hours_after_day_3, breakdown_chance_per_hour, game_over
+        import random
+
+        # Check if any motor part is broken
+        motor_parts = ["pump_basic", "pump_upgraded", "pump_reinforced"] # Assuming 'pump' is the motor part
+        for motor_part in motor_parts:
+            # Use .get with a default of 0.0 in case a part isn't in the dictionary (shouldn't happen with current setup, but good practice)
+            if installed_generator_parts.get(motor_part, 0.0) <= 0 and generator_status != "broken":
+                generator_status = "broken"
+                renpy.notify(f"The {motor_part.replace('_', ' ')} is broken! The generator has stopped.")
+                # Game over if core is off when generator breaks due to motor
+                if not core_active:
+                        game_over = True
+                        renpy.notify("Power lost! Meltdown imminent.")
+                return # Stop lubricant updates if the generator is broken
+
+
+        # Check if an in-game day has passed (48 real-life minutes)
+        if current_real_time - last_day_increment_time >= 48.0:
+            # Increase lubricant aging based on broken non-motor parts
+            aging_increase = calculate_broken_part_lubricant_increase()
+            generator_lubricant_cycles += (1 + aging_increase) # Aging increases faster with broken parts
+
+
+            last_day_increment_time = current_real_time # Update the last increment time
 
             # Calculate and earn daily wage
-            self.calculate_and_earn_wage()
+            calculate_and_earn_wage()
 
- # Check if lubricant needs replacement
- if self.generator_lubricant_cycles >= self.lubricant_replacement_threshold:
-                            self.generator_status = "needs_lubricant"
-                            renpy.notify("Generator lubricant needs replacement!")
+
+            # Check if lubricant needs replacement
+            # Note: Lubricant might need replacement faster now due to increased aging
+            if generator_lubricant_cycles >= lubricant_replacement_threshold:
+                generator_status = "needs_lubricant"
+                renpy.notify("Generator lubricant needs replacement.")
 
         # Calculate real-life hours after day 3
-        if self.generator_lubricant_cycles >= 4:
-            total_real_life_minutes = self.game_time_in_minutes_real
+        if generator_lubricant_cycles >= 4:
+            total_real_life_minutes = game_time_in_minutes_real
             minutes_in_first_3_days = 3 * 48.0
             if total_real_life_minutes > minutes_in_first_3_days:
-                 self.real_life_hours_after_day_3 = (total_real_life_minutes - minutes_in_first_3_days) / 60.0
+                real_life_hours_after_day_3 = (total_real_life_minutes - minutes_in_first_3_days) / 60.0
             else:
-                 self.real_life_hours_after_day_3 = 0.0 # Ensure it's not negative before day 4
+                real_life_hours_after_day_3 = 0.0 # Ensure it's not negative before day 4
 
 
             # Calculate base breakdown chance based on time
-            base_breakdown_chance = self.real_life_hours_after_day_3 * self.breakdown_chance_per_hour
+            base_breakdown_chance = real_life_hours_after_day_3 * breakdown_chance_per_hour
 
             # Calculate total reduction from installed parts
-            parts_reduction = self.calculate_total_breakdown_reduction()
+            parts_reduction = calculate_total_breakdown_reduction()
 
             # Apply reduction to get the final breakdown chance
             current_breakdown_chance = max(0.0, base_breakdown_chance - parts_reduction)
@@ -306,176 +389,306 @@ init python:
             current_breakdown_chance = min(current_breakdown_chance, 100.0)
 
             # Check for breakdown
-            if self.generator_status != "broken": # Only calculate chance if not already broken
+            if generator_status != "broken": # Only calculate chance if not already broken
                 if random.random() * 100 < current_breakdown_chance:
-                    self.generator_status = "broken"
+                    generator_status = "broken"
                     renpy.notify("The generator has broken down!")
                     # Game over if core is off when generator breaks
-                    if not self.core_active:
-                        self.game_over = True
+                    if not core_active:
+                        game_over = True
                         renpy.notify("Power lost! Meltdown imminent.")
+        elif generator_status != "broken": # If before day 4 or already broken, breakdown chance is 0 (or not calculated)
+            current_breakdown_chance = 0.0 # Ensure it's explicitly 0 before day 4
 
-       def replace_lubricant(self):
-              global lubricant_kits, generator_lubricant_cycles, generator_status, core_active
 
-              if self.lubricant_kits > 0:
-                     self.lubricant_kits -= 1
-                     self.generator_lubricant_cycles = 0
+    def replace_lubricant():
+        global lubricant_kits, generator_lubricant_cycles, generator_status, core_active
 
-                     # Determine the new generator status based on the core's state
-                     if not self.core_active:
-                            self.generator_status = "running"
-                     else:
-                            self.generator_status = "idle"
+        if lubricant_kits > 0:
+            lubricant_kits -= 1
+            generator_lubricant_cycles = 0
 
-                     renpy.notify("Generator lubricant replaced.")
-              else:
-                     renpy.notify("You don't have any lubricant kits.")
+            # Determine the new generator status based on the core's state
+            # If the core is off, the generator should start running. If the core is on, it should be idle.
+            if not core_active:
+                # Check if the motor is broken. If so, replacing lubricant won't fix it.
+                motor_parts = ["pump_basic", "pump_upgraded", "pump_reinforced"]
+                motor_broken = False
+                for motor_part in motor_parts:
+                    if installed_generator_parts.get(motor_part, 0.0) <= 0:
+                        motor_broken = True
+                        break
+
+                if not motor_broken:
+                    generator_status = "running"
+                    renpy.notify("Generator lubricant replaced. Generator starting.")
+                else:
+                    generator_status = "broken" # Still broken if motor is
+                    renpy.notify("Generator lubricant replaced, but the motor is broken. Generator cannot start.")
+            else:
+                generator_status = "idle"
+                renpy.notify("Generator lubricant replaced.")
+
+        else:
+            renpy.notify("You don't have any lubricant kits.")
 
     # Add functions for survival item consumption
-    def consume_ration(self):
+    def consume_ration():
         global rations, hunger_level
-        if self.rations > 0:
-            self.rations -= 1
-            self.hunger_level = max(0.0, self.hunger_level - 30.0) # Example: Reduce hunger by 30
+        if rations > 0:
+            rations -= 1
+            hunger_level = max(0.0, hunger_level - 30.0) # Example: Reduce hunger by 30
             renpy.notify("Consumed a ration. Feeling less hungry.")
         else:
             renpy.notify("You don't have any rations.")
 
-    def use_coffee_tea(self):
+    def use_coffee_tea():
         global coffee_tea, coffee_tea_uses_left, insomnia_level, caffeine_effect_timer, caffeine_crash_timer
-        if self.coffee_tea > 0 or self.coffee_tea_uses_left > 0:
-            if self.coffee_tea_uses_left == 0: # Starting a new coffee/tea item
-                 self.coffee_tea -= 1
-                 self.coffee_tea_uses_left = 3 # Set uses for the new item
+        if coffee_tea > 0 or coffee_tea_uses_left > 0:
+            if coffee_tea_uses_left == 0: # Starting a new coffee/tea item
+                if coffee_tea > 0:
+                    coffee_tea -= 1
+                    coffee_tea_uses_left = 3 # Set uses for the new item
+                else:
+                    renpy.notify("You don't have any coffee or tea.")
+                    return
 
-            if self.coffee_tea_uses_left > 0:
-                 self.coffee_tea_uses_left -= 1
-                 self.insomnia_level = max(0.0, self.insomnia_level - 20.0) # Example: Reduce insomnia by 20
-                 self.caffeine_effect_timer = 60.0 # Example: Caffeine effect lasts 60 real-life minutes
-                 self.caffeine_crash_timer = self.caffeine_effect_timer + 30.0 # Example: Crash occurs 30 mins after effect ends
-                 renpy.notify("Drank some coffee/tea. Feeling more alert.")
-            else:
-                renpy.notify("The coffee/tea is empty.")
+            if coffee_tea_uses_left > 0:
+                coffee_tea_uses_left -= 1
+                insomnia_level = max(0.0, insomnia_level - 20.0) # Example: Reduce insomnia by 20
+                caffeine_effect_timer = 60.0 # Example: Caffeine effect lasts 60 real-life minutes
+                caffeine_crash_timer = caffeine_effect_timer + 30.0 # Example: Crash occurs 30 mins after effect ends
+                renpy.notify("Drank some coffee/tea. Feeling more alert.")
+            # The else case for coffee_tea_uses_left == 0 inside the outer if is handled by the initial coffee_tea > 0 check
         else:
             renpy.notify("You don't have any coffee or tea.")
 
 
     # Function to update survival stats over time
-    def update_survival_stats(self, dt):
+    def update_survival_stats(dt):
         global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate
 
         # Increase hunger and insomnia over time
-        self.hunger_level += self.hunger_increase_rate * (dt / 60.0) # dt is in seconds, convert to minutes
-        self.insomnia_level += self.insomnia_increase_rate * (dt / 60.0)
+        hunger_level += hunger_increase_rate * (dt / 60.0) # dt is in seconds, convert to minutes
+        insomnia_level += insomnia_increase_rate * (dt / 60.0)
 
-        # Update caffeine timers (implementation to be added later)
+        # Update caffeine timers
+        if caffeine_effect_timer > 0:
+            caffeine_effect_timer = max(0.0, caffeine_effect_timer - (dt / 60.0))
+            if caffeine_effect_timer == 0:
+                renpy.notify("The caffeine effect is wearing off.")
 
-       # Function to update reactor power output
-       def update_reactor_power_output(self):
-              global reactor_temp, reactor_pressure, reactor_power_output, core_active
+        # Only count down crash timer if effect timer has finished
+        if caffeine_effect_timer <= 0 and caffeine_crash_timer > 0:
+            caffeine_crash_timer = max(0.0, caffeine_crash_timer - (dt / 60.0))
+            if caffeine_crash_timer == 0:
+                # Implement caffeine crash penalty
+                renpy.notify("Experiencing a caffeine crash!")
+                # Example: Increase insomnia significantly
+                insomnia_level += 40.0 # Example crash penalty
+                # Reset crash timer to prevent repeated penalty
+                caffeine_crash_timer = -1.0 # Use a negative value or None to indicate it's passed
 
-              if self.core_active:
-              # Calculate power output based on reactor parameters
-              # This is a simplified example; you'll refine this formula
-              output = 100.0 # Base output when active
-              if self.reactor_temp > 150 or self.reactor_pressure > 15: # Example: Reduced output at high temp/pressure
-                     output *= 0.5
-              elif self.reactor_temp < 30 or self.reactor_pressure < 5: # Example: Reduced output at low temp/pressure
-                     output *= 0.75
 
-              self.reactor_power_output = max(0, min(100, output)) # Ensure output is within a range
-              else:
-              self.reactor_power_output = 0 # No significant power output when core is off
+        # Add penalties for high hunger/insomnia (will implement effects later)
+        # if hunger_level >= 100:
+        #     renpy.notify("You are starving!")
+        #     # Add hunger penalties
+        # if insomnia_level >= 100:
+        #     renpy.notify("You are severely sleep deprived!")
+        #     # Add insomnia penalties
 
-       def update_generator_oil(self):
-              global backup_generator_oil, core_active, game_over, generator_lubricant_cycles, oil_consumption_rate, oil_leak_multiplier, generator_status, lubricant_aging_oil_multiplier
-              # Generator is running, consume oil
-        if not self.core_active and self.generator_status != "broken": # Only consume oil if core is off and generator is not broken
+    # Function to update reactor power output
+    def update_reactor_power_output():
+        global reactor_temp, reactor_pressure, reactor_power_output, core_active
+
+        if core_active:
+            # Calculate power output based on reactor parameters
+            # This is a simplified example; you'll refine this formula
+            output = 100.0 # Base output when active
+            if reactor_temp > 150 or reactor_pressure > 15: # Example: Reduced output at high temp/pressure
+                output *= 0.5
+            elif reactor_temp < 30 or reactor_pressure < 5: # Example: Reduced output at low temp/pressure
+                output *= 0.75
+
+            reactor_power_output = max(0, min(100, output)) # Ensure output is within a range
+        else:
+            reactor_power_output = 0 # No significant power output when core is off
+
+
+    def update_generator_oil():
+        global backup_generator_oil, core_active, game_over, generator_lubricant_cycles, oil_consumption_rate, oil_leak_multiplier, generator_status, lubricant_aging_oil_multiplier
+        if not core_active and generator_status != "broken": # Only consume oil if core is off and generator is not broken
+            # Base consumption
+            consumption = oil_consumption_rate
 
             # Increase consumption based on lubricant aging
-            aging_multiplier = self.generator_lubricant_cycles * self.lubricant_aging_oil_multiplier
+            aging_multiplier = generator_lubricant_cycles * lubricant_aging_oil_multiplier
             consumption *= (1 + aging_multiplier) # Apply aging multiplier
 
-              consumption = self.oil_consumption_rate
-              # Add oil consumption due to leaks (we'll add pipe leak tracking later)
-              # if pipes_leaking: # Placeholder for leak check
-              #     consumption *= self.oil_leak_multiplier
+            # Add oil consumption due to leaks (will be implemented later)
+            # if pipes_leaking: # Placeholder for leak check
+            #     consumption *= oil_leak_multiplier
 
-            # Add oil consumption due to worn generator parts (implement later)
-            # worn_part_oil_multiplier = self.calculate_worn_part_oil_consumption_multiplier() # Need to create this function
-            # consumption *= (1 + worn_part_oil_multiplier)
+            # Add oil consumption due to broken non-motor parts
+            consumption += calculate_broken_part_oil_increase()
 
 
-              self.backup_generator_oil -= consumption
-              self.backup_generator_oil = max(0, self.backup_generator_oil) # Ensure it doesn't go below 0
+            backup_generator_oil -= consumption
+            backup_generator_oil = max(0, backup_generator_oil) # Ensure it doesn't go below 0
 
-              # Check for game over if oil runs out while core is off
-              if self.backup_generator_oil <= 0:
-                     self.game_over = True
-                     # Trigger game over event (oil depleted while core off)
-                     renpy.notify("Generator out of oil! Meltdown imminent.")
-       # --------------------
+            # Check for game over if oil runs out while core is off
+            if backup_generator_oil <= 0:
+                game_over = True
+                # Trigger game over event (oil depleted while core off)
+                renpy.notify("Generator out of oil! Meltdown imminent.")
+    # --------------------
 
-       def update_game_state(self, dt):
- # dt is the time elapsed since the last update (in seconds)
- # We need to track total real-life minutes
- global game_time_in_minutes_real, game_over
- if game_over: # Stop updates if the game is over
- return
+    def update_game_state(dt):
+        # dt is the time elapsed since the last update (in seconds)
+        # We need to track total real-life minutes
+        global game_time_in_minutes_real, game_over, generator_status, core_active
 
-        self.game_time_in_minutes_real += dt / 60.0 # Convert seconds to minutes
+        if game_over: # Stop updates if the game is over
+            return
+
+        real_life_minutes_elapsed = dt / 60.0 # Convert seconds to minutes
+        game_time_in_minutes_real += real_life_minutes_elapsed
 
         # Update lubricant based on real-life time and check for breakdown
-        self.update_lubricant(self.game_time_in_minutes_real)
+        update_lubricant(game_time_in_minutes_real)
 
         # Update generator oil if the core is off and generator is not broken
-        self.update_generator_oil()
+        update_generator_oil()
 
         # Update survival stats
-        self.update_survival_stats(dt)
+        update_survival_stats(dt)
+
+        # Decay durability of installed generator parts if the generator is running
+        if not core_active and generator_status == "running":
+            for part_type in installed_generator_parts:
+                if installed_generator_parts[part_type] > 0: # Only decay if the part is installed
+                    installed_generator_parts[part_type] -= generator_part_decay_per_minute * real_life_minutes_elapsed
+                    # Ensure durability doesn't go below 0
+                    installed_generator_parts[part_type] = max(0.0, installed_generator_parts[part_type])
+                    # Note: Checking for a part breaking (durability == 0) is handled in update_lubricant for the motor
+                    # and will need to be handled when we implement the effects of other broken parts.
+
 
         # Update reactor temperature
-        self.update_reactor_temp()
+        update_reactor_temp()
 
         # Update reactor power output
-        self.update_reactor_power_output()
+        update_reactor_power_output()
+
 
         # ... other game state updates like creature movement, etc. ...
 
-       label start:
+    def handle_terminal_command(command):
+        global player_money, oil_cans, lubricant_kits, rations, coffee_tea, installed_generator_parts, max_part_durability, latest_terminal_output # Added latest_terminal_output
 
-       # Initial scene setup (control room background)
-       scene black # Start with a black screen or your initial control room image
+        command_parts = command.lower().split()
 
-       # Call the main game UI screen
-       # call screen game_ui # Placeholder - define this screen below
+        if not command_parts:
+            display_terminal_output("Enter a command.")
+            return
 
-       # Game loop will run here (or within the screen logic)
-       # For now, just a return to end if not using a persistent screen
- # The game loop will likely involve calling update_game_state periodically
+        action = command_parts[0]
 
- # Example of a simple loop structure (will need a way to exit)
-       return
-       # --------------------
-       # Game UI Screen Definition
-       # --------------------
-       # Define your main game UI screen here using Ren'Py Screen Language.
-       # This will include camera buttons, power meter, reactor controls, etc.
-       screen game_ui:
-       tag menu # Optional: tag the screen
+        if action == "buy":
+            if len(command_parts) < 2:
+                display_terminal_output("Usage: buy [item_name]")
+                return
 
-       # Add UI elements here
+            item_name = command_parts[1]
 
-       # Placeholder for screen elements
-       pass
+            if item_name in item_costs:
+                cost = item_costs[item_name]
+                if player_money >= cost:
+                    player_money -= cost
+                    # Add the item to inventory or install the part
+                    if item_name == "oil_can":
+                        oil_cans += 1
+                        display_terminal_output(f"Purchased an oil can for ${cost:.2f}.")
+                    elif item_name == "lubricant_kit":
+                        lubricant_kits += 1
+                        display_terminal_output(f"Purchased a lubricant kit for ${cost:.2f}.")
+                    elif item_name == "ration":
+                        rations += 1
+                        display_terminal_output(f"Purchased a ration for ${cost:.2f}.")
+                    elif item_name == "coffee_tea":
+                        coffee_tea += 1
+                        display_terminal_output(f"Purchased coffee/tea for ${cost:.2f}.")
+                    elif item_name in installed_generator_parts:
+                        # When buying a part, it's installed with max durability
+                        installed_generator_parts[item_name] = max_part_durability.get(item_name, 100.0) # Default to 100 if not in max_part_durability
+                        display_terminal_output(f"Purchased and installed a {item_name.replace('_', ' ')} for ${cost:.2f}.")
+                    else:
+                        # Should not happen if item_name is in item_costs
+                        display_terminal_output(f"Unknown item: {item_name}")
 
-       # --------------------
-       # Game Logic (Python Functions)
-       # --------------------
-       # Define your Python functions for game mechanics here.
-       def move_creatures():
-       pass # Placeholder for creature movement logic
+                else:
+                    display_terminal_output(f"Not enough money to buy {item_name}. Costs ${cost:.2f}, you have ${player_money:.2f}.")
+            else:
+                display_terminal_output(f"Unknown item: {item_name}. Type 'shop list' to see available items.")
+
+        elif action == "shop":
+            if len(command_parts) > 1 and command_parts[1] == "list":
+                output = "--- Available Items ---\n"
+                for item, cost in item_costs.items():
+                    output += f"{item.replace('_', ' ').title()}: ${cost:.2f}\n"
+                output += "-----------------------"
+                display_terminal_output(output)
+            else:
+                display_terminal_output("Usage: shop list")
+
+        elif action == "use": # Added 'use' command
+            if len(command_parts) < 2:
+                display_terminal_output("Usage: use [item_name]")
+                return
+
+            item_to_use = command_parts[1]
+            if item_to_use == "ration":
+                consume_ration()
+            elif item_to_use == "coffee_tea":
+                use_coffee_tea()
+            elif item_to_use == "oil_can": # Add using oil cans
+                # Need to implement refill_generator_oil function to
+
+
+    label start:
+
+    # Initial scene setup (control room background)
+    scene black # Start with a black screen or your initial control room image
+
+    # Call the main game UI screen
+    # call screen game_ui # Placeholder - define this screen below
+
+    # Game loop will run here (or within the screen logic)
+    # For now, just a return to end if not using a persistent screen
+# The game loop will likely involve calling update_game_state periodically
+
+# Example of a simple loop structure (will need a way to exit)
+    return
+    # --------------------
+    # Game UI Screen Definition
+    # --------------------
+    # Define your main game UI screen here using Ren'Py Screen Language.
+    # This will include camera buttons, power meter, reactor controls, etc.
+    screen game_ui:
+    tag menu # Optional: tag the screen
+
+    # Add UI elements here
+
+    # Placeholder for screen elements
+    pass
+
+    # --------------------
+    # Game Logic (Python Functions)
+    # --------------------
+    # Define your Python functions for game mechanics here.
+    def move_creatures():
+    pass # Placeholder for creature movement logic
 
 # --------------------
 # End of Script
