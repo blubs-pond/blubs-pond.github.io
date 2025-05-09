@@ -45,6 +45,15 @@ init python:
     power_allocated_to_experiment = False # Boolean to indicate if power is allocated
     experiment_transformation_threshold = 10.0 # Threshold below which Experiment becomes Loss
 
+    # Door Durability and Experiment Encounter
+    door_max_durability = 100 # Example max durability, adjust as needed
+    left_door_durability = door_max_durability
+    right_door_durability = door_max_durability
+    experiment_encounter_duration = 10.0 # Duration of Experiment's encounter with a door
+    experiment_held_door_hit_damage = 1 # Damage per hit when door is held
+    experiment_unheld_door_hit_damage = 2 # Damage per hit when door is not held
+    experiment_hit_rate_per_second = 1.0 # How many times Experiment hits per second during encounter
+
     # Loss Sanity Drain
     haunted_deterioration_multiplier = 2.0 # Adjust the multiplier for faster decay
     loss_sanity_drain_rate_per_second = 1.0 # Adjust the rate as needed
@@ -81,24 +90,24 @@ init python:
         if shadow_active:
             # Shadow Movement (simple random movement for now)
             if shadow_location is None or renpy.random.random() < 0.01: # Chance to move or if no location yet
-                 available_locations = [loc for loc in locations if loc != shadow_location]
-                 if available_locations:
-                     shadow_location = renpy.random.choice(available_locations)
-                     # Optional: Notification when Shadow moves (for testing)
-                     # renpy.notify(f"The Shadow shifts in the darkness...")
+                available_locations = [loc for loc in locations if loc != shadow_location]
+                if available_locations:
+                    shadow_location = renpy.random.choice(available_locations)
+                    # Optional: Notification when Shadow moves (for testing)
+                    # renpy.notify(f"The Shadow shifts in the darkness...")
 
-            # Shadow Manifestation/Attack
-            if sanity < shadow_harm_sanity_threshold and (in_game_hour >= 18 or in_game_hour < 5):
-                 # Chance to manifest and attack if sanity is very low during dark hours
-                 if renpy.random.random() < shadow_manifestation_chance_per_update * dt: # Scale chance by time delta
-                     renpy.notify("The Shadow manifests!")
-                     # --- Start Shadow Attack Placeholder ---
-                     game_over = True # Game over placeholder for attack
-                     renpy.notify("The Shadow consumed you! Game Over.")
-                     # Example: Show a scary image, play a sound
-                     # show shadow_attack_image at full_screen
-                     # play sound "shadow_attack_sound.ogg"
-                     # --- End Shadow Attack Placeholder ---
+        # Shadow Manifestation/Attack
+        if sanity < shadow_harm_sanity_threshold and (in_game_hour >= 18 or in_game_hour < 5):
+                # Chance to manifest and attack if sanity is very low during dark hours
+                if renpy.random.random() < shadow_manifestation_chance_per_update * dt: # Scale chance by time delta
+                    renpy.notify("The Shadow manifests!")
+                    # --- Start Shadow Attack Placeholder ---
+                    game_over = True # Game over placeholder for attack
+                    renpy.notify("The Shadow consumed you! Game Over.")
+                    # Example: Show a scary image, play a sound
+                    # show shadow_attack_image at full_screen
+                    # play sound "shadow_attack_sound.ogg"
+                    # --- End Shadow Attack Placeholder ---
 
 
     # Experiment entry timer
@@ -132,9 +141,6 @@ init python:
 
             # Check for transformation
             if experiment_containment_level <= experiment_transformation_threshold and "Experiment" in monsters:
- renpy.notify("The Experiment's containment has failed!")
- # The Experiment is now free to roam (assuming its movement was previously restricted before containment failure)
-
 
     monsters = {
         "Shadow": {"location": ""}, # Shadow doesn't have a fixed physical location
@@ -444,7 +450,7 @@ init python:
         if not core_active:
             # Temperature might slowly decrease when core is off, or stay stable
             # For now, let's assume it stays relatively stable or decreases slowly
-            # reactor_temp -= 0.05 # Optional: slow cooling when off
+            reactor_temp -= 0.05 # Optional: slow cooling when off
             return
 
         # Temperature increases over time
@@ -706,7 +712,7 @@ init python:
 
 
     def update_monster_positions(): # Update monster positions
-        global monsters, locations, monster_paths, left_door_state, right_door_state # Added door states
+        global monsters, locations, monster_paths, left_door_state, right_door_state, left_door_durability, right_door_durability, door_max_durability, experiment_encounter_duration, experiment_held_door_hit_damage, experiment_unheld_door_hit_damage, experiment_hit_rate_per_second, left_door_experiment_timer, right_door_experiment_timer # Added door states and experiment encounter variables
         global placed_crucifixes, total_placed_crucifixes # Added crucifix variables
         for monster_name, monster_data in monsters.items():
             # Check if monster exists and has a location for movement
@@ -714,6 +720,8 @@ init python:
                 continue # Skip monsters without a defined location
 
             if monster_name == "Loss":
+                # Loss movement and haunting logic
+                # (Existing code for Loss movement and haunting goes here)
                 current_location = monster_data["location"]
                 # Determine a potential new location for the Loss
                 possible_locations = [loc for loc in locations if loc != current_location]
@@ -739,74 +747,64 @@ init python:
                         # If no other locations, perhaps it just stays put or is temporarily banished
                         pass # Or set a banished state
 
+            elif monster_name in ["Runner", "Experiment"]: # Only move these along paths for now
+                # Move Runner and Experiment along their paths
+                current_location = monster_data["location"]
+                if current_location != "ControlRoom": # Don't move if they reached the control room (handled separately)
+                    path = monster_paths.get(monster_name, [])
+                    if path:
+                        try:
+                            current_index = path.index(current_location)
+                            next_index = (current_index + 1) % len(path) # Loop back to the beginning
+                            new_location = path[next_index]
+
+                            # Check if the new location is the Control Room and if the corresponding door is open
+                            can_move_to_control_room = True
+                            if new_location == "ControlRoom":
+                                # Assume left door for Runner, right for Experiment for this example. Adjust as needed.
+                                if monster_name == "Runner" and left_door_state != "open":
+                                    can_move_to_control_room = False
+                                elif monster_name == "Experiment" and right_door_state != "open":
+                                    can_move_to_control_room = False
+
+                            if can_move_to_control_room: # If the door is open or it's not a door location
+                                # Implement a chance to move
+                                if random.random() < 0.3: # 30% chance to move
+                                    monster_data["location"] = new_location
+                                    # Check if the monster entered the Control Room
+                                    if new_location == "ControlRoom":
+                                        renpy.notify(f"{monster_name} entered the Control Room!")
+                                        # Handle consequences of monster entering the Control Room
+                                        if monster_name == "Experiment":
+                                            global experiment_entry_timer
+                                            experiment_entry_timer = 10.0 # Start the 10-second timer for Experiment
+                                            renpy.notify("The Experiment is in the Control Room! You have 10 seconds to hide.")
+                                        # Runner causes instant game over if not hiding
+                                        elif monster_name == "Runner": # Check for Runner after it enters Control Room
+                                            global game_over, is_hiding
+                                            if not is_hiding:
+                                                game_over = True
+                                                renpy.notify("The Runner caught you! Game Over.")
+                                    elif new_location != "ControlRoom": # Only notify if moving to a non-ControlRoom location
+                                        renpy.notify(f"{monster_name} moved to {new_location}.")
+                            else:
+                                # Monster is blocked at the door - Start/Reset Experiment encounter timer
+                                if monster_name == "Experiment":
+                                    door_being_attacked = "left" if monster_data["location"] == "LeftDoor" else "right"
+                                    if door_being_attacked == "left":
+                                        left_door_experiment_timer = experiment_encounter_duration
+                                        renpy.notify("The Experiment is at the left door!")
+                                    else:
+                                        right_door_experiment_timer = experiment_encounter_duration
+                                        renpy.notify("The Experiment is at the right door!")
+
+                        except ValueError:
+                            # Monster not on its defined path, maybe handle this error or reset
+                            pass
+
             else:
-                if monster_name in ["Runner", "Experiment"]: # Only move these along paths for now
-                    # Move Runner and Experiment along their paths
-                    if current_location != "ControlRoom": # Don't move if they reached the control room (for now)
-                        path = monster_paths.get(monster_name, [])
-                        if path:
-                            try:
-                                current_index = path.index(current_location)
-                                next_index = (current_index + 1) % len(path) # Loop back to the beginning
-                                new_location = path[next_index]
-
-                                # Check if the new location is the Control Room and if the corresponding door is open
-                                can_move_to_control_room = True
-                                if new_location == "ControlRoom":
-                                    # Assume left door for Runner, right for Experiment for this example. Adjust as needed.
-                                    if monster_name == "Runner" and left_door_state != "open":
-                                        can_move_to_control_room = False
-                                    elif monster_name == "Experiment" and right_door_state != "open":
-                                        can_move_to_control_room = False
-
-                                if can_move_to_control_room: # If the door is open or it's not a door location
-                                    # Implement a chance to move
-                                    if random.random() < 0.3: # 30% chance to move
-                                        monster_data["location"] = new_location
-                                        # Check if the monster entered the Control Room
-                                        if new_location == "ControlRoom":
-                                            renpy.notify(f"{monster_name} entered the Control Room!")
-                                            # Handle consequences of monster entering the Control Room
-                                            if monster_name == "Experiment":
-                                                global experiment_entry_timer
-                                                experiment_entry_timer = 10.0 # Start the 10-second timer for Experiment
-                                                renpy.notify("The Experiment is in the Control Room! You have 10 seconds to hide.")
-                                            # Runner causes instant game over if not hiding
-                                            elif monster_name == "Runner": # Check for Runner after it enters Control Room
-                                                global game_over, is_hiding
-                                                if not is_hiding:
-                                                    game_over = True
-                                                    renpy.notify("The Runner caught you! Game Over.")
-                                        elif new_location != "ControlRoom": # Only notify if moving to a non-ControlRoom location
-                                            renpy.notify(f"{monster_name} moved to {new_location}.")
-                                except ValueError:
-                                    # Monster not on its defined path, maybe handle this error or reset
-                                    pass
-                                else:
-                                    door_state = left_door_state if monster_name == "Runner" else right_door_state
-                                    # Monster is blocked at the door
-                                    renpy.notify(f"{monster_name} is at the door, but it is {door_state}.")
-                elif monster_name == "Loss":
-                    # If the Loss is moving and not blocked by a crucifix, update its location
-                    monster_data["location"] = new_location
-                    renpy.notify(f"The Loss moved to {new_location}.")
-
-                    # After moving, check for haunting chance in the new location
-                    haunting_chance = 0.2 # Example chance, adjust as needed
-                    if renpy.random.random() < haunting_chance:
-                        # Find machines in this location (you'll need a way to map locations to machines)
-                        # For now, let's assume all machines are in the Control Room for haunting purposes
-                        machines_in_location = ["coolant_pump", "moderator_rod_drive"] # Example list of machines
-                        if machines_in_location:
-                            machine_to_haunt = renpy.random.choice(machines_in_location)
-                            global reactor_components
-                            if machine_to_haunt in reactor_components and not reactor_components[machine_to_haunt]["haunted"]:
-                                reactor_components[machine_to_haunt]["haunted"] = True
-                                renpy.notify(f"You feel a chill... The {machine_to_haunt} seems haunted.")
-
-                elif monster_name.startswith("Abomination"):
-                    # Keep existing Abomination movement logic here if it's not path-based
-                    pass # Assuming Abomination movement is handled elsewhere or is random without path
+                # Keep existing movement logic for other monsters (Abominations, etc.) here if not path-based
+                pass # Assuming Abomination movement is handled elsewhere or is random without path
 
 
 
@@ -991,6 +989,45 @@ init python:
         # ... other game state updates like creature movement, etc. ...
 
     def handle_terminal_command(command):
+        global player_money, oil_cans, lubricant_kits, rations, coffee_tea, installed_generator_parts, max_part_durability, latest_terminal_output, left_door_durability, right_door_durability, door_max_durability, repair_tool_durability, max_repair_tool_durability, repair_tool_decay_per_use # Added door and repair variables
+
+        command_parts = command.lower().split()
+
+        if not command_parts:
+            display_terminal_output("Enter a command.")
+            return
+
+        action = command_parts[0]
+
+        if action == "buy":
+            # ... (existing buy logic) ...
+            pass # Placeholder for buy logic
+
+        elif action == "shop":
+            # ... (existing shop list logic) ...
+            pass # Placeholder for shop logic
+
+        elif action == "repair":
+            if len(command_parts) < 2:
+                display_terminal_output("Usage: repair [left_door | right_door]")
+                return
+
+            target = command_parts[1]
+            door_to_repair_durability = None
+            door_to_repair_state = None
+            door_name = None
+
+            if target == "left_door":
+                door_to_repair_durability = left_door_durability
+                door_to_repair_state = left_door_state
+                door_name = "left door"
+            elif target == "right_door":
+                door_to_repair_durability = right_door_durability
+                door_to_repair_state = right_door_state
+                door_name = "right door"
+            else:
+                display_terminal_output("Invalid repair target. Use 'left_door' or 'right_door'.")
+                return
         global player_money, oil_cans, lubricant_kits, rations, coffee_tea, installed_generator_parts, max_part_durability, latest_terminal_output # Added latest_terminal_output
 
         command_parts = command.lower().split()
@@ -1049,10 +1086,30 @@ init python:
                 display_terminal_output("Usage: shop list")
 
         elif action == "repair":
-            # We will add the actual repair logic here later
-            repair_tool_durability -= 5.0 # Decrease durability by a fixed amount
-            repair_tool_durability = max(0.0, repair_tool_durability) # Ensure durability doesn't go below 0
-            renpy.notify(f"Repair tool used. Durability: {repair_tool_durability:.1f}") # Temporary notification
+            if repair_tool_durability <= 0:
+                display_terminal_output("Your repair tool is broken.")
+                return
+
+            if door_to_repair_state == "broken":
+                display_terminal_output(f"The {door_name} is broken and cannot be repaired with a wrench.")
+                return
+
+            if door_to_repair_durability >= door_max_durability:
+                display_terminal_output(f"The {door_name} is already at full durability.")
+                return
+
+            # Apply repair
+            repair_amount = 20 # Example: Repair 20 durability per use, adjust as needed
+            new_durability = min(door_max_durability, door_to_repair_durability + repair_amount)
+
+            if target == "left_door":
+                left_door_durability = new_durability
+            else:
+                right_door_durability = new_durability
+
+            repair_tool_durability -= repair_tool_decay_per_use # Decrease tool durability
+            repair_tool_durability = max(0.0, repair_tool_durability)
+            display_terminal_output(f"Repaired the {door_name}. Durability: {new_durability}/{door_max_durability}. Repair tool durability: {repair_tool_durability:.1f}/{max_repair_tool_durability:.1f}")
 
         elif action == "place":
         if len(args) > 0 and args[0].lower() == "crucifix":
@@ -1165,6 +1222,44 @@ init python:
 
         # Update Experiment containment (runs in every iteration regardless of phase)
         update_experiment_containment(dt)
+
+        # Handle Experiment door encounters
+        # Left Door
+        if left_door_experiment_timer > 0:
+            left_door_experiment_timer -= dt
+            if left_door_experiment_timer <= 0:
+                left_door_experiment_timer = -1.0 # End encounter
+                # Add logic here to make the Experiment move away from the door
+                renpy.notify("The Experiment moved away from the left door.")
+            else:
+                # Apply damage during encounter
+                hits_this_update = experiment_hit_rate_per_second * dt
+                damage_to_deal = experiment_held_door_hit_damage if left_door_state == "holding" else experiment_unheld_door_hit_damage
+                damage_applied = damage_to_deal * hits_this_update
+                left_door_durability -= damage_applied
+                left_door_durability = max(0, left_door_durability)
+
+                # Check if the door is broken
+                if left_door_durability <= 0 and left_door_state != "broken":
+                    left_door_state = "broken"
+                    renpy.notify("The left door is broken!")
+                    # Add logic here to allow Experiment to enter (will need to modify update_monster_positions)
+
+        # Right Door
+        if right_door_experiment_timer > 0:
+            right_door_experiment_timer -= dt
+            if right_door_experiment_timer <= 0:
+                right_door_experiment_timer = -1.0 # End encounter
+                # Add logic here to make the Experiment move away from the door
+                renpy.notify("The Experiment moved away from the right door.")
+            else:
+                # Apply damage during encounter
+                hits_this_update = experiment_hit_rate_per_second * dt
+                damage_to_deal = experiment_held_door_hit_damage if right_door_state == "holding" else experiment_unheld_door_hit_damage
+                damage_applied = damage_to_deal * hits_this_update
+                right_door_durability -= damage_applied
+                right_door_durability = max(0, right_door_durability)
+
 
         # Update monster positions during the survival phase
         if current_phase == "survival":
