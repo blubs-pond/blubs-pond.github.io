@@ -1,7 +1,7 @@
 body {
     width: 80vw;
     max-width: 100vh ;
-    margin: auto
+    margin: auto !important;
 }
 .logo {
     width: 25px;
