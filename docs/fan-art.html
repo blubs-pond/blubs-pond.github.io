@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
         <script src="https://kit.fontawesome.com/5b343a76ac.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="deafult.css">
-        
     </head>
     <body>
         <!-- Navbar (sit on top) -->
@@ -23,21 +22,32 @@
         </header>
         <main>
             <!-- Page conetnt go here -->
-            <div class="w3-grid" style="grid-template-columns: repeat(auto-fit,minmax(500px, 1fr)">
-                <div class="w3-padding w3-card-4">
-                    <header class="w3-container w3-teal">
-                       <img src="glerey/Minity fanart 9-5-2025.png" alt="FAN ART" class="w3-round crew-tag w3-hover-sepia img-fanart">
-                    </header>
-
-                    <div class="w3-container">
-                        <h3>Art by 💕minty💕</h3>
-                        <p>"Barkity borkity"</p>
-                    </div>
-                </div>
+            <div class="w3-grid" style="grid-template-columns: repeat(auto-fit,minmax(500px, 1fr))">
+                <div id="gallery"></div>
             </div>
         </main>
         <!--- Footer (sit at the bottom) -->
         <div id="footer-placeholder"></div>
+        <script>
+            const artworks = [
+            {
+                artist: "💕minty💕",
+                description: "Barkity borkity",
+                url: "glerey/Minity fanart 9-5-2025.png"
+            }
+            ];
+
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = artworks.map(item => `
+            <div class="w3-padding w3-card-4 artwork">
+                <h2 class="w3-container w3-teal"><img src="${item.url}" alt="${item.description}"  class="w3-round crew-tag w3-hover-sepia img-fanart"></h2>
+                <div class="w3-container">
+                    <p>Art by ${item.artist}</p>
+                    <p>${item.description}</p>
+                </div>
+            </div>
+            `).join('');
+        </script>
         <script>
             fetch('footer.html')
             .then(response => response.text())
