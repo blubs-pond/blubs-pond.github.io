@@ -16,6 +16,85 @@ define e = Character("Eileen")
 init python:
     import random
 
+    # Define possible locations in the facility
+    locations = ["Camera1", "Camera2", "HallwayA", "ControlRoom"]
+
+    # Define predefined monster movement paths
+    monster_paths = {
+    "Runner": ["HallwayA", "HallwayB", "ControlRoom"],
+    "Experiment": ["Camera1", "HallwayA", "ControlRoom"]
+    }
+
+    # Door states
+    left_door_state = "open" # Can be "open", "closed", or "holding"
+    right_door_state = "open"
+    door_being_held = "none" # Can be "none", "left", or "right"
+    door_hold_hunger_cost_per_second = 0.5 # Example cost, adjust as needed
+
+    # Hiding mechanics
+    is_hiding = False
+    hiding_abuse_counter = 0.0
+    hiding_abuse_increase_rate = 1.0 # Rate at which abuse counter increases while hiding
+    hiding_abuse_decay_rate = 0.5 # Rate at which abuse counter decays when not hiding
+    hide_monster_appear_chance_per_abuse = 0.01 # Chance of Hide appearing per unit of abuse counter
+
+    # Experiment Containment
+    experiment_containment_level = 100.0 # Percentage of containment
+    experiment_decay_rate_per_second = 0.1 # Rate at which containment drops if not powered
+    power_allocated_to_experiment = False # Boolean to indicate if power is allocated
+    experiment_transformation_threshold = 10.0 # Threshold below which Experiment becomes Loss
+
+    # Loss Sanity Drain
+    loss_sanity_drain_rate_per_second = 1.0 # Adjust the rate as needed
+
+    # Crucifix mechanics
+    crucifix_inventory = 0 # Number of crucifixes the player is carrying
+    placed_crucifixes = {} # Dictionary to store number of placed crucifixes per location { "location_name": count }
+    total_placed_crucifixes = 0
+    sanity_increase_per_placed_crucifix_per_second = 0.1 # Adjust rate as needed
+    max_placed_crucifixes = 3
+
+
+    # Experiment entry timer
+    experiment_entry_timer = -1.0 # Tracks time since Experiment entered Control Room (-1.0 if not in room)
+
+    def check_hide_monster():
+        global hiding_abuse_counter, hide_monster_appear_chance_per_abuse, game_over
+        if hiding_abuse_counter > 0 and not game_over:
+            # Calculate the chance of Hide appearing based on abuse counter
+            appear_chance = hiding_abuse_counter * hide_monster_appear_chance_per_abuse
+            if renpy.random.random() < appear_chance:
+                renpy.notify("Something is under the floorboards with you!")
+                # Trigger Hide monster attack (for now, set game over)
+                game_over = True
+                renpy.notify("The Hide monster attacked! Game Over.")
+    # Define monsters and their initial state
+
+    def update_experiment_containment(dt):
+        global experiment_containment_level, experiment_decay_rate_per_second, power_allocated_to_experiment, experiment_transformation_threshold, monsters
+
+        # Decay containment if power is not allocated and Experiment still exists
+        if not power_allocated_to_experiment and "Experiment" in monsters:
+            experiment_containment_level = max(0.0, experiment_containment_level - experiment_decay_rate_per_second * dt)
+
+            # Check for transformation
+            if experiment_containment_level <= experiment_transformation_threshold and "Experiment" in monsters:
+                renpy.notify("The Experiment's containment has failed!")
+                # Transform Experiment into Loss
+                del monsters["Experiment"]
+                monsters["Loss"] = {"location": "ControlRoom"} # Or a random location
+                renpy.notify("The Experiment has transformed into the Loss!")
+
+
+    monsters = {
+        "Shadow": {"location": ""}, # Shadow doesn't have a fixed physical location
+        "Runner": {"location": "HallwayA"},
+        "Experiment": {"location": "Camera1"},
+        "Loss": {"location": ""}, # Loss might not have a fixed physical location either
+        "Abomination1": {"location": "Camera2", "hostile": False}, # Added HallwayB to locations for Abomination2
+        "Abomination2": {"location": "HallwayA", "hostile": True} # Note: HallwayA is also a location
+    }
+
     # Game state variables (power, reactor parameters, creature locations, etc.)
 
     # Reactor Parameters (Initial Values)
@@ -208,7 +287,7 @@ init python:
     # Action Point variables
     max_action_points = 10 # Maximum action points per fixing phase
     action_points = 0 # Current action points
- current_phase = "survival" # Assume starting in survival phase
+    current_phase = "survival" # Assume starting in survival phase
 
     def start_fixing_phase():
         global action_points, max_action_points, hunger_level
@@ -219,9 +298,95 @@ init python:
         renpy.notify(f"Fixing phase starts. You have {action_points:.1f} action points.")
 
 
+    def rest_in_control_room():
+        global insomnia_level, sanity, hunger_level, game_time_in_minutes_real, in_game_hour, in_game_minute, current_phase
+
+        # Apply stat changes
+        insomnia_level = max(0.0, insomnia_level - 50.0)
+        sanity = min(100.0, sanity + 20.0)
+        hunger_level += 30.0 # Resting might make you a bit hungry
+
+        # Calculate real-life minutes to skip until midnight (assuming 48 real minutes = 1 in-game day, 1440 in-game minutes per day)
+        # The ratio of real minutes to in-game minutes is 48 / 1440 = 1/30
+        in_game_minutes_until_midnight = (24 - in_game_hour) * 60 - in_game_minute
+        real_minutes_to_skip = in_game_minutes_until_midnight * (48.0 / 1440.0) # Or * (1.0 / 30.0)
+
+        # Update game_time_in_minutes_real
+        game_time_in_minutes_real += real_minutes_to_skip
+
+        # Force in-game time to midnight (start of survival phase)
+        in_game_hour = 0
+        in_game_minute = 0
+        # The game loop's next iteration will detect the phase change to "survival" and handle its start logic.
+
     def display_terminal_output(self, message):
-        global latest_terminal_output
-        latest_terminal_output = message
+
+    def close_left_door(): # Added functions for left door control
+        global left_door_state, door_being_held
+        if left_door_state != "holding":
+            left_door_state = "closed"
+            renpy.notify("Left door closed.")
+        else:
+            renpy.notify("Cannot close the left door while holding it.")
+    def open_left_door():
+        global left_door_state, door_being_held
+        if left_door_state != "holding":
+            left_door_state = "open"
+            renpy.notify("Left door opened.")
+        else:
+            renpy.notify("Cannot open the left door while holding it.")
+    def hold_left_door():
+        global left_door_state, door_being_held
+        if door_being_held == "none":
+            left_door_state = "holding"
+            door_being_held = "left"
+            renpy.notify("Holding the left door.")
+        elif door_being_held == "left":
+            # Already holding this door, perhaps a message or no action
+            pass # Or renpy.notify("You are already holding the left door.")
+        else:
+            renpy.notify("You are already holding the right door.")
+    def stop_holding_left_door():
+        global left_door_state, door_being_held
+        if left_door_state == "holding":
+            left_door_state = "closed" # Door closes when you stop holding
+            door_being_held = "none"
+            renpy.notify("Stopped holding the left door.")
+
+    def close_right_door(): # Added functions for right door control
+        global right_door_state, door_being_held
+        if right_door_state != "holding":
+            right_door_state = "closed"
+            renpy.notify("Right door closed.")
+        else:
+            renpy.notify("Cannot close the right door while holding it.")
+
+    def open_right_door():
+        global right_door_state, door_being_held
+        if right_door_state != "holding":
+            right_door_state = "open"
+            renpy.notify("Right door opened.")
+        else:
+            renpy.notify("Cannot open the right door while holding it.")
+
+    def hold_right_door():
+        global right_door_state, door_being_held
+        if door_being_held == "none":
+            right_door_state = "holding"
+            door_being_held = "right"
+            renpy.notify("Holding the right door.")
+        elif door_being_held == "right":
+            pass
+        else:
+            renpy.notify("You are already holding the left door.")
+
+    def stop_holding_right_door():
+        global right_door_state, door_being_held
+        if right_door_state == "holding":
+            right_door_state = "closed"
+            door_being_held = "none"
+            global latest_terminal_output
+            latest_terminal_output = message
 
     def update_reactor_temp(self):
         global reactor_temp, pump_speed, core_active, game_over, meltdown_rate, generator_status
@@ -490,13 +655,70 @@ init python:
             renpy.notify("You don't have any coffee or tea.")
 
 
+    def update_monster_positions():
+        global monsters, locations, monster_paths, left_door_state, right_door_state # Added door states
+        for monster_name, monster_data in monsters.items():
+            # Check if monster exists and has a location
+            if monster_name in ["Runner", "Experiment"]: # Only move these along paths for now
+                # Move Runner and Experiment along their paths
+                current_location = monster_data["location"]
+                if current_location != "ControlRoom": # Don't move if they reached the control room (for now)
+                    path = monster_paths.get(monster_name, [])
+                    if path:
+                        try:
+                            current_index = path.index(current_location)
+                            next_index = (current_index + 1) % len(path) # Loop back to the beginning
+                            new_location = path[next_index]
+
+                            # Check if the new location is the Control Room and if the corresponding door is open
+                            can_move_to_control_room = True
+                            if new_location == "ControlRoom":
+                                # Assume left door for Runner, right for Experiment for this example. Adjust as needed.
+                                if monster_name == "Runner" and left_door_state != "open":
+                                    can_move_to_control_room = False
+                                elif monster_name == "Experiment" and right_door_state != "open":
+                                    can_move_to_control_room = False
+
+                            if can_move_to_control_room: # If the door is open or it's not a door location
+                                # Implement a chance to move
+                                if random.random() < 0.3: # 30% chance to move
+                                    monster_data["location"] = new_location
+                                    # Check if the monster entered the Control Room
+                                    if new_location == "ControlRoom":
+                                        renpy.notify(f"{monster_name} entered the Control Room!")
+                                        # Handle consequences of monster entering the Control Room
+                                        if monster_name == "Experiment":
+                                            global experiment_entry_timer
+                                            experiment_entry_timer = 10.0 # Start the 10-second timer for Experiment
+                                            renpy.notify("The Experiment is in the Control Room! You have 10 seconds to hide.")
+                                        # Runner causes instant game over if not hiding
+                                        elif monster_name == "Runner": # Check for Runner after it enters Control Room
+                                            global game_over, is_hiding
+                                            if not is_hiding:
+                                                game_over = True
+                                                renpy.notify("The Runner caught you! Game Over.")
+                                    elif new_location != "ControlRoom": # Only notify if moving to a non-ControlRoom location
+                                        renpy.notify(f"{monster_name} moved to {new_location}.")
+                            except ValueError:
+                                # Monster not on its defined path, maybe handle this error or reset
+                                pass
+                            else:
+                                door_state = left_door_state if monster_name == "Runner" else right_door_state
+                                # Monster is blocked at the door
+                                renpy.notify(f"{monster_name} is at the door, but it is {door_state}.")
+                            
+            elif monster_name.startswith("Abomination"):
+                # Randomly move Abominations
+                current_location = monster_data["location"]
+                possible_locations = [loc for loc in locations if loc != current_location]
+                if possible_locations and random.random() < 0.1: # 10% chance to move to a random location
+                            monster_data["location"] = random.choice(possible_locations)
+                            renpy.notify(f"{monster_name} moved to {monster_data['location']}.")
+
+
     # Function to update survival stats over time
     def update_survival_stats(dt):
-        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate, consecutive_coffee_tea_uses
-
-        # Increase hunger and insomnia over time
-        hunger_level += hunger_increase_rate * (dt / 60.0) # dt is in seconds, convert to minutes
-        insomnia_level += insomnia_increase_rate * (dt / 60.0)
+        global hunger_level, insomnia_level, caffeine_effect_timer, caffeine_crash_timer, hunger_increase_rate, insomnia_increase_rate, consecutive_coffee_tea_uses, sanity, caffeine_overdosed, hiding_abuse_counter, hiding_abuse_increase_rate, hiding_abuse_decay_rate, is_hiding, experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second # Added experiment_entry_timer, game_over, monsters, loss_sanity_drain_rate_per_second
 
         # Update caffeine timers
         if caffeine_effect_timer > 0:
@@ -508,35 +730,61 @@ init python:
                 # Reset overdose flag when effect timer ends (if crash timer is also done)
                 if caffeine_crash_timer <= 0:
                     caffeine_overdosed = False
-
-        if caffeine_effect_timer <= 0 and caffeine_crash_timer > 0:
+        elif caffeine_crash_timer > 0: # Only count down if crash timer is active after effect
+            caffeine_crash_timer = max(0.0, caffeine_crash_timer - (dt / 60.0))
             if caffeine_crash_timer == 0:
                 # Implement caffeine crash penalty
                 renpy.notify("Experiencing a caffeine crash!")
                 # Example: Increase insomnia significantly
                 insomnia_level += 40.0 # Example crash penalty
-                # Reset crash timer to prevent repeated penalty
-                caffeine_crash_timer = -1.0 # Use a negative value or None to indicate it's passed
                 caffeine_overdosed = False # Also reset overdose flag here
-            else: # Only count down if crash timer is active
-                caffeine_crash_timer = max(0.0, caffeine_crash_timer - (dt / 60.0))
+
+        # Increase hunger and insomnia over time
+        # Apply increased hunger cost if holding a door
+        current_hunger_increase_rate = hunger_increase_rate
+        if door_being_held != "none":
+            current_hunger_increase_rate += door_hold_hunger_cost_per_second # Add holding cost to base rate
+
+        hunger_level += current_hunger_increase_rate * (dt / 60.0)
+        insomnia_level += insomnia_increase_rate * (dt / 60.0)
+
+        # Increase hunger if holding a door during survival phase
+        # This is handled by the current_hunger_increase_rate logic above now
+        # if door_being_held != "none":
+        #     hunger_level += door_hold_hunger_cost_per_second * (dt / 60.0)
+
+
 
         # Add penalties for high hunger/insomnia (will implement effects later)
-        # if hunger_level >= 100:
-        #     renpy.notify("You are starving!")
         # Add sanity reduction during overdose
         if caffeine_overdosed:
-        sanity = max(0.0, sanity) # Ensure sanity doesn't go below 0
-
-        # Reset overdose flag when crash timer ends
-        if caffeine_effect_timer <= 0 and caffeine_crash_timer == 0:
-        caffeine_overdosed = False
+            # Sanity decreases over time during overdose
+            sanity = max(0.0, sanity - (0.05 * (dt / 60.0))) # Decrease sanity by 0.05 per real-life minute
         #     # Add hunger penalties
         # if insomnia_level >= 100:
         #     renpy.notify("You are severely sleep deprived!")
         #     # Add insomnia penalties
 
-    # Function to update reactor power output
+        # Update hiding abuse counter
+        if is_hiding:
+            hiding_abuse_counter += hiding_abuse_increase_rate * (dt / 60.0)
+        else:
+            hiding_abuse_counter = max(0.0, hiding_abuse_counter - hiding_abuse_decay_rate * (dt / 60.0))
+
+        # Update Experiment entry timer
+        if experiment_entry_timer > 0:
+            experiment_entry_timer -= dt # Decrease timer by real-life seconds
+            if experiment_entry_timer <= 0:
+                # Timer ran out, check if player is hiding
+                if not is_hiding:
+                    game_over = True
+                    renpy.notify("The Experiment caught you! Game Over.")
+
+        # Sanity drain from Loss (only active during darker hours)
+        if "Loss" in monsters and monsters["Loss"]["location"] == "ControlRoom" and (in_game_hour >= 18 or in_game_hour < 5):
+ sanity = max(0.0, sanity - loss_sanity_drain_rate_per_second * (dt / 60.0))
+            # renpy.notify(f"Loss is nearby! Sanity draining. Sanity: {sanity:.1f}") # Debugging line
+
     def update_reactor_power_output():
         global reactor_temp, reactor_pressure, reactor_power_output, core_active
 
@@ -589,10 +837,6 @@ init python:
 
         if game_over: # Stop updates if the game is over
             return
-
-        # Apply time dilation if overdosed
-        if caffeine_overdosed:
-            dt *= 1.5
 
         if sanity <= 0:
             game_over = True
@@ -707,18 +951,50 @@ init python:
                 use_coffee_tea()
             elif item_to_use == "oil_can": # Add using oil cans
                 # Need to implement refill_generator_oil function to
+            elif action == "hide":
+                    # Added hide command logic
+                        global is_hiding
+                if not is_hiding:
+                    is_hiding = True
+                    renpy.notify("You are now hiding under the floorboards.")
+                else:
+                    display_terminal_output("You are already hiding.")
+            elif action == "unhide":
+                # Added unhide command logic
+            if is_hiding:
+                is_hiding = False
+                renpy.notify("You are no longer hiding.")
+            else:
+                display_terminal_output("You are not hiding.")
+
+            display_terminal_output(f"Unknown item: {item_to_use}")
+            # Note: Need to uncomment and implement refill_generator_oil logic here
 
 
+            else:
+            display_terminal_output(f"Unknown item: {item_to_use}")
+                    elif action == "rest":
+                        if current_phase == "rest_payment":
+                            rest_in_control_room()
+                        else:
+                            display_terminal_output("You can only rest during the Rest and Payment phase.")
+
+
+# The game starts here.
     label start:
 
+        # Example game loop structure
         label game_loop:
         python:
         dt = renpy.update(realtime=True)
+
+        # Apply time dilation if overdosed
+        if caffeine_overdosed:
+            dt *= 1.5
+
         game_time_in_minutes_real += dt / 60.0
         # Convert real minutes to in-game time (assuming 48 real minutes = 1 in-game day)
         # This will need adjustment based on your desired time scale
-        total_in_game_minutes = (game_time_in_minutes_real / 48.0) * (24 * 60)
-        in_game_hour = int((total_in_game_minutes / 60) % 24)
 
         # Determine the current phase
         new_phase = "survival" # Default to survival
@@ -739,7 +1015,20 @@ init python:
             elif current_phase == "survival":
                 # Call function to start survival phase
                 renpy.notify("Entering Survival Phase.") # Temporary notification
-                in_game_minute = int(total_in_game_minutes % 60)
+
+        # Convert real minutes to in-game time (after applying potential time dilation for updates)
+        total_in_game_minutes = (game_time_in_minutes_real / 48.0) * (24 * 60)
+        in_game_hour = int((total_in_game_minutes / 60) % 24)
+        in_game_minute = int(total_in_game_minutes % 60)
+
+        # Update Experiment containment (runs in every iteration regardless of phase)
+        update_experiment_containment(dt)
+
+        # Update monster positions during the survival phase
+        if current_phase == "survival":
+            update_monster_positions() # Call the new monster update function
+            check_hide_monster() # Check for the Hide monster during the survival phase
+            # update_survival_stats is called within the survival phase logic
         jump game_loop
     # Initial scene setup (control room background)
     scene black # Start with a black screen or your initial control room image
@@ -777,3 +1066,4 @@ init python:
 # --------------------
 # End of Script
 # --------------------
+

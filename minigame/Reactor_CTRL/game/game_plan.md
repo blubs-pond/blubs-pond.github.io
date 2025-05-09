@@ -86,3 +86,28 @@ This document outlines the plan for developing a FNAF-like game in Ren'Py, blend
     *   Thoroughly test for bugs and gameplay issues.
 
 This plan provides a structured approach to building your game, starting with core mechanics and gradually adding complexity and content. Remember that iterative development and testing will be crucial for balancing the gameplay and ensuring everything works together smoothly.
+
+
+renpy
+screen game_ui():
+    # ... other UI elements ...
+
+    # Example button calling a door function
+    textbutton "Close Left Door":
+        xpos ... ypos ...
+        action Python("close_left_door()")
+
+    textbutton "Open Left Door":
+        xpos ... ypos ...
+        action Python("open_left_door()")
+
+    textbutton "Hold Left Door":
+        xpos ... ypos ...
+        action Python("hold_left_door()")
+
+    # Add buttons for the right door as well
+    textbutton "Close Right Door":
+        xpos ... ypos ...
+        action Python("close_right_door()")
+
+    # ... and so on for open_right_door and hold_right_door
