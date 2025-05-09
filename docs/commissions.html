@@ -56,6 +56,7 @@
                 <div class="w3-container w3-card-4">
                 <h3>Commissions Form</h3>
                 <div class="w3-section">
+                <form action="submit_commission.php" method="post">
                     <input class="w3-input" type="text" required />
                     <label>Fursona / Name:</label>
                 </div>
@@ -93,19 +94,23 @@
                     <input class="w3-input" type="file" id="asset_upload" name="asset_upload" accept=".blend" multiple>
                 </div>
 
-
                 <div class="w3-section">
-                    <p>Note: If a license is required for your avatar's base model, 50% of the base cost will be added.</p>
-                    <input class="w3-check" type="checkbox" name="licensing" value="yes">
-                    <label>My base avatar's model required PAID license.</label>
+                    <input class="w3-check" type="checkbox" id="licensing" name="licensing" value="yes">
+                    <label for="licensing">My base avatar's model requires a PAID license.</label>
+                    <div id="avatarPriceSection" style="display: none;">
+                        <label for="avatar_price">Avatar Model Price (if known):</label>
+                        <input class="w3-input" type="number" id="avatar_price" name="avatar_price" min="0">
+                    </div>
                 </div>
                 <div class="w3-section">
-                    <button class="w3-button w3-black w3-hover-amber" type="submit">Submit</button>
+                    <button class="w3-button w3-black w3-hover-amber" type="submit" value="submit">Submit</button>
                 </div>
              </div>
+             </form>
              <div class="w3-container w3-padding w3-large">
                  <p>Estimated Total: $<span id="totalCost">0</span></p>
             </div>
+             <p id="licensingDisclaimer" style="color: red; display: none;">* Estimated total may be inaccurate if avatar price is not provided.</p>
  
         </main>
         <!--- Footer (sit at the bottom) -->
@@ -154,9 +159,21 @@
                         total -= 50;
                     }
 
-                     const licensingCheckbox = form.querySelector('input[name="licensing"]');
-                     if (licensingCheckbox.checked) {
-                         total += basePrices[commissionType] * 0.5;
+                    const licensingCheckbox = form.querySelector('#licensing');
+                    const avatarPriceSection = form.querySelector('#avatarPriceSection');
+                    const avatarPriceInput = form.querySelector('#avatar_price');
+                    const licensingDisclaimer = form.querySelector('#licensingDisclaimer');
+
+                    if (licensingCheckbox.checked) {
+                        avatarPriceSection.style.display = 'block';
+                        const avatarPrice = parseFloat(avatarPriceInput.value) || 0;
+                        if (avatarPrice > 0) {
+                            total += avatarPrice * 0.5;
+                            licensingDisclaimer.style.display = 'none';
+                        } else {
+                            total += 20; // Default value if price not provided
+                            licensingDisclaimer.style.display = 'block';
+                        }
                     }
 
                     totalCostSpan.textContent = total;
@@ -164,6 +181,16 @@
 
                 // Add event listeners to relevant form elements
                 form.querySelectorAll('input[type="radio"], input[type="number"], input[type="checkbox"]').forEach(element => {
+                    element.addEventListener('change', calculateTotal);
+                });
+
+                // Add event listener for the avatar price input specifically
+                avatarPriceInput.addEventListener('input', calculateTotal);
+
+                // Add event listener to the licensing checkbox to toggle avatar price input visibility
+                licensingCheckbox.addEventListener('change', function() {
+                    avatarPriceSection.style.display = licensingCheckbox.checked ? 'block' : 'none';
+                    // Also recalculate when the checkbox is toggled
                     element.addEventListener('change', calculateTotal);
                 });
                 calculateTotal(); // Calculate initial total on page load
