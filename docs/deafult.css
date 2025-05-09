@@ -30,6 +30,10 @@ body {
     height: 250px;
 }
 
+.artwork {
+    width: 30%;
+    padding: auto;
+}
 .img-fanart {
     width: 100%;
     height: 100%;
