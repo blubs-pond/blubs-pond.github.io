@@ -1,6 +1,4 @@
-// gameSettings.js
-
-let gameSettings = {
+const gameSettings = {
     facilityMap: `
 ┌─────────────┐ ┌───┐ ┌───────┐ ┌─────────────────────────┐ ┌───────┐ ┌───┐  ┌─────────────┐
 │             │ │<5>│ │       │ │                         │ │       │ │<6>│  │             │
@@ -116,48 +114,49 @@ let gameSettings = {
             mapMarker: "<B>",
             exits: {
                 "Hallway3": "Hallway3", // Assuming connection via Hallway 3
-                "DecontaminationRoom": "DecontaminationRoom"
+                "DecontaminationRoom": "DecontaminationRoom" // Assuming direct connection
             }
         },
         "DecontaminationRoom": {
             friendlyName: "Decontamination Room",
             description: "This room is used for decontaminating personnel and equipment.",
             mapMarker: "<DCR>",
-            exits: { // Assuming connection via Hallway 3 and direct to Bunker
-                "Hallway3": "Hallway3",
-                "Bunker": "Bunker"
+            exits: {
+                "Hallway3": "Hallway3", // Assuming connection via Hallway 3
+                "Bunker": "Bunker" // Assuming direct connection
             }
         },
         "CoolantPumpStation": {
             friendlyName: "Coolant Pump Station",
             description: "Houses the critical coolant pumps.",
             mapMarker: "<CP>",
-            exits: { // Assuming connection to the upper hallway
-                "Hallway5": "Hallway5"
+            exits: {
+                "Hallway5": "Hallway5" // Assuming connection to the upper hallway
             }
         },
         "VentilationSystems": {
             friendlyName: "Ventilation Systems",
             description: "Complex network of vents and air handlers.",
             mapMarker: "<Vent>",
-            exits: { // Assuming connection to the upper hallway
-                "Hallway5": "Hallway5"
+            exits: {
+                "Hallway5": "Hallway5" // Assuming connection to the upper hallway
             }
         },
         "ElectricalSwitchyard": {
             friendlyName: "Electrical Switchyard",
             description: "High-voltage equipment for external power distribution.",
             mapMarker: "<Elect>",
-            exits: { // Define exits based on the map - looks like it connects to a hallway section
-                 // Define exits based on the map
+            exits: {
+                // Define exits based on the map - looks like it connects to a hallway section
+                 "Hallway4": "Hallway4" // Example connection
             }
         },
-        "WaterTreatmentFacility": {
+        "WaterTreatmentFacility": { // Added based on <BW> marker
             friendlyName: "Water Treatment Facility",
             description: "Processes and treats water for the facility.",
             mapMarker: "<BW>",
-            exits: { // Define exits based on the map
-                 // Define exits based on the map
+            exits: {
+                 "Hallway2": "Hallway2" // Example connection
             }
         },
 
@@ -165,31 +164,31 @@ let gameSettings = {
         "Hallway1": {
             friendlyName: "Hallway 1",
             description: "A vertical corridor connecting the west side of the facility.",
-            mapMarker: "<HW1>",
-            exits: { // Connection to horizontal hallway
+            mapMarker: "<HW1>", // Using <HW1> as the representative marker
+            exits: {
                 "Laboratory": "Laboratory",
                 "GeneratorRoom": "GeneratorRoom",
                 "ControlRoom": "ControlRoom",
                 "Bunker": "Bunker",
-                "Hallway3": "Hallway3"
+                "Hallway3": "Hallway3" // Connection to horizontal hallway
             }
         },
         "Hallway2": {
             friendlyName: "Hallway 2",
             description: "A vertical corridor connecting the east side of the facility.",
-            mapMarker: "<HW2>",
-            exits: { // Connection to horizontal hallway
+            mapMarker: "<HW2>", // Using <HW2> as the representative marker
+            exits: {
                 "ServerRoom": "ServerRoom",
                 "ControlRoom": "ControlRoom",
                 "TurbineRoom": "TurbineRoom",
-                "Hallway3": "Hallway3"
+                "Hallway3": "Hallway3" // Connection to horizontal hallway
             }
         },
         "Hallway3": {
             friendlyName: "Hallway 3",
             description: "A horizontal corridor connecting Hallways 1 and 2, leading towards the Decontamination Room and Bunker.",
-            mapMarker: null,
-            exits: { // Connections to other parts of the hallway network and rooms
+            mapMarker: null, // No specific marker for the whole hallway
+            exits: {
                 "Hallway1": "Hallway1",
                 "Hallway2": "Hallway2",
                 "DecontaminationRoom": "DecontaminationRoom",
@@ -199,29 +198,72 @@ let gameSettings = {
          "Hallway4": {
             friendlyName: "Hallway 4",
             description: "A horizontal corridor connecting the Reactor Room and Turbine Room areas.",
-            mapMarker: null,
-            exits: { // Connections based on the map
+            mapMarker: null, // No specific marker for the whole hallway
+            exits: {
                 "ReactorRoom": "ReactorRoom",
-                "TurbineRoom": "TurbineRoom"
+                "TurbineRoom": "TurbineRoom",
+                "ElectricalSwitchyard": "ElectricalSwitchyard" // Example connection
+                // Potentially other connections via the 'xxx' sections
             }
         },
          "Hallway5": {
             friendlyName: "Hallway 5",
             description: "An upper horizontal corridor in the northern part of the facility.",
-            mapMarker: null,
+            mapMarker: null, // No specific marker for the whole hallway
             exits: {
                 "PowerConverterRoom": "PowerConverterRoom",
                 "CoolantPumpStation": "CoolantPumpStation",
                 "VentilationSystems": "VentilationSystems"
+                 // Potentially connections to the areas with cameras <5> and <6>
             }
         }
     },
 
-    // Camera settings
+    blastDoors: {
+        // You will need to manually add entries for each blast door ('x')
+        // with their correct line and column coordinates from the map.
+        // Example:
+        "door_44_17": { line: 44, column: 17, isOpen: true }, // Example coordinates
+        "door_44_21": { line: 44, column: 21, isOpen: true }, // Example coordinates
+         // Add all other blast doors here
+    },
+
     cameras: {
         "camera1": {
             mapMarker: "<1>",
-            description: "A view of the junction in Hallway 1."
+            description: "A view of the junction in Hallway 1.",
+            isDistorted: false
+        },
+        "camera2": {
+            mapMarker: "<2>",
+            description: "Monitoring a section of Hallway 2.",
+            isDistorted: false
+        },
+        "camera3": {
+            mapMarker: "<3>",
+            description: "Overlooking the entrance to the Laboratory.",
+            isDistorted: false
+        },
+        "camera4": {
+            mapMarker: "<4>",
+            description: "Providing a view of the area near the Bunker entrance.",
+            isDistorted: false
+        },
+        "camera5": {
+            mapMarker: "<5>",
+            description: "A camera view near the Power Converter Room.",
+            isDistorted: false
+        },
+        "camera6": {
+            mapMarker: "<6>",
+            description: "Monitoring the area near the Turbine Room.",
+            isDistorted: false
         }
     }
 };
+
+// If not using ES6 modules, you might need to make gameSettings globally accessible
+// window.gameSettings = gameSettings;
+
+// If using ES6 modules, export it
+// export default gameSettings;
