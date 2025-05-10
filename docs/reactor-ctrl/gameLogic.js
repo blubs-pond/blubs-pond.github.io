@@ -1,3 +1,13 @@
+function gameLoop(timestamp) {
+    if (!lastUpdateTime) lastUpdateTime = timestamp;
+    const dt = (timestamp - lastUpdateTime) / 1000; // in seconds
+    lastUpdateTime = timestamp; 
+
+    updateGameState(dt); // Update time + phase
+    updateGame(); // Call your core logic
+    requestAnimationFrame(gameLoop); // Keep the loop running
+}
+
 function updateGameState(dt) {
     const realLifeMinutesElapsed = dt / 60.0;
     gameTimeInMinutesReal += realLifeMinutesElapsed;
