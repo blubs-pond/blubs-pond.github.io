@@ -16,7 +16,6 @@ body {
     margin: 20px auto; /* Center the container and add some space */
     max-width: 800px; /* Max width for better readability */
     height: 95vh;
-    border: 2px solid #fff; /* White border */
     box-sizing: border-box;
 }
 
@@ -30,6 +29,7 @@ body {
     white-space: pre; /* Preserve whitespace for formatted status */
     font-size: 0.9em;
     overflow: hidden; /* Hide scrollbar */
+	border-bottom: 2px solid #fff;
 }
 
 #stats-area {
@@ -41,6 +41,11 @@ body {
     overflow-y: auto; /* Enable scrolling for stats if needed */
     font-size: 0.9em;
 }
+
+#stats-area div {
+	margin-bottom: 5px; /* Reduce space between stats entries */
+}
+
 
 #map-area {
     grid-column: 2; /* Second column */
@@ -59,7 +64,7 @@ body {
 #terminal-area {
     grid-column: 1 / span 2; /* Span across both columns */
     grid-row: 3; /* Third row */
-    height: 30%; /* Adjust height for the terminal area */
+    height: 20%; /* Adjust height for the terminal area */
     display: flex;
     flex-direction: column;
     border-top: 1px solid #fff;
@@ -72,12 +77,12 @@ body {
 #output-area {
     flex-grow: 1; /* Take up remaining space in terminal */
     overflow-y: auto; /* Enable scrolling for output */
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* Space between output and input */
     font-size: 0.9em;
 }
 
 #output-area p {
-    margin: 0 0 2px 0; /* Reduce space between paragraphs */
+    margin: 0; /* Remove default margin */
 }
 
 #input-area {
