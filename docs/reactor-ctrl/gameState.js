@@ -17,22 +17,6 @@ let gameState = {
         sanity: 100 // 0-100, 0 is critical
     },
     playerMoney: 1000, // Starting money
-    monsters: {
-        // Dummy monster data: replace with actual monster types, positions, and states
-        "monster1": {
-            type: "basic_android",
-            mapPosition: { line: -1, column: -1 }, // Will be updated based on map
-            state: "idle", // idle, moving, attacking, disabled
-            target: null // Location key or player if attacking
-        },
-        "monster2": {
-             type: "security_bot",
-            mapPosition: { line: -1, column: -1 }, // Will be updated based on map
-            state: "patrolling", // idle, moving, attacking, disabled
-            patrolRoute: ["Hallway1", "Hallway2", "ControlRoom"], // Example route
-            currentTargetIndex: 0
-        }
-    },
     failedDevices: [], // Array of device IDs that have failed
     tasks: {
         // Tasks the player needs to complete
@@ -49,5 +33,39 @@ let gameState = {
             requiredAction: "flip_switch",
             isCompleted: false
         }
-    }
+    },
+    generatorState: {
+        power: 0,
+        fuel: 100
+    },
+    monsterState: [], // Array of monster objects
+    monsters: { // Object to track individual monster states
+        "Shadow": { location: null, state: "dormant", isNearPlayer: false } // Initial state for Shadow, added isNearPlayer
+    },
+    doorState: {
+        door1: { state: 'closed', durability: 100 },
+        door2: { state: 'closed', durability: 100 }
+    },
+    oilCans: 2,
+    lubricantKits: 1,
+    rations: 0, // Assuming rations start at 0 based on the Ren'Py script example
+    coffeeTea: 0, // Assuming coffee/tea starts at 0
+    repairToolDurability: 100.0, // Assuming a starting repair tool
+    hungerLevel: 0.0,
+    insomniaLevel: 0.0,
+    sanity: 100,
+    caffeineEffectTimer: 0.0,
+    caffeineCrashTimer: 0.0,
+    caffeineOverdosed: false,
+    hidingAbuseCounter: 0.0,
+    isHiding: false,
+    experimentEntryTimer: -1.0, // -1.0 if not in room
+    doorBeingHeld: "none", // Tracks which door is being held ('door1', 'door2', or 'none')
+    cameraState: { // Object to track the state of cameras
+    "camera1": { isDistorted: false }, // Example state property
+    "camera2": { isDistorted: false }
+    },
+    shadowVisible: false, // Track if the Shadow is currently visible on a camera
+    
+    gameFlags: {} // Object to store boolean flags
 };
