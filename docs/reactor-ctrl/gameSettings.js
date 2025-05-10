@@ -55,9 +55,9 @@ let gameSettings = {
 +-------------+       +---------------------------------------------+ +---+  +-------------+
 `,
 
-	machines: {s
+	machines: {
         // Dummy data: replace with actual machine IDs and coordinates
-        "reactor": { line: 9, column: 47 }, // Example coordinate in Reactor Room
+        "reactor": { line: 9, column: 47 } // Example coordinate in Reactor Room
     },
 
 	blastDoors: {
