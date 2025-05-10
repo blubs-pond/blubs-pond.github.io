@@ -1,5 +1,5 @@
 function escapeRegExp(string) {
- return string.replace(/[.*+?^${}()|[\\]\\\\]/g, \'\\\\$&\'); // $& means the whole matched string
+    return string.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&\'');
 }
 
 function appendOutput(text) {
@@ -115,20 +115,20 @@ function displayMap(state = 'default') {
         default:
             // No extra markers needed
             break;
-    } // Added missing closing curly brace for switch
+        } // Added missing closing curly brace for switch
 
     // --- Render final map ---
     const finalMap = finalMapLines.map(line => line.join('')).join('\n');
- mapArea.textContent = finalMap; // Display the map in the dedicated area
+    mapArea.textContent = finalMap; // Display the map in the dedicated area
 
- } else {
- console.warn(`Map marker or coordinates not found for location: ${playerLocationKey}.`);
- if (mapArea) {
- mapArea.textContent = finalMapLines.map(line => line.join('')).join('\n'); // Display map without player marker
- } else {
- appendOutput("Error displaying map: Player location not found.");
- }
+    } else {
+    console.warn(`Map marker or coordinates not found for location: ${playerLocationKey}.`);
+    if (mapArea) {
+    mapArea.textContent = finalMapLines.map(line => line.join('')).join('\n'); // Display map without player marker
+    } else {
+    appendOutput("Error displaying map: Player location not found.");
     }
+        }
 }
 
 // Function to update the UI elements
