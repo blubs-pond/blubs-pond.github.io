@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reactor Control (CLI)</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
 </head>
 <body>
-    <div id="game-container">
-        <div id="status-bar">
+    <div id="game-container" class="w3-display-container">
+        <div id="status-bar" class="w3-display-left">
             <!-- Player stats, time, location, etc. -->
             <p>Time: <span id="inGameTime"></span></p>
             <p>Money: $<span id="playerMoney"></span></p>
@@ -23,7 +24,7 @@
             <p>Hiding: <span id="isHiding"></span></p>
             <p>Door Held: <span id="doorBeingHeld"></span></p>
         </div>
-        <div id="map-area">
+        <div id="map-area" class="w3-display-right">
             <!-- ASCII map will be rendered here -->
         </div>
         <div id="terminal-area">
