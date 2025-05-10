@@ -17,7 +17,22 @@ init python:
     import random
 
     # Define possible locations in the facility
-    locations = ["Camera1", "Camera2", "HallwayA", "ControlRoom"]
+    locations = {
+    "ControlRoom": "The central control room. Your only safe haven.",
+    "ReactorHall": "The dangerous area directly above the reactor core. High radiation.",
+    "TurbineHall": "Contains the massive turbines and generators.",
+    "CoolantPumpStation": "Houses the critical coolant pumps.",
+    "WaterTreatmentFacility": "Area for processing water for the cooling system.",
+    "ElectricalSwitchyard": "Connects the facility to the power grid.",
+    "UsedFuelStorage": "Area for storing spent nuclear fuel. Extremely radioactive.",
+    "VentilationSystems": "Essential for air circulation and filtering.",
+    "CablingRoomA": "A complex network of cables and conduits.",
+    "MaintenanceWorkshop": "Contains tools and equipment for repairs.",
+    "StaffQuarters": "A small area for staff to rest and eat.",
+    "HallwayA": "A long corridor connecting different sections.",
+    "HallwayB": "Another corridor, potentially with less traffic.",
+    "Camera1": "Camera feed from a specific location.",
+    "Camera2": "Camera feed from another location."}
 
     loss_active = True # Flag to indicate if the Loss is an active threat
     # Define predefined monster movement paths
@@ -946,7 +961,7 @@ init python:
         if game_over: # Stop updates if the game is over
             return
 
-        if sanity <= 0:
+        if sanity <= 0.0:
             game_over = True
             renpy.notify("You have gone insane. Game Over.")
 

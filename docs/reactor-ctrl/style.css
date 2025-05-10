@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 20px; /* Add some padding */
+    background-color: #1e1e1e; /* Dark background */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font for CLI feel */
+    overflow-y: auto; /* Enable scrolling if content exceeds height */
+}
+
+#game-container {
+    width: 100%;
+    max-width: 800px; /* Optional: Limit width */
+    margin: 0 auto; /* Center the container */
+}
+
+#output-area {
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-wrap: break-word; /* Break long words */
+    margin-bottom: 10px;
+    border: 1px solid #00ff00; /* Green border */
+    padding: 10px;
+    height: 400px; /* Example height - adjust as needed */
+    overflow-y: auto; /* Enable scrolling for output */
+}
+
+#input-area {
+    display: flex; /* Align prompt and input */
+}
+
+#command-input {
+    flex-grow: 1; /* Make input take up remaining space */
+    background-color: transparent; /* Transparent background */
+    border: none; /* No border */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    outline: none; /* Remove outline on focus */
+    padding: 0;
+    margin-left: 5px; /* Space between prompt and input */
+}
