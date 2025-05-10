@@ -7,37 +7,42 @@
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="style.css">
     </head>
-    <body>
-        <div id="title-section" class="w3-container w3-padding w3-center w3-green">
+    <body class="w3-black">
+        <div class="w3-row">
+            <div id="title-section" class="w3-col s12 w3-container w3-padding w3-center w3-green">
             <h1 class="w3-jumbo">Reactor Control (CLI Edition)</h1>
         </div>
+        </div>
 
-        <div id="main-content">
-            <div id="stats-section" class="w3-container w3-border w3-padding">
-                <h3 class="w3-center">Stats</h3>
-                <div id="status-bar">
-                    <!-- Player stats, time, location, etc. -->
-                    <p>Time: <span id="inGameTime"></span></p>
-                    <p>Money: $<span id="playerMoney"></span></p>
-                    <p>Current Location: <span id="currentLocation"></span></p>
-                    <p>Player State: <span id="playerState"></span></p>
-                    <hr>
-                    <p>Oil Cans: <span id="oilCans"></span></p>
-                    <p>Lubricant Kits: <span id="lubricantKits"></span></p>
-                    <p>Rations: <span id="rations"></span></p>
-                    <p>Coffee/Tea: <span id="coffeeTea"></span></p>
-                    <p>Repair Tool: <span id="repairToolDurability"></span>%</p>
-                    <p>Hunger: <span id="hungerLevel"></span></p>
-                    <p>Insomnia: <span id="insomniaLevel"></span></p>
-                    <p>Sanity: <span id="sanity"></span></p>
-                    <p>Hiding: <span id="isHiding"></span></p>
-                    <p>Door Held: <span id="doorBeingHeld"></span></p>
+        <div class="w3-row">
+            <div id="stats-section" class="w3-col s3 w3-container w3-border w3-padding">
+                <div class="w3-container">
+                    <h3 class="w3-center">Stats</h3>
+                    <div id="status-bar">
+                        <!-- Player stats, time, location, etc. -->
+                        <p>Time: <span id="inGameTime"></span></p>
+                        <p>Money: $<span id="playerMoney"></span></p>
+                        <p>Current Location: <span id="currentLocation"></span></p>
+                        <p>Player State: <span id="playerState"></span></p>
+                        <hr>
+                        <p>Oil Cans: <span id="oilCans"></span></p>
+                        <p>Lubricant Kits: <span id="lubricantKits"></span></p>
+                        <p>Rations: <span id="rations"></span></p>
+                        <p>Coffee/Tea: <span id="coffeeTea"></span></p>
+                        <p>Repair Tool: <span id="repairToolDurability"></span>%</p>
+                        <p>Hunger: <span id="hungerLevel"></span></p>
+                        <p>Insomnia: <span id="insomniaLevel"></span></p>
+                        <p>Sanity: <span id="sanity"></span></p>
+                        <p>Hiding: <span id="isHiding"></span></p>
+                        <p>Door Held: <span id="doorBeingHeld"></span></p>
+                    </div>
                 </div>
             </div>
-
-            <div id="map-section" class="w3-container w3-border w3-padding">
-                <h3 class="w3-center">Map Area</h3>
-                <pre id="map-area" class="w3-monospace"></pre>
+            <div id="map-section" class="w3-col s9 w3-container w3-border w3-padding">
+                <div class="w3-container">
+                    <h3 class="w3-center">Map Area</h3>
+                    <pre id="map-area" class="w3-monospace"></pre>
+                </div>
             </div>
         </div>
 
