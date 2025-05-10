@@ -30,9 +30,14 @@ body {
     height: 250px;
 }
 
+#gallery {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
 .artwork {
     width: 30%;
-    margin: auto;
+    margin: 1rem auto;
 }
 .img-fanart {
     width: 100%;
