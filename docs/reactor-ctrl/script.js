@@ -16,49 +16,63 @@ let gameSettings = {
     doorHoldHungerCostPerSecond: 0.5, // Example cost, adjust as needed
     shadowLookSanityDrain: 5, // Example sanity drain when looking at Shadow
     facilityMap: `
---------------------------------------------------------------------------------------------------------------+
-|                                                                                                              |
-|                                                                                                              |
-|                                      +--------------------------------+     +----------------------------+   |
-|  +-----------------+ +------------+  |                                |     |                            |   |
-|  |                 | |            |  |                                |     |                            |   |
-|  |                 | |            |  |                                |     |                            |   |
-|  |                 | | Spent fuel +--+                                +-----|               Turbine room |   |
-|  |                 | |            |  |          Reactor room          |     |                            |   |
-|  |                 | | Storage    |  |                                |     |                            |   |
-|  |                 | |            |  |                                +-----|                            |   |
-|  |                 | |            +--+                                |     |                            |   |
-|  |                 | |            |  |                                |     |                            |   |
-|  |                 | |            |  |                                |     |                            |   |
-|  | Power Converter | |            |  |                                |     |                            |   |
-|  |                 | |            |  +--------------+---+-------------+     +----------------------------+   |
-|  |  Room           | +------------+                 |   |                                  |    |            |
-|  |                 |                                |   |                                  |    |            |
-|  |                 |------------------+----+--------+   +--------+----+--------------------+    +            |
-|  |                 |                                                                            |            |
-|  |                 |                                                                            |            |
-|  |                 |-----+      +-----+    +---------------------+    +--------------------+    +            |
-|  |                 |     |      |     |Hall|---------------------|    | +----------------+ |    |            |
-|  |                 |+----+------+----+|Way1|       <CR>          |Hall| |                | |    |  +-------+ |
-|  |                 ||                ||    |                     |Way2| |                | |    +--+ <SR> | |
-|  |                 ||                ||    |+                   +|    | |                +-+       |       | |
-|  |                 ||                ||    ||                   ||    | | Generator room |         |       | |
-|  |                 ||                ||    ||                   ||    | |      <GR>      |      +--+       | |
-|  |                 || Labatory <LAB> ||    ||                   ||    | |                |      |  | Server| |
-|  |                 ||                ||    |+                   +|    | |                |      |  |  Room | |
-|  |                 ||                ||cam1|                     |cam2| |                |      |  |       | |
-|  |                 ||                |+----+---------------------+----+ |                |      |  |       | |
-|  |                 ||                |               |  |               |                +-+    +--+       | |
-|  |                 ||                |               |  |               |                | |       |       | |
-|  +-----------------++----------------+  +------------+--+-------------+ |                | |       |       | |
-|                                         |                             | |                | |    +--+       | |
-|                                         |   Bunker <B>                | |                | |    |  +-------+ |
-|                                         +-----------------------------+ +----------------+ +----+            |
---------------------------------------------------------------------------------------------------------------+
+┌─────────────┐ ┌───┐ ┌───────┐ ┌─────────────────────────┐ ┌───────┐ ┌───┐  ┌─────────────┐
+│             │ │<5>│ │       │ │                         │ │       │ │<6>│  │             │
+│             │ │   │ │       │ │                         │ │       │ │   │  │             │
+│             │ │   │ │ <PC>  │ │                         │ │       │ │   │  │             │
+│             └─┘   │ │       │ │                         │ │       │ │   │  │             │
+│    <CP>           │ └─┐   ┌─┘ │                         └─┘       │ │   └──┘             │
+│             ┌─┐   │ ┌─┘   └─┐ │                                   │ │<HW5>      <BW>     │
+│             │ │   │ │       │ │          <RR>               <TR>  │ │   ┌──┐             │
+│             │ │   │ │       │ │                         ┌─┐       │ │   │  │             │
+│             │ │   │ │       └─┘                         │ │       │ │   │  │             │
+└─────────────┘ │   │ │ <SF>                              │ │       │ │   │  └─────────────┘
+┌─────────────┐ │   │ │       ┌─┐                         │ │       │ │   │                 
+│             │ │   │ │       │ │                         │ │       │ │   │  ┌─────────────┐
+│             └─┘   │ │       │ │                         │ │       │ │   │  │             │
+│   <Vent>     <HW4>│ └───────┘ └──────────┬xxx┬──────────┘ └───────┘ │   │  │             │
+│             ┌─┐   │                      │   │                      │   │  │             │
+│             │ │   └──────────────────────┴xxx┴──────────────────────┘   └──┘             │
+└─────────────┘ │                          <HW3>                                  <CA>     │
+┌─────────────┐ │   ┌───────────┐   ┌─────────────────┐   ┌───────────┐   ┌──┐             │
+│             │ │   │ ┌───────┐ │   │ ┌─────────────┐ │   │ ┌───────┐ │   │  │             │
+│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+│             │ │   │ │       └─┘   └─┤             ├─┘   └─┘       │ │   │  └─────────────┘
+│             ├─┤   │ │         <HW1> x             x <HW2>         │ │   │                 
+│             x x   │ │ <GR>  ┌─┐   ┌─┤    <CR>     ├─┐   ┌─┐  <SR> │ │   │  ┌─────────────┐
+│    <LAB>    x x   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+│             x x   │ │       │ │   │ │      @      │ │   │ │       │ │   │  │             │
+│             ├─┤   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+│             │ │   │ │       │ │<1>│ │             │ │<2>│ │       │ │   └──┘             │
+│             │ │   │ └───────┘ └───┘ └────┬xxx┬────┘ └───┘ └───────┘ │          <Elect>   │
+│             │ │<3>│                      │   │                      │   ┌──┐             │
+│             │ └───┘ ┌────────────────────┘   └────────────────────┐ │   │  │             │
+│             ├───────┤                                             │ │   │  │             │
+│             x <DCR> x                     <B>                     │ │   │  │             │
+│             ├───────┤                                             │ │<4>│  │             │
+└─────────────┘       └─────────────────────────────────────────────┘ └───┘  └─────────────┘
 `,
-    machines: {
+
+	machines: {
         // Dummy data: replace with actual machine IDs and coordinates
         "reactor": { line: 9, column: 47 }, // Example coordinate in Reactor Room
+    },
+
+	blastDoors: {
+		// Approximate coordinates based on the map 'x' markers
+		"door26_17_HW1": { line: 26, column: 17, isOpen: true }, // Hallway 1 section
+		"door27_18_HW1": { line: 27, column: 18, isOpen: true }, // Hallway 1 section
+		"door28_18_HW1": { line: 28, column: 18, isOpen: true }, // Hallway 1 section
+		"door29_18_HW1": { line: 29, column: 18, isOpen: true }, // Hallway 1 section
+		"door30_18_HW1": { line: 30, column: 18, isOpen: true }, // Hallway 1 section
+		"door26_64_HW2": { line: 26, column: 64, isOpen: true }, // Hallway 2 section
+		"door27_63_HW2": { line: 27, column: 63, isOpen: true }, // Hallway 2 section
+		"door36_17_DCR": { line: 36, column: 17, isOpen: true }, // Decontamination Room entrance
+		"door37_17_DCR": { line: 37, column: 17, isOpen: true }, // Decontamination Room section
+		"door38_17_DCR": { line: 38, column: 17, isOpen: true }, // Decontamination Room exit
+
     },
 };
 // Helper to get user-friendly location name
@@ -68,145 +82,7 @@ return gameSettings.locations[locationId]?.friendlyName || locationId;
 
 gameSettings.locations = {
     // Added friendlyName to locations for user-friendly display
-    "ControlRoom": {
-        friendlyName: "Control Room",
-        description: "You are in the main Control Room. Various consoles and monitors display the reactor's status. There are exits to the hallways.",
-        mapMarker: "<CR>", // Unique marker for map
-        exits: { // Defined exits based on the map
-            "Hallway1": "Hallway1",
-            "Hallway2": "Hallway2"
-        },
-    },
-    "Hallway1": {
-        description: "A long, narrow hallway connecting several key areas.",
-        mapMarker: "HallWay1", // Marker for Hallway 1
-        friendlyName: "Hallway 1",
-        exits: {
-            "ControlRoom": "ControlRoom",
-            "ReactorRoom": "ReactorRoom",
-            "PowerConverterRoom": "PowerConverterRoom",
-            "Laboratory": "Laboratory",
-            "Bunker": "Bunker"
-        }
-    },
-    "Hallway2": {
-        description: "Another hallway, leading to the turbine and generator sections.",
-        mapMarker: "HallWay2", // Marker for Hallway 2
-        friendlyName: "Hallway 2",
-        exits: {
-        friendlyName: "Hallway 2",
-            "ControlRoom": "ControlRoom",
-            "TurbineRoom": "TurbineRoom",
-            "GeneratorRoom": "GeneratorRoom"
-        }
-    },
-    "ReactorRoom": {
-        description: "The heart of the facility, housing the reactor core. Radiation levels are high here.",
-        mapMarker: "<RR>", // Marker for Reactor Room
-        friendlyName: "Reactor Room",
-        exits: {
-            "Hallway1": "Hallway1",
-            "SpentFuelStorage": "SpentFuelStorage",
-            "TurbineRoom": "TurbineRoom" // Assuming direct access from Reactor to Turbine
-        }
-    },
-    "SpentFuelStorage": {
-        description: "Area for storing spent nuclear fuel. Extremely radioactive.",
-        mapMarker: "<SF>", // Marker for Spent Fuel Storage
-        friendlyName: "Spent Fuel Storage",
-        exits: {
-            "ReactorRoom": "ReactorRoom"
-        }
-    },
-    "CoolantPumpStation": { 
-        description: "Houses the critical coolant pumps." , // Assuming no exits from the map for now
-        mapMarker: "<CP>", // Add a marker for Coolant Pump Station if it's on the map
-        friendlyName: "Coolant Pump Station"
-    },
-    "WaterTreatmentFacility": { 
-        description: "Area for processing water for the cooling system.", // Assuming no exits from the map for now
-        mapMarker: "<BW>", // Add a marker for Water Treatment Facility if it's on the map
-        friendlyName: "Water Treatment Facility"
-    },
-    "ElectricalSwitchyard": { 
-        description: "Connects the facility to the power grid." , // Assuming no exits from the map for now
-        mapMarker: "<Elec>", // Add a marker for Electrical Switchyard if it's on the map
-        friendlyName: "Electrical Switchyard"
-    },
-    "VentilationSystems": {
-        description: "Essential for air circulation and filtering.",
-        mapMarker: "<Vent>", // Add a marker for Ventilation Systems if it's on the map
-        friendlyName: "Ventilation Systems" // Assuming it's a location object now
-    },
-    "CablingRoomA": {
-        description: "A complex network of cables and conduits.",
-        mapMarker: "<CR>", // Add a marker for Cabling Room A if it's on the map
-        friendlyName: "Cabling Room A" // Assuming it's a location object now
-    },
-    "Camera1": { // Added Camera location
-        description: "The feed shows the main corridor outside the Control Room. Looks clear.", // Detailed description
-        mapMarker: "cam1", // Marker for Camera 1
-        friendlyName: "Camera 1",
-        exits: {}, // Cameras are not physical locations to move to
-        cameraFeed: "camera1",
-        location: "Camera1" // Added location property for checkLookAtShadow
-    }, // Added Camera location
-    "Camera2": { // Added Camera location
-        friendlyName: "Camera 2",
-        description: "A camera feed showing a view of...", // Will add detailed view later
-        exits: {}, // Cameras are not physical locations to move to
-        mapMarker: "cam2", // Marker for Camera 2
-        location: "Camera2", // Added location property for checkLookAtShadow
-        cameraFeed: "camera2"
-    },
-    "PowerConverterRoom": {
-        friendlyName: "Power Converter Room",
-        description: "Houses the equipment for converting reactor power.",
-        mapMarker: "<PC>", // Marker for Power Converter Room
-        exits: { "Hallway1": "Hallway1" }
-    },
-    "Laboratory": {
-        friendlyName: "Laboratory",
-        description: "A laboratory for conducting experiments.",
-        mapMarker: "<LAB>", // Marker for Laboratory
-        exits: { 
-            "Hallway1": "Hallway1" 
-        }
-    },
-    "GeneratorRoom": {
-        friendlyName: "Generator Room",
-        description: "Contains backup generators.",
-        mapMarker: "<GR>", // Marker for Generator Room
-        exits: { 
-            "Hallway2": "Hallway2", 
-            "ServerRoom": "ServerRoom" 
-        }
-    },
-    "ServerRoom": {
-        friendlyName: "Server Room",
-        description: "Houses the facility's servers.",
-        mapMarker: "<SR>", // Marker for Server Room
-        exits: { 
-            "GeneratorRoom": "GeneratorRoom" 
-        }
-    },
-    "TurbineRoom": {
-        friendlyName: "Turbine Room",
-        description: "Contains the massive turbines and generators.",
-        mapMarker: "<TR>", // Marker for Turbine Room
-        exits: {
-            "Hallway2": "Hallway2",
-            "ReactorRoom": "ReactorRoom" // Assuming direct access from Turbine to Reactor
-        }
-    },
-    "Bunker": {
-        friendlyName: "Bunker",
-        description: "A reinforced bunker.",
-        mapMarker: "<B>", // Marker for Bunker
-        exits: { 
-            "Hallway1": "Hallway1" 
-        }
-    }
+    
 };
 
 let awaitingExitConfirmation = false; // Flag to track exit confirmation
@@ -215,7 +91,8 @@ let awaitingExitConfirmation = false; // Flag to track exit confirmation
 let gameState = {
     currentScene: 'start', // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
-    playerInventory: [], // Array of item strings
+	playerInventory: [], // Array of item strings
+	playerLocation: "ControlRoom", // Add this line
     reactorState: {
         temperature: 500, // Example initial values
         pressure: 100,
@@ -231,7 +108,6 @@ let gameState = {
         door1: { state: 'closed', durability: 100 },
         door2: { state: 'closed', durability: 100 }
     },
-    currentLocation: "ControlRoom", // Start in the Control Room
     playerMoney: 1000.0,
     oilCans: 2,
     lubricantKits: 1,
