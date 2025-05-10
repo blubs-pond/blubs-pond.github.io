@@ -1,43 +1,78 @@
-const gameSettings = {
+let gameSettings = {
+    failedDevices: {
+        // Dummy data: replace with actual device IDs and coordinates
+        "device1": { line: 7, column: 18 }, // Example coordinate in Spent Fuel Storage
+        "device2": { line: 14, column: 65 }, // Example coordinate in Turbine Room
+    },
+
+    tasks: {
+        // Dummy data: replace with actual task IDs and coordinates
+        "task1": { line: 28, column: 38 }, // Example coordinate in Control Room
+        "task2": { line: 37, column: 45 }, // Example coordinate in Bunker
+    },
+    soundEnabled: true,
+    musicEnabled: true,
+    showGameName: true, // Example setting based on gui.show_name
+    doorHoldHungerCostPerSecond: 0.5, // Example cost, adjust as needed
+    shadowLookSanityDrain: 5, // Example sanity drain when looking at Shadow
     facilityMap: `
-┌─────────────┐ ┌───┐ ┌───────┐ ┌─────────────────────────┐ ┌───────┐ ┌───┐  ┌─────────────┐
-│             │ │<5>│ │       │ │                         │ │       │ │<6>│  │             │
-│             │ │   │ │       │ │                         │ │       │ │   │  │             │
-│             │ │   │ │ <PC>  │ │                         │ │       │ │   │  │             │
-│             └─┘   │ │       │ │                         │ │       │ │   │  │             │
-│    <CP>           │ └─┐   ┌─┘ │                         └─┘       │ │   └──┘             │
-│             ┌─┐   │ ┌─┘   └─┐ │                                   │ │<HW5>      <BW>     │
-│             │ │   │ │       │ │          <RR>               <TR>  │ │   ┌──┐             │
-│             │ │   │ │       │ │                         ┌─┐       │ │   │  │             │
-│             │ │   │ │       └─┘                         │ │       │ │   │  │             │
-└─────────────┘ │   │ │ <SF>                              │ │       │ │   │  └─────────────┘
-┌─────────────┐ │   │ │       ┌─┐                         │ │       │ │   │                 
-│             │ │   │ │       │ │                         │ │       │ │   │  ┌─────────────┐
-│             └─┘   │ │       │ │                         │ │       │ │   │  │             │
-│   <Vent>     <HW4>│ └───────┘ └──────────┬xxx┬──────────┘ └───────┘ │   │  │             │
-│             ┌─┐   │                      │   │                      │   │  │             │
-│             │ │   └──────────────────────┴xxx┴──────────────────────┘   └──┘             │
-└─────────────┘ │                          <HW3>                                  <CA>     │
-┌─────────────┐ │   ┌───────────┐   ┌─────────────────┐   ┌───────────┐   ┌──┐             │
-│             │ │   │ ┌───────┐ │   │ ┌─────────────┐ │   │ ┌───────┐ │   │  │             │
-│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             │ │   │ │       └─┘   └─┤             ├─┘   └─┘       │ │   │  └─────────────┘
-│             ├─┤   │ │         <HW1> x             x <HW2>         │ │   │                 
-│             x x   │ │ <GR>  ┌─┐   ┌─┤    <CR>     ├─┐   ┌─┐  <SR> │ │   │  ┌─────────────┐
-│    <LAB>    x x   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             x x   │ │       │ │   │ │      @      │ │   │ │       │ │   │  │             │
-│             ├─┤   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             │ │   │ │       │ │<1>│ │             │ │<2>│ │       │ │   └──┘             │
-│             │ │   │ └───────┘ └───┘ └────┬xxx┬────┘ └───┘ └───────┘ │          <Elect>   │
-│             │ │<3>│                      │   │                      │   ┌──┐             │
-│             │ └───┘ ┌────────────────────┘   └────────────────────┐ │   │  │             │
-│             ├───────┤                                             │ │   │  │             │
-│             x <DCR> x                     <B>                     │ │   │  │             │
-│             ├───────┤                                             │ │<4>│  │             │
-└─────────────┘       └─────────────────────────────────────────────┘ └───┘  └─────────────┘
++-------------+ +---+ +-------+ +-------------------------+ +-------+ +---+  +-------------+
+|             | |<5>| |       | |                         | |       | |<6>|  |             |
+|             | |   | |       | |                         | |       | |   |  |             |
+|             | |   | | <PC>  | |                         | |       | |   |  |             |
+|             +-+   | |       | |                         | |       | |   |  |             |
+|    <CP>     <HW4> | +-+   +-+ |                         | |       | |   +--+             |
+|             +-+   | +-+   +-+ |                         +-+       | | <HW5>     <BW>     |
+|             | |   | |       | |          <RR>               <TR>  | |   +--+             |
+|             | |   | |       | |                         +-+       | |   |  |             |
+|             | |   | |       +-+                         | |       | |   |  |             |
++-------------+ |   | | <SF>                              | |       | |   |  +-------------+
++-------------+ |   | |       +-+                         | |       | |   |                 
+|             | |   | |       | |                         | |       | |   |  +-------------+
+|             +-+   | |       | |                         | |       | |   |  |             |
+|   <Vent>          | +-------+ +----------+xxx+----------+ +-------+ |   |  |             |
+|             +-+   |                      |   |                      |   |  |             |
+|             | |   +----------------------+xxx+----------------------+   +--+             |
++-------------+ |                          <HW3>                                  <CA>     |
++-------------+ |   +-----------+   +-----------------+   +-----------+   +--+             |
+|             | |   | +-------+ |   | +-------------+ |   | +-------+ |   |  |             |
+|             | |   | |       | |   | |             | |   | |       | |   |  |             |
+|             | |   | |       | |   | |             | |   | |       | |   |  |             |
+|             | |   | |       | |   | |             | |   | |       | |   |  |             |
+|             | |   | |       +-+   +-+             +-+   +-+       | |   |  +-------------+
+|             +-+   | |         <HW1> x             x <HW2>         | |   |                 
+|             x x   | | <GR>  +-+   +-+    <CR>     +-+   +-+  <SR> | |   |  +-------------+
+|    <LAB>    x x   | |       | |   | |             | |   | |       | |   |  |             |
+|             x x   | |       | |   | |      @      | |   | |       | |   |  |             |
+|             +-+   | |       | |   | |             | |   | |       | |   |  |             |
+|             | |   | |       | |<1>| |             | |<2>| |       | |   +--+             |
+|             | |   | +-------+ +---+ +----+xxx+----+ +---+ +-------+ |          <Elect>   |
+|             | |<3>|                      |   |                      |   +--+             |
+|             | +---+ +--------------------+   +--------------------+ |   |  |             |
+|             +-------+                                             | |   |  |             |
+|             x <DCR> x                     <B>                     | |   |  |             |
+|             +-------+                                             | |<4>|  |             |
++-------------+       +---------------------------------------------+ +---+  +-------------+
 `,
+
+	machines: {s
+        // Dummy data: replace with actual machine IDs and coordinates
+        "reactor": { line: 9, column: 47 }, // Example coordinate in Reactor Room
+    },
+
+	blastDoors: {
+		// Approximate coordinates based on the map 'x' markers
+		"door26_17_HW1": { line: 26, column: 17, isOpen: true }, // Hallway 1 section
+		"door27_18_HW1": { line: 27, column: 18, isOpen: true }, // Hallway 1 section
+		"door28_18_HW1": { line: 28, column: 18, isOpen: true }, // Hallway 1 section
+		"door29_18_HW1": { line: 29, column: 18, isOpen: true }, // Hallway 1 section
+		"door30_18_HW1": { line: 30, column: 18, isOpen: true }, // Hallway 1 section
+		"door26_64_HW2": { line: 26, column: 64, isOpen: true }, // Hallway 2 section
+		"door27_63_HW2": { line: 27, column: 63, isOpen: true }, // Hallway 2 section
+		"door36_17_DCR": { line: 36, column: 17, isOpen: true }, // Decontamination Room entrance
+		"door37_17_DCR": { line: 37, column: 17, isOpen: true }, // Decontamination Room section
+		"door38_17_DCR": { line: 38, column: 17, isOpen: true }, // Decontamination Room exit
+    },
     locations: {
         // Rooms
         "PowerConverterRoom": {
@@ -187,8 +222,8 @@ const gameSettings = {
         "Hallway3": {
             friendlyName: "Hallway 3",
             description: "A horizontal corridor connecting Hallways 1 and 2, leading towards the Decontamination Room and Bunker.",
-            mapMarker: "<HW3>", // No specific marker for the whole hallway
-            exits: {
+            mapMarker: null, // No specific marker for the whole hallway
+            exits: { // Corrected exits based on map
                 "Hallway1": "Hallway1",
                 "Hallway2": "Hallway2",
                 "Hallway4": "Hallway4",
@@ -200,8 +235,8 @@ const gameSettings = {
          "Hallway4": {
             friendlyName: "Hallway 4",
             description: "A horizontal corridor connecting the Reactor Room and Turbine Room areas.",
-            mapMarker: "<HW4>", // No specific marker for the whole hallway
-            exits: {
+            mapMarker: null, // No specific marker for the whole hallway
+            exits: { // Corrected exits based on map
                 "ReactorRoom": "ReactorRoom",
                 "TurbineRoom": "TurbineRoom",
                 "Hallway3": "Hallway3",
@@ -213,7 +248,7 @@ const gameSettings = {
          "Hallway5": {
             friendlyName: "Hallway 5",
             description: "An upper horizontal corridor in the northern part of the facility.",
-            mapMarker: "<HW5>", // No specific marker for the whole hallway
+            mapMarker: null, // No specific marker for the whole hallway
             exits: {
                 "PowerConverterRoom": "PowerConverterRoom",
                 "CoolantPumpStation": "CoolantPumpStation",
@@ -266,8 +301,7 @@ const gameSettings = {
     }
 };
 
-// If not using ES6 modules, you might need to make gameSettings globally accessible
-// window.gameSettings = gameSettings;
-
-// If using ES6 modules, export it
-// export default gameSettings;
+// Helper to get user-friendly location name
+function getUserFriendlyLocationName(locationId) {
+return gameSettings.locations[locationId]?.friendlyName || locationId;
+};
