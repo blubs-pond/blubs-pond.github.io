@@ -43,6 +43,7 @@ body {
 }
 
 #stats-area div {
+	display: block; /* Ensure stats entries stack */
 	margin-bottom: 5px; /* Reduce space between stats entries */
 }
 
@@ -76,7 +77,8 @@ body {
 
 #output-area {
     flex-grow: 1; /* Take up remaining space in terminal */
-    overflow-y: auto; /* Enable scrolling for output */
+    overflow-y: scroll; /* Enable scrolling for output, explicitly scroll */
+	height: 100%; /* Ensure output area takes full height of flex container */
     margin-bottom: 5px; /* Space between output and input */
     font-size: 0.9em;
 }
