@@ -4,17 +4,16 @@ body {
     font-family: 'Courier New', Courier, monospace; /* Monospace font */
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Hide scrollbar */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    height: 100%;
 }
 
 #game-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Title row, content row, CML row */
+    grid-template-columns: 1fr 3fr; /* Stats column, Map column */
+    gap: 5px; /* Adjust gap between grid items as needed */
     width: 90%; /* Adjust width as needed */
+    margin: 20px auto; /* Center the container and add some space */
     max-width: 800px; /* Max width for better readability */
     height: 95vh;
     border: 2px solid #fff; /* White border */
@@ -22,19 +21,35 @@ body {
 }
 
 #status-bar {
+    grid-column: 1 / span 2; /* Span across both columns */
+    grid-row: 1; /* First row */
     background-color: #333; /* Dark gray background */
     color: #fff; /* White text */
     padding: 5px 10px;
     border-bottom: 1px solid #fff;
     white-space: pre; /* Preserve whitespace for formatted status */
     font-size: 0.9em;
+    overflow: hidden; /* Hide scrollbar */
+}
+
+#stats-area {
+    grid-column: 1; /* First column */
+    grid-row: 2; /* Second row */
+    background-color: #111; /* Slightly lighter dark for stats */
+    color: #fff;
+    padding: 10px;
+    overflow-y: auto; /* Enable scrolling for stats if needed */
+    font-size: 0.9em;
 }
 
 #map-area {
-    flex-grow: 1; /* Take up most of the space */
+    grid-column: 2; /* Second column */
+    grid-row: 2; /* Second row */
     background-color: #000; /* Black background for map */
     padding: 10px;
-    overflow: hidden; /* Hide scrollbar for map */
+    overflow: auto; /* Enable scrolling for map if needed */
+    /* Existing map-specific styles */
+    flex-grow: 1; /* This flex-grow is within the grid item, useful if it's a flex container itself */
     white-space: pre; /* Preserve whitespace for ASCII art */
     font-size: 0.9em;
     line-height: 1; /* Reduce line height for compact map */
@@ -42,6 +57,8 @@ body {
 }
 
 #terminal-area {
+    grid-column: 1 / span 2; /* Span across both columns */
+    grid-row: 3; /* Third row */
     height: 30%; /* Adjust height for the terminal area */
     display: flex;
     flex-direction: column;
