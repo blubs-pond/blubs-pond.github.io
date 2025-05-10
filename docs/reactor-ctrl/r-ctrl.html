@@ -7,15 +7,35 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="game-container">
-        <div id="output-area">
-            <!-- Game output (text, ASCII art) will appear here -->
-            <p>Welcome to Reactor Control (CLI Edition)!</p>
-            <p>Type 'start' to begin.</p>
+        <div id="status-bar">
+            <!-- Player stats, time, location, etc. -->
+            <p>Time: <span id="inGameTime"></span></p>
+            <p>Money: $<span id="playerMoney"></span></p>
+            <p>Oil Cans: <span id="oilCans"></span></p>
+            <p>Lubricant Kits: <span id="lubricantKits"></span></p>
+            <p>Rations: <span id="rations"></span></p>
+            <p>Coffee/Tea: <span id="coffeeTea"></span></p>
+            <p>Repair Tool: <span id="repairToolDurability"></span>%</p>
+            <p>Hunger: <span id="hungerLevel"></span></p>
+            <p>Insomnia: <span id="insomniaLevel"></span></p>
+            <p>Sanity: <span id="sanity"></span></p>
+            <p>Hiding: <span id="isHiding"></span></p>
+            <p>Door Held: <span id="doorBeingHeld"></span></p>
         </div>
-        <div id="input-area">
-            &gt; <input type="text" id="command-input" autofocus>
+        <div id="map-area">
+            <!-- ASCII map will be rendered here -->
+        </div>
+        <div id="terminal-area">
+            <div id="output-area">
+                <!-- Command output -->
+                <p>Welcome to Reactor Control (CLI Edition)!</p>
+                <p>Type 'start' to begin.</p>
+            </div>
+            <div id="input-area">
+                <span class="prompt">></span>
+                &gt; <input type="text" id="command-input" autofocus>
+            </div>
         </div>
     </div>
 

@@ -1,28 +1,74 @@
 # Ren'Py to Web Migration To-Do List
 
-This list outlines the key tasks required to migrate the game from Ren'Py to a dynamic web application using HTML, CSS, and JavaScript, hosted as a subpage on `blubs-pond.github.io`.
+This list outlines the key tasks required to migrate the game from Ren'Py to a dynamic web application using HTML, CSS, and JavaScript, with a command-line interface (CLI) style and ASCII art.
 
 ## Phase 1: Setup and Core Structure
 
-- [ ] **Create a new folder for the game within your `blubs-pond.github.io` repository (e.g., `reactor-game/`).**
+- [ ] Create a new folder for the game within your `blubs-pond.github.io` repository (e.g., `reactor-game/`).
 - [ ] Create the basic project structure within the game folder:
-    - `index.html` (main game page)
-    - `style.css` (for styling)
+    - `r-ctrl.html` (main game page)
+    - `style.css` (for styling the CLI interface)
     - `script.js` (main game logic)
-    - Folders for assets (images, audio)
-- [ ] Set up a basic HTML layout in `index.html` with containers for game elements (background, character sprites, dialogue box, choices, UI elements).
-- [ ] Apply basic CSS styling in `style.css` to the layout.
-- [ ] Create a simple JavaScript file (`script.js`) that loads and runs a basic function to confirm the setup is working.
-- [ ] **Ensure all file paths within your HTML, CSS, and JavaScript are relative to the game folder (e.g., `/reactor-game/style.css`, `/reactor-game/assets/background.png`).**
-- [ ] (Optional but Recommended) Research and choose a JavaScript game development framework (e.g., Phaser, PixiJS) and set it up in the project.
+- [ ] Set up a basic HTML layout in `r-ctrl.html` with a container for text output and an input area for player commands.
+- [ ] Apply CSS styling in `style.css` to create a terminal-like appearance (background color, text color, font, input field style).
+- [ ] Create a simple JavaScript file (`script.js`) that loads and runs a basic function to confirm the setup is working and perhaps displays a welcome message in the output area.
+- [ ] Ensure all file paths within your HTML, CSS, and JavaScript are relative to the game folder (e.g., `style.css`, `script.js`).
+- [ ] (W3.CSS is optional now, but can still be used for basic layout if desired)
 
-## Phase 2: Core Visual Novel Elements
+## Phase 2: Core Text-Based Output and Input
 
-... (The rest of the tasks remain the same)
+- [ ] Implement a system for displaying text output (dialogue, game information, ASCII art) in the output area.
+- [ ] Implement a system for capturing player input from the input area.
+- [ ] Implement a command parser in JavaScript to understand player commands.
+- [ ] Implement a system for displaying ASCII art.
+
+## Phase 3: Game State Management
+
+- [ ] Define JavaScript variables to hold the game state (current scene, inventory, resources, game time, monster states, etc.).
+- [ ] Implement functions to update the game state based on player commands and game events.
+- [ ] **(Removed) Implement a save game functionality.**
+- [ ] **(Removed) Implement a load game functionality.**
+
+## Phase 4: Implementing Game Mechanics (Migrate from Ren'Py Logic)
+
+- [ ] Game Loop: Implement a game loop using `requestAnimationFrame` or intervals to handle continuous updates (like time progression, reactor simulation, and monster movement).
+- [ ] Time System: Implement the in-game time system (hours, minutes).
+- [ ] Reactor Simulation:
+    - Translate the Ren'Py logic for reactor parameters (temperature, pressure, power) into JavaScript.
+    - Implement the rate changes and interactions between parameters.
+    - Implement the power generation and consumption logic.
+- [ ] Monster System:
+    - Migrate the monster data and properties (location, hostile, etc.).
+    - Implement the monster movement logic (updating monster locations based on game time or events).
+    - Implement monster interactions with the environment (described in text).
+    - Implement monster-specific mechanics (described in text output).
+- [ ] Door System:
+    - Implement the door states (open, closed, held, damaged).
+    - Implement functions to control the doors based on player commands and monster interactions.
+    - Implement door durability and breaking logic (described in text output).
+- [ ] Inventory and Resource Management:
+    - Implement functions to add, remove, and track player inventory items (rations, coffee/tea, crucifixes).
+    - Implement the spoilage mechanic for rations (described in text output).
+    - Implement the effects of coffee/tea on sanity or other stats (described in text output).
+- [ ] Sanity System:
+    - Implement the sanity variable and its decrease/increase logic.
+    - Implement the effects of low sanity (described in text output).
+- [ ] Game Over Conditions:
+    - Implement checks for all game over conditions based on the updated game state.
+    - Display the game over message and ASCII art.
+
+## Phase 5: Visuals (Text-Based) and Audio
+
+- [ ] Create or find ASCII art for game elements (monsters, locations, UI elements).
+- [ ] Implement functions to display the appropriate ASCII art based on the game state.
+- [ ] Integrate sound effects and background music (if desired, though less common for pure CLI style).
+- [ ] Implement text-based visual and audio cues for monster presence and actions.
+- [ ] Refine the text output formatting for readability.
 
 ## Phase 6: Testing and Deployment
 
-... (The testing remains the same)
-- [ ] Commit your changes to the `blubs-pond.github.io` repository.
-- [ ] **Verify that the game is accessible at `https://blubs-pond.github.io/reactor-game/`.**
+- [ ] Thoroughly test all game mechanics and systems through text commands.
+- [ ] **(Removed) Test the save/load functionality.**
+- [ ] Test on different browsers to ensure compatibility.
+- [ ] Deploy the game to GitHub Pages (as a subpage or standalone).
 - [ ] Test the deployed game on GitHub Pages.

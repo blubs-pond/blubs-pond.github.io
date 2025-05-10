@@ -1,40 +1,84 @@
 body {
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font */
     margin: 0;
-    padding: 20px; /* Add some padding */
-    background-color: #1e1e1e; /* Dark background */
-    color: #00ff00; /* Green text */
-    font-family: 'Courier New', Courier, monospace; /* Monospaced font for CLI feel */
-    overflow-y: auto; /* Enable scrolling if content exceeds height */
+    padding: 0;
+    overflow: hidden; /* Hide scrollbar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 #game-container {
-    width: 100%;
-    max-width: 800px; /* Optional: Limit width */
-    margin: 0 auto; /* Center the container */
+    display: flex;
+    flex-direction: column;
+    width: 90%; /* Adjust width as needed */
+    max-width: 800px; /* Max width for better readability */
+    height: 95vh;
+    border: 2px solid #fff; /* White border */
+    box-sizing: border-box;
+}
+
+#status-bar {
+    background-color: #333; /* Dark gray background */
+    color: #fff; /* White text */
+    padding: 5px 10px;
+    border-bottom: 1px solid #fff;
+    white-space: pre; /* Preserve whitespace for formatted status */
+    font-size: 0.9em;
+}
+
+#map-area {
+    flex-grow: 1; /* Take up most of the space */
+    background-color: #000; /* Black background for map */
+    padding: 10px;
+    overflow: hidden; /* Hide scrollbar for map */
+    white-space: pre; /* Preserve whitespace for ASCII art */
+    font-size: 0.9em;
+    line-height: 1; /* Reduce line height for compact map */
+    color: #0f0; /* Green color for the map */
+}
+
+#terminal-area {
+    height: 30%; /* Adjust height for the terminal area */
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #fff;
+    background-color: #1a1a1a; /* Darker gray for terminal */
+    color: #00ff00; /* Green text for terminal */
+    padding: 5px 10px;
+    box-sizing: border-box;
 }
 
 #output-area {
-    white-space: pre-wrap; /* Preserve whitespace and wrap text */
-    word-wrap: break-word; /* Break long words */
-    margin-bottom: 10px;
-    border: 1px solid #00ff00; /* Green border */
-    padding: 10px;
-    height: 400px; /* Example height - adjust as needed */
+    flex-grow: 1; /* Take up remaining space in terminal */
     overflow-y: auto; /* Enable scrolling for output */
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+#output-area p {
+    margin: 0 0 2px 0; /* Reduce space between paragraphs */
 }
 
 #input-area {
-    display: flex; /* Align prompt and input */
+    display: flex;
 }
 
 #command-input {
-    flex-grow: 1; /* Make input take up remaining space */
+    flex-grow: 1;
     background-color: transparent; /* Transparent background */
-    border: none; /* No border */
     color: #00ff00; /* Green text */
-    font-family: 'Courier New', Courier, monospace;
+    border: none;
+    outline: none;
+    font-family: inherit;
     font-size: 1em;
-    outline: none; /* Remove outline on focus */
     padding: 0;
-    margin-left: 5px; /* Space between prompt and input */
+}
+
+.prompt {
+    color: #00ff00; /* Green prompt */
+    margin-right: 5px;
 }
