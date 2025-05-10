@@ -6,7 +6,7 @@ const gameSettings = {
 │             │ │   │ │ <PC>  │ │                         │ │       │ │   │  │             │
 │             └─┘   │ │       │ │                         │ │       │ │   │  │             │
 │    <CP>           │ └─┐   ┌─┘ │                         └─┘       │ │   └──┘             │
-│             ┌─┐   │ ┌─┘   └─┐ │                                   │ │           <BW>     │
+│             ┌─┐   │ ┌─┘   └─┐ │                                   │ │<HW5>      <BW>     │
 │             │ │   │ │       │ │          <RR>               <TR>  │ │   ┌──┐             │
 │             │ │   │ │       │ │                         ┌─┐       │ │   │  │             │
 │             │ │   │ │       └─┘                         │ │       │ │   │  │             │
@@ -14,10 +14,10 @@ const gameSettings = {
 ┌─────────────┐ │   │ │       ┌─┐                         │ │       │ │   │                 
 │             │ │   │ │       │ │                         │ │       │ │   │  ┌─────────────┐
 │             └─┘   │ │       │ │                         │ │       │ │   │  │             │
-│   <Vent>          │ └───────┘ └──────────┬xxx┬──────────┘ └───────┘ │   │  │             │
+│   <Vent>     <HW4>│ └───────┘ └──────────┬xxx┬──────────┘ └───────┘ │   │  │             │
 │             ┌─┐   │                      │   │                      │   │  │             │
 │             │ │   └──────────────────────┴xxx┴──────────────────────┘   └──┘             │
-└─────────────┘ │                                                                 <CA>     │
+└─────────────┘ │                          <HW3>                                  <CA>     │
 ┌─────────────┐ │   ┌───────────┐   ┌─────────────────┐   ┌───────────┐   ┌──┐             │
 │             │ │   │ ┌───────┐ │   │ ┌─────────────┐ │   │ ┌───────┐ │   │  │             │
 │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
@@ -187,10 +187,12 @@ const gameSettings = {
         "Hallway3": {
             friendlyName: "Hallway 3",
             description: "A horizontal corridor connecting Hallways 1 and 2, leading towards the Decontamination Room and Bunker.",
-            mapMarker: null, // No specific marker for the whole hallway
+            mapMarker: "<HW3>", // No specific marker for the whole hallway
             exits: {
                 "Hallway1": "Hallway1",
                 "Hallway2": "Hallway2",
+                "Hallway4": "Hallway4",
+                "Hallway5": "Hallway5",
                 "DecontaminationRoom": "DecontaminationRoom",
                 "Bunker": "Bunker"
             }
@@ -198,10 +200,12 @@ const gameSettings = {
          "Hallway4": {
             friendlyName: "Hallway 4",
             description: "A horizontal corridor connecting the Reactor Room and Turbine Room areas.",
-            mapMarker: null, // No specific marker for the whole hallway
+            mapMarker: "<HW4>", // No specific marker for the whole hallway
             exits: {
                 "ReactorRoom": "ReactorRoom",
                 "TurbineRoom": "TurbineRoom",
+                "Hallway3": "Hallway3",
+                "Hallway2": "Hallway2",
                 "ElectricalSwitchyard": "ElectricalSwitchyard" // Example connection
                 // Potentially other connections via the 'xxx' sections
             }
@@ -209,7 +213,7 @@ const gameSettings = {
          "Hallway5": {
             friendlyName: "Hallway 5",
             description: "An upper horizontal corridor in the northern part of the facility.",
-            mapMarker: null, // No specific marker for the whole hallway
+            mapMarker: "<HW5>", // No specific marker for the whole hallway
             exits: {
                 "PowerConverterRoom": "PowerConverterRoom",
                 "CoolantPumpStation": "CoolantPumpStation",
