@@ -60,16 +60,18 @@ function getPhaseForTime(hours) {
 document.addEventListener('DOMContentLoaded', () => {
     const outputArea = document.getElementById('output-area');
     const commandInput = document.getElementById('command-input');
-    
-    // Command input event listener
-    commandInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent form submission
-            handleUserCommand(commandInput.value.trim());
-        }
-    });
 
-    console.log('script.js loaded successfully!');
+    if (commandInput) {
+        commandInput.addEventListener('keypress', (event) => {
+            console.log('Key pressed:', event.key); // Log key press
+            if (event.key === 'Enter') {
+                console.log('Enter key pressed. Command:', commandInput.value.trim()); // Log Enter and command
+                handleUserCommand(commandInput.value.trim()); // Process the command
+            }
+        });
+    } else {
+        console.error('Error: Could not find element with ID "command-input". Command input will not work.');
+    }
 
     // Start the game loop
     requestAnimationFrame(gameLoop);
@@ -85,4 +87,3 @@ function handleUserCommand(command) {
         processInputCommand(command);
     }
 }
-
