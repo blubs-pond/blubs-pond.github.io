@@ -1,20 +1,19 @@
 let gameSettings = {
     failedDevices: {
-        // Dummy data: replace with actual device IDs and coordinates
-        "device1": { line: 7, column: 18 }, // Example coordinate in Spent Fuel Storage
-        "device2": { line: 14, column: 65 }, // Example coordinate in Turbine Room
+        "device1": { line: 7, column: 18 },
+        "device2": { line: 14, column: 65 }
     },
 
     tasks: {
-        // Dummy data: replace with actual task IDs and coordinates
-        "task1": { line: 28, column: 38 }, // Example coordinate in Control Room
-        "task2": { line: 37, column: 45 }, // Example coordinate in Bunker
+        "task1": { line: 28, column: 38 },
+        "task2": { line: 37, column: 45 }
     },
+
     soundEnabled: true,
     musicEnabled: true,
-    showGameName: true, // Example setting based on gui.show_name
-    doorHoldHungerCostPerSecond: 0.5, // Example cost, adjust as needed
-    shadowLookSanityDrain: 5, // Example sanity drain when looking at Shadow
+    showGameName: true,
+    doorHoldHungerCostPerSecond: 0.5,
+    shadowLookSanityDrain: 5,
     facilityMap: `
 +-------------+ +---+ +-------+ +-------------------------+ +-------+ +---+  +-------------+
 |             | |<5>| |       | |                         | |       | |<6>|  |             |
@@ -55,26 +54,67 @@ let gameSettings = {
 +-------------+       +---------------------------------------------+ +---+  +-------------+
 `,
 
-	machines: {
-        // Dummy data: replace with actual machine IDs and coordinates
-        "reactor": { line: 9, column: 47 } // Example coordinate in Reactor Room
+    machines: {
+        "reactor": { line: 9, column: 47 }
     },
 
-	blastDoors: {
-		// Approximate coordinates based on the map 'x' markers
-		"door26_17_HW1": { line: 26, column: 17, isOpen: true }, // Hallway 1 section
-		"door27_18_HW1": { line: 27, column: 18, isOpen: true }, // Hallway 1 section
-		"door28_18_HW1": { line: 28, column: 18, isOpen: true }, // Hallway 1 section
-		"door29_18_HW1": { line: 29, column: 18, isOpen: true }, // Hallway 1 section
-		"door30_18_HW1": { line: 30, column: 18, isOpen: true }, // Hallway 1 section
-		"door26_64_HW2": { line: 26, column: 64, isOpen: true }, // Hallway 2 section
-		"door27_63_HW2": { line: 27, column: 63, isOpen: true }, // Hallway 2 section
-		"door36_17_DCR": { line: 36, column: 17, isOpen: true }, // Decontamination Room entrance
-		"door37_17_DCR": { line: 37, column: 17, isOpen: true }, // Decontamination Room section
-		"door38_17_DCR": { line: 38, column: 17, isOpen: true }, // Decontamination Room exit
+    blastDoors: {
+        // Control Room doors
+        "door_CR_left":  { line: 26, column: 17, isOpen: true },
+        "door_CR_center": { line: 27, column: 20, isOpen: true },
+        "door_CR_right": { line: 26, column: 64, isOpen: true },
+
+        // Decontamination Room doors
+        "door_DCR_entry": { line: 36, column: 17, isOpen: true },
+        "door_DCR_exit":  { line: 38, column: 17, isOpen: true },
+
+        // Laboratory door
+        "door_LAB": { line: 33, column: 17, isOpen: true },
+
+        // Hallway 3 door (between Hallway 1 and Hallway 2)
+        "door_HW3": { line: 40, column: 18, isOpen: true },
+
+        // Reactor Room door (to Hallway 4)
+        "door_RR_to_HW4": { line: 9, column: 48, isOpen: true },
+
+        // Hallway 5 door
+        "door_HW5": { line: 42, column: 18, isOpen: true }
     },
+
+    cameras: {
+        "camera1": {
+            mapMarker: "<1>",
+            description: "A view of the junction in Hallway 1.",
+            isDistorted: false
+        },
+        "camera2": {
+            mapMarker: "<2>",
+            description: "Monitoring a section of Hallway 2.",
+            isDistorted: false
+        },
+        "camera3": {
+            mapMarker: "<3>",
+            description: "Overlooking the entrance to the Laboratory.",
+            isDistorted: false
+        },
+        "camera4": {
+            mapMarker: "<4>",
+            description: "Providing a view of the area near the Bunker entrance.",
+            isDistorted: false
+        },
+        "camera5": {
+            mapMarker: "<5>",
+            description: "A camera view near the Power Converter Room.",
+            isDistorted: false
+        },
+        "camera6": {
+            mapMarker: "<6>",
+            description: "Monitoring the area near the Turbine Room.",
+            isDistorted: false
+        }
+    },
+
     locations: {
-        // Rooms
         "PowerConverterRoom": {
             friendlyName: "Power Converter Room",
             description: "The hum of electrical energy fills this room, housing the main power converters.",
@@ -148,8 +188,8 @@ let gameSettings = {
             description: "A reinforced bunker for emergencies.",
             mapMarker: "<B>",
             exits: {
-                "Hallway3": "Hallway3", // Assuming connection via Hallway 3
-                "DecontaminationRoom": "DecontaminationRoom" // Assuming direct connection
+                "Hallway3": "Hallway3",
+                "DecontaminationRoom": "DecontaminationRoom"
             }
         },
         "DecontaminationRoom": {
@@ -157,8 +197,8 @@ let gameSettings = {
             description: "This room is used for decontaminating personnel and equipment.",
             mapMarker: "<DCR>",
             exits: {
-                "Hallway3": "Hallway3", // Assuming connection via Hallway 3
-                "Bunker": "Bunker" // Assuming direct connection
+                "Hallway3": "Hallway3",
+                "Bunker": "Bunker"
             }
         },
         "CoolantPumpStation": {
@@ -166,7 +206,7 @@ let gameSettings = {
             description: "Houses the critical coolant pumps.",
             mapMarker: "<CP>",
             exits: {
-                "Hallway5": "Hallway5" // Assuming connection to the upper hallway
+                "Hallway5": "Hallway5"
             }
         },
         "VentilationSystems": {
@@ -174,7 +214,7 @@ let gameSettings = {
             description: "Complex network of vents and air handlers.",
             mapMarker: "<Vent>",
             exits: {
-                "Hallway5": "Hallway5" // Assuming connection to the upper hallway
+                "Hallway5": "Hallway5"
             }
         },
         "ElectricalSwitchyard": {
@@ -182,48 +222,48 @@ let gameSettings = {
             description: "High-voltage equipment for external power distribution.",
             mapMarker: "<Elect>",
             exits: {
-                // Define exits based on the map - looks like it connects to a hallway section
-                 "Hallway4": "Hallway4" // Example connection
+                "Hallway4": "Hallway4"
             }
         },
-        "WaterTreatmentFacility": { // Added based on <BW> marker
+        "WaterTreatmentFacility": {
             friendlyName: "Water Treatment Facility",
             description: "Processes and treats water for the facility.",
             mapMarker: "<BW>",
             exits: {
-                 "Hallway2": "Hallway2" // Example connection
+                "Hallway2": "Hallway2"
             }
         },
 
-        // Hallways
         "Hallway1": {
             friendlyName: "Hallway 1",
             description: "A vertical corridor connecting the west side of the facility.",
-            mapMarker: "<HW1>", // Using <HW1> as the representative marker
+            mapMarker: "<HW1>",
             exits: {
                 "Laboratory": "Laboratory",
                 "GeneratorRoom": "GeneratorRoom",
                 "ControlRoom": "ControlRoom",
                 "Bunker": "Bunker",
-                "Hallway3": "Hallway3" // Connection to horizontal hallway
+                "Hallway3": "Hallway3"
             }
         },
+
         "Hallway2": {
             friendlyName: "Hallway 2",
             description: "A vertical corridor connecting the east side of the facility.",
-            mapMarker: "<HW2>", // Using <HW2> as the representative marker
+            mapMarker: "<HW2>",
             exits: {
                 "ServerRoom": "ServerRoom",
                 "ControlRoom": "ControlRoom",
                 "TurbineRoom": "TurbineRoom",
-                "Hallway3": "Hallway3" // Connection to horizontal hallway
+                "Hallway3": "Hallway3"
             }
         },
+
         "Hallway3": {
             friendlyName: "Hallway 3",
             description: "A horizontal corridor connecting Hallways 1 and 2, leading towards the Decontamination Room and Bunker.",
-            mapMarker: null, // No specific marker for the whole hallway
-            exits: { // Corrected exits based on map
+            mapMarker: "<HW3>",
+            exits: {
                 "Hallway1": "Hallway1",
                 "Hallway2": "Hallway2",
                 "Hallway4": "Hallway4",
@@ -232,76 +272,29 @@ let gameSettings = {
                 "Bunker": "Bunker"
             }
         },
-         "Hallway4": {
+
+        "Hallway4": {
             friendlyName: "Hallway 4",
             description: "A horizontal corridor connecting the Reactor Room and Turbine Room areas.",
-            mapMarker: null, // No specific marker for the whole hallway
-            exits: { // Corrected exits based on map
+            mapMarker: "<HW4>",
+            exits: {
                 "ReactorRoom": "ReactorRoom",
                 "TurbineRoom": "TurbineRoom",
                 "Hallway3": "Hallway3",
-                "Hallway2": "Hallway2",
-                "ElectricalSwitchyard": "ElectricalSwitchyard" // Example connection
-                // Potentially other connections via the 'xxx' sections
+                "ControlRoom": "ControlRoom"
             }
         },
-         "Hallway5": {
+
+        "Hallway5": {
             friendlyName: "Hallway 5",
-            description: "An upper horizontal corridor in the northern part of the facility.",
-            mapMarker: null, // No specific marker for the whole hallway
+            description: "A passageway near the Backup Systems and Pump Station.",
+            mapMarker: "<HW5>",
             exits: {
-                "PowerConverterRoom": "PowerConverterRoom",
                 "CoolantPumpStation": "CoolantPumpStation",
-                "VentilationSystems": "VentilationSystems"
-                 // Potentially connections to the areas with cameras <5> and <6>
+                "VentilationSystems": "VentilationSystems",
+                "PowerConverterRoom": "PowerConverterRoom",
+                "GeneratorRoom": "GeneratorRoom"
             }
-        }
-    },
-
-    blastDoors: {
-        // You will need to manually add entries for each blast door ('x')
-        // with their correct line and column coordinates from the map.
-        // Example:
-        "door_44_17": { line: 44, column: 17, isOpen: true }, // Example coordinates
-        "door_44_21": { line: 44, column: 21, isOpen: true }, // Example coordinates
-         // Add all other blast doors here
-    },
-
-    cameras: {
-        "camera1": {
-            mapMarker: "<1>",
-            description: "A view of the junction in Hallway 1.",
-            isDistorted: false
-        },
-        "camera2": {
-            mapMarker: "<2>",
-            description: "Monitoring a section of Hallway 2.",
-            isDistorted: false
-        },
-        "camera3": {
-            mapMarker: "<3>",
-            description: "Overlooking the entrance to the Laboratory.",
-            isDistorted: false
-        },
-        "camera4": {
-            mapMarker: "<4>",
-            description: "Providing a view of the area near the Bunker entrance.",
-            isDistorted: false
-        },
-        "camera5": {
-            mapMarker: "<5>",
-            description: "A camera view near the Power Converter Room.",
-            isDistorted: false
-        },
-        "camera6": {
-            mapMarker: "<6>",
-            description: "Monitoring the area near the Turbine Room.",
-            isDistorted: false
         }
     }
-};
-
-// Helper to get user-friendly location name
-function getUserFriendlyLocationName(locationId) {
-return gameSettings.locations[locationId]?.friendlyName || locationId;
 };

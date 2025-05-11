@@ -1,36 +1,36 @@
-/* layout.css */
+/* layout.css - structural layout only */
 
 body {
     margin: 0;
     padding: 0;
-    background-color: #000; /* Keep black background */
-    color: #fff; /* Keep white text */
-    font-family: 'Courier New', Courier, monospace; /* Keep monospace font */
-    overflow: hidden; /* Hide scrollbar */
+    background-color: #000;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
     display: flex;
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 #game-container {
     display: grid;
-    grid-template-rows: auto 1fr auto; /* Title row (auto height), content row (takes remaining space), CML row (auto height) */
-    grid-template-columns: 1fr; /* Single column for the main grid container */
-    width: 95%; /* Adjust width as needed */
-    max-width: 1200px; /* Maximum width */
-    height: 95vh; /* Use percentage of viewport height */
-    border: 2px solid #fff; /* White border */
+    grid-template-rows: auto 1fr auto; /* Title, main, terminal */
+    grid-template-columns: 1fr;
+    width: 95%;
+    max-width: 1200px;
+    height: 95vh;
+    border: 2px solid #fff;
     box-sizing: border-box;
-    overflow: hidden; /* Hide scrollbar for the main container */
+    overflow: hidden;
 }
 
-#title-area {
+#title-section {
     grid-row: 1;
     grid-column: 1;
     text-align: center;
     padding: 10px;
-    background-color: #333; /* Dark gray background for title */
+    background-color: #333;
     border-bottom: 1px solid #fff;
 }
 
@@ -38,61 +38,69 @@ body {
     grid-row: 2;
     grid-column: 1;
     display: grid;
-    grid-template-columns: 25% 75%; /* Stats column (25%), Map column (75%) */
-    overflow: hidden; /* Hide scrollbar for the main content area */
+    grid-template-columns: 25% 75%; /* Stats | Map */
+    overflow: hidden;
 }
 
-#stats-area {
+/* Match style.css and HTML */
+#stats-section {
     grid-column: 1;
     padding: 10px;
-    border-right: 1px solid #fff; /* Separator line */
-    overflow-y: auto; /* Add scroll if stats exceed height */
-    white-space: pre-wrap; /* Wrap long stat lines */
+    border-right: 1px solid #fff;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+#map-section {
+    grid-column: 2;
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #map-area {
-    grid-column: 2;
-    padding: 10px;
-    overflow: hidden; /* Hide scrollbar for map */
-    white-space: pre; /* Preserve whitespace for ASCII art */
+    flex-grow: 1;
+    white-space: pre;
     font-size: 0.9em;
-    line-height: 1; /* Reduce line height for compact map */
-    color: #0f0; /* Green color for the map */
+    line-height: 1;
+    color: #0f0;
 }
 
-#terminal-area {
+#cml-section {
     grid-row: 3;
     grid-column: 1;
-    height: 30%; /* Adjust height for the terminal area */
     display: flex;
     flex-direction: column;
+    height: 30%;
     border-top: 1px solid #fff;
-    background-color: #1a1a1a; /* Darker gray for terminal */
-    color: #00ff00; /* Green text for terminal */
+    background-color: #1a1a1a;
+    color: #00ff00;
     padding: 5px 10px;
     box-sizing: border-box;
-    overflow: hidden; /* Hide scrollbar for terminal container */
+    overflow: hidden;
 }
 
 #output-area {
-    flex-grow: 1; /* Take up remaining space in terminal */
-    overflow-y: auto; /* Enable scrolling for output */
+    flex-grow: 1;
+    overflow-y: auto;
     margin-bottom: 5px;
     font-size: 0.9em;
 }
 
 #output-area p {
-    margin: 0 0 2px 0; /* Reduce space between paragraphs */
+    margin: 0 0 2px 0;
 }
 
 #input-area {
     display: flex;
+    align-items: center;
 }
 
 #command-input {
     flex-grow: 1;
-    background-color: transparent; /* Transparent background */
-    color: #00ff00; /* Green text */
+    background-color: transparent;
+    color: #00ff00;
     border: none;
     outline: none;
     font-family: inherit;
@@ -101,6 +109,6 @@ body {
 }
 
 .prompt {
-    color: #00ff00; /* Green prompt */
+    color: #00ff00;
     margin-right: 5px;
 }

@@ -2,7 +2,12 @@ let gameState = {
     currentScene: 'start', // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
     playerInventory: [], // Array of item strings
-    reactorState: { // Updated based on Ren'Py script
+    playerLocation: "ControlRoom", // Player's current location key
+    playerMoney: 1000, // Starting money
+    failedDevices: [], // Array of device IDs that have failed
+
+    // Reactor-related variables
+    reactorState: {
         reactor_temp: 50.0, // Temperature
         reactor_pressure: 10.0, // Pressure
         coolant_level: 100.0, // Coolant level
@@ -10,39 +15,41 @@ let gameState = {
         reactor_power_output: 100.0, // Power Output
         stability: 90 // Percentage
     },
-    playerLocation: "ControlRoom", // Player's current location key
+
     playerStats: {
         hunger: 0, // 0-100, 100 is starving
         insomnia: 0, // 0-100, 100 is critical insomnia
         sanity: 100 // 0-100, 0 is critical
     },
-    playerMoney: 1000, // Starting money
-    failedDevices: [], // Array of device IDs that have failed
+
     tasks: {
-        // Tasks the player needs to complete
-        // Dummy data: replace with actual tasks, states, and required items/actions
         "repairReactor": {
             description: "Repair the primary reactor coolant pump.",
             location: "ReactorRoom",
             requiredItem: "wrench",
             isCompleted: false
         },
-         "restorePower": {
+        "restorePower": {
             description: "Restore auxiliary power to the server room.",
             location: "ServerRoom",
             requiredAction: "flip_switch",
             isCompleted: false
         }
     },
+
+    // Generator and pump-related states
     generatorState: {
         power: 0,
         fuel: 100
     },
-    monsterState: [], // Array of monster objects
-    monsters: { // Object to track individual monster states
-        "Shadow": { location: null, state: "dormant", isNearPlayer: false } // Initial state for Shadow, added isNearPlayer
-    },    
-    // Reactor-related variables from Ren'Py script
+
+    // Monster state
+    monsterState: [],
+    monsters: {
+        "Shadow": { location: null, state: "dormant", isNearPlayer: false } // Initial state for Shadow
+    },
+
+    // Reactor-related parameters for temperature and pump management
     backup_generator_oil: 100.0, // Backup generator oil level
     pump_speed: 50, // Pump speed (0-100)
     temp_increase_rate: 0.1, // Base rate temperature increases
@@ -51,15 +58,21 @@ let gameState = {
     temp_power_cutout_threshold: 20.0, // Temperature for power cutout
     temp_core_shutdown_overspeed_threshold: 80.0, // Temp above which high speed is safe
     pump_speed_overspeed_threshold: 80, // Pump speed causing shutdown at low temp
+
+    // Door states
     doorState: {
         door1: { state: 'closed', durability: 100 },
         door2: { state: 'closed', durability: 100 }
     },
+
+    // Inventory items
     oilCans: 2,
     lubricantKits: 1,
-    rations: 0, // Assuming rations start at 0 based on the Ren'Py script example
+    rations: 0, // Assuming rations start at 0
     coffeeTea: 0, // Assuming coffee/tea starts at 0
-    repairToolDurability: 100.0, // Assuming a starting repair tool
+    repairToolDurability: 100.0, // Starting repair tool durability
+
+    // Player-specific states
     hungerLevel: 0.0,
     insomniaLevel: 0.0,
     sanity: 100,
@@ -70,20 +83,20 @@ let gameState = {
     isHiding: false,
     experimentEntryTimer: -1.0, // -1.0 if not in room
     doorBeingHeld: "none", // Tracks which door is being held ('door1', 'door2', or 'none')
-    cameraState: { // Object to track the state of cameras
-    "camera1": { isDistorted: false }, // Example state property
-    "camera2": { isDistorted: false }
+
+    // Camera system
+    cameraState: {
+        "camera1": { isDistorted: false },
+        "camera2": { isDistorted: false }
     },
     shadowVisible: false, // Track if the Shadow is currently visible on a camera
-    
-    gameFlags: {} // Object to store boolean flags
-    ,
+
+    // Flags and states for specific conditions
+    gameFlags: {}, // Object to store boolean flags
     recentHallwayMovement: false, // Track if there's been recent monster movement in hallways
 
-    // Ventilation System variables
+    // Ventilation System
     ventilationStatus: 'working', // 'working' or 'blocked'
     ventilationBlockageLevel: 0, // 0-100, 100 is fully blocked
     ventilationBlockedTimer: 0, // Tracks how long ventilation has been blocked
-
-    // Control Archives (CA) variables
 };

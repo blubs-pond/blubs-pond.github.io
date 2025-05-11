@@ -1,63 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reactor Control (CLI)</title>
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="layout.css"> <!-- Add a separate CSS for layout -->
-    </head>
-    <body class="w3-black">
- <div id="game-container">
- <div id="title-section">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reactor Control (CLI)</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="layout.css" />
+    <style>
+        body, input {
+            font-family: "Courier New", Courier, monospace;
+        }
+        #command-input {
+            background: black;
+            color: #00FF00;
+            border: none;
+            outline: none;
+            width: 90%;
+        }
+        #output-area, #status-bar, #map-area {
+            color: #00FF00;
+            background-color: black;
+            padding: 1em;
+        }
+        .prompt {
+            color: #00FF00;
+            display: inline-block;
+            margin-right: 0.5em;
+        }
+    </style>
+</head>
+<body class="w3-black">
+    <div id="game-container">
+        <div id="title-section">
             <h1 class="w3-jumbo">Reactor Control (CLI Edition)</h1>
- </div>
- <div id="main-content">
- <div id="stats-section">
- <h3 class="w3-center">Stats</h3>
- <div id="status-bar">
- <!-- Player stats, time, location, etc. -->
- <p>Time: <span id="inGameTime"></span></p>
- <p>Money: $<span id="playerMoney"></span></p>
- <p>Current Location: <span id="currentLocation"></span></p>
- <p>Player State: <span id="playerState"></span></p>
- <hr>
- <p>Oil Cans: <span id="oilCans"></span></p>
- <p>Lubricant Kits: <span id="lubricantKits"></span></p>
- <p>Rations: <span id="rations"></span></p>
- <p>Coffee/Tea: <span id="coffeeTea"></span></p>
- <p>Repair Tool: <span id="repairToolDurability"></span>%</p>
- <p>Hunger: <span id="hungerLevel"></span></p>
- <p>Insomnia: <span id="insomniaLevel"></span></p>
- <p>Sanity: <span id="sanity"></span></p>
- <p>Hiding: <span id="isHiding"></span></p>
- <p>Door Held: <span id="doorBeingHeld"></span></p>
- </div>
- </div>
- <div id="map-section">
- <h3 class="w3-center">Map Area</h3>
- <pre id="map-area" class="w3-monospace"></pre>
- </div>
- </div>
- <div id="cml-section">
- <div id="output-area">
- <!-- Command output -->
- <p>Welcome to Reactor Control (CLI Edition)!</p>
- <p>Type 'start' to begin.</p>
- </div>
- <div id="input-area">
- <span class="prompt">></span>
- &gt; <input type="text" id="command-input" autofocus>
- </div>
- </div>
         </div>
 
-        <script src="gameSettings.js"></script>
-        <script src="gameState.js"></script>
-        <script src="ui.js"></script>
-        <script src="commands.js"></script>
-        <script src="gameLogic.js"></script>
-        <script src="main.js"></script>
-    </body>
+        <div id="main-content" class="w3-row">
+            <div id="stats-section" class="w3-col m6">
+                <div id="status-bar">
+                    <p>Time: <span id="inGameTime"></span></p>
+                    <p>Money: $<span id="playerMoney"></span></p>
+                    <p>Location: <span id="currentLocation"></span></p>
+                    <p>State: <span id="playerState"></span></p>
+                    <hr />
+                    <p>Oil Cans: <span id="oilCans"></span></p>
+                    <p>Lubricant Kits: <span id="lubricantKits"></span></p>
+                    <p>Rations: <span id="rations"></span></p>
+                    <p>Coffee/Tea: <span id="coffeeTea"></span></p>
+                    <p>Repair Tool: <span id="repairToolDurability"></span>%</p>
+                    <p>Hunger: <span id="hungerLevel"></span></p>
+                    <p>Insomnia: <span id="insomniaLevel"></span></p>
+                    <p>Sanity: <span id="sanity"></span></p>
+                    <p>Hiding: <span id="isHiding"></span></p>
+                    <p>Door Held: <span id="doorBeingHeld"></span></p>
+                </div>
+            </div>
+
+            <div id="map-section" class="w3-col m6">
+                <div id="map-area" class="w3-monospace"></div>
+            </div>
+        </div>
+
+        <div id="cli-section">
+            <div id="output-area">
+                <p>Welcome to Reactor Control (CLI Edition)!</p>
+                <p>Type 'start' to begin.</p>
+            </div>
+            <div id="input-area">
+                <span class="prompt">&gt;</span>
+                <input type="text" id="command-input" autofocus />
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="gameSettings.js"></script>
+    <script src="gameState.js"></script>
+    <script src="ui.js"></script>
+    <script src="commands.js"></script>
+    <script src="gameLogic.js"></script>
+    <script src="main.js"></script>
+</body>
 </html>

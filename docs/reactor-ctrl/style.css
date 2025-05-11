@@ -1,7 +1,8 @@
+/* Base Layout */
 body {
     background-color: #000; /* Black background */
     color: #fff; /* White text */
-    font-family: 'Courier New', Courier, monospace; /* Monospace font */
+    font-family: 'Courier New', Courier, monospace;
     margin: 0;
     padding: 0;
     height: 100%;
@@ -9,100 +10,125 @@ body {
 
 #game-container {
     display: grid;
-    grid-template-rows: auto 1fr auto; /* Title row, content row, CML row */
-    grid-template-columns: 1fr 3fr; /* Stats column, Map column */
-    gap: 5px; /* Adjust gap between grid items as needed */
-    width: 90%; /* Adjust width as needed */
-    margin: 20px auto; /* Center the container and add some space */
-    max-width: 800px; /* Max width for better readability */
+    grid-template-rows: auto 1fr auto; /* Title, main content, terminal */
+    grid-template-columns: 1fr 3fr; /* Stats, map */
+    gap: 5px;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
     height: 95vh;
     box-sizing: border-box;
 }
 
+/* Status Bar (Top of Stats Section) */
 #status-bar {
-    grid-column: 1 / span 2; /* Span across both columns */
-    grid-row: 1; /* First row */
-    background-color: #333; /* Dark gray background */
-    color: #fff; /* White text */
+    grid-column: 1 / span 2;
+    background-color: #333;
+    color: #fff;
     padding: 5px 10px;
-    border-bottom: 1px solid #fff;
-    white-space: pre; /* Preserve whitespace for formatted status */
+    border-bottom: 2px solid #fff;
+    white-space: pre;
     font-size: 0.9em;
-    overflow: hidden; /* Hide scrollbar */
-	border-bottom: 2px solid #fff;
+    overflow: hidden;
 }
 
-#stats-area {
-    grid-column: 1; /* First column */
-    grid-row: 2; /* Second row */
-    background-color: #111; /* Slightly lighter dark for stats */
+/* Stats Section */
+#stats-section {
+    grid-column: 1;
+    grid-row: 2;
+    background-color: #111;
     color: #fff;
     padding: 10px;
-    overflow-y: auto; /* Enable scrolling for stats if needed */
+    overflow-y: auto;
     font-size: 0.9em;
 }
 
-#stats-area div {
-	display: block; /* Ensure stats entries stack */
-	margin-bottom: 5px; /* Reduce space between stats entries */
+#stats-section div {
+    display: block;
+    margin-bottom: 5px;
 }
 
-
+/* Map Section */
 #map-area {
-    grid-column: 2; /* Second column */
-    grid-row: 2; /* Second row */
-    background-color: #000; /* Black background for map */
+    grid-column: 2;
+    grid-row: 2;
+    background-color: #000;
     padding: 10px;
-    overflow: auto; /* Enable scrolling for map if needed */
-    /* Existing map-specific styles */
-    flex-grow: 1; /* This flex-grow is within the grid item, useful if it's a flex container itself */
-    white-space: pre; /* Preserve whitespace for ASCII art */
+    overflow: auto;
+    white-space: pre;
     font-size: 0.9em;
-    line-height: 1; /* Reduce line height for compact map */
-    color: #0f0; /* Green color for the map */
+    line-height: 1;
+    color: #0f0;
+    text-shadow: 0 0 2px #0f0;
 }
 
+/* Terminal Section (CLI Interface) */
 #terminal-area {
-    grid-column: 1 / span 2; /* Span across both columns */
-    grid-row: 3; /* Third row */
-    height: 20%; /* Adjust height for the terminal area */
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    height: 20%;
     display: flex;
     flex-direction: column;
     border-top: 1px solid #fff;
-    background-color: #1a1a1a; /* Darker gray for terminal */
-    color: #00ff00; /* Green text for terminal */
+    background-color: #1a1a1a;
+    color: #00ff00;
     padding: 5px 10px;
     box-sizing: border-box;
-}
-
-#output-area {
-    flex-grow: 1; /* Take up remaining space in terminal */
-    overflow-y: scroll; /* Enable scrolling for output, explicitly scroll */
-	height: 100%; /* Ensure output area takes full height of flex container */
-    margin-bottom: 5px; /* Space between output and input */
     font-size: 0.9em;
 }
 
-#output-area p {
-    margin: 0; /* Remove default margin */
+#output-area {
+    flex-grow: 1;
+    overflow-y: scroll;
+    margin-bottom: 5px;
+    color: #0f0;
+    text-shadow: 0 0 2px #0f0;
 }
 
+#output-area p {
+    margin: 0;
+    animation: typewrite 0.5s steps(40, end) 1;
+}
+
+/* Optional Typing Animation */
+@keyframes typewrite {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Input Section */
 #input-area {
     display: flex;
+    align-items: center;
+}
+
+.prompt {
+    color: #00ff00;
+    margin-right: 5px;
+    text-shadow: 0 0 2px #00ff00;
 }
 
 #command-input {
     flex-grow: 1;
-    background-color: transparent; /* Transparent background */
-    color: #00ff00; /* Green text */
+    background-color: transparent;
+    color: #00ff00;
     border: none;
     outline: none;
     font-family: inherit;
     font-size: 1em;
     padding: 0;
+    text-shadow: 0 0 2px #00ff00;
 }
 
-.prompt {
-    color: #00ff00; /* Green prompt */
-    margin-right: 5px;
+/* Optional Scrollbar Styling */
+#output-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+#output-area::-webkit-scrollbar-thumb {
+    background-color: #00ff00;
 }
