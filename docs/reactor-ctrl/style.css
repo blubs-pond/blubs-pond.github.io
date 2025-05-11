@@ -19,7 +19,7 @@ body {
     width: 90%; /* Adjust as needed */
     max-width: 800px; /* Max width for better readability */
     border: 2px solid #00ff00; /* Green border */
-    padding: 15px;
+    padding: 15px 15px 15px 15px;
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
     /* Add box-sizing to include padding and border in the element's total width */
