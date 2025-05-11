@@ -22,10 +22,9 @@ body {
     padding: 15px;
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
-    flex-grow: 1; /* Allow the container to grow and take up space */
-    display: flex; /* Make the container a flex container */
-    flex-direction: column; /* Stack elements vertically within the container */
-    max-height: calc(100vh - 40px); /* Adjust based on body padding */
+    /* Remove flex-grow and max-height from container */
+    /* flex-grow: 1; */
+    /* max-height: calc(100vh - 40px); */
 }
 
 /* Styling for the game title */
@@ -60,7 +59,8 @@ body {
 
 /* Styling for the output area */
 #output-area {
-    flex-grow: 1; /* Allow output area to take up available space */
+    /* Remove flex-grow from output area */
+    /* flex-grow: 1; */
     overflow-y: auto; /* Enable scrolling for output */
     word-break: break-all; /* Break long words */
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
@@ -74,8 +74,9 @@ body {
         #00ff001a 2px
     );
     margin-bottom: 10px; /* Space before the input */
-    /* Remove max-height and let flex-grow manage height */
-    /* max-height: 300px; */
+
+    /* Set a fixed height for the output area */
+    height: 400px; /* Adjust this value as needed */
 }
 
 /* Styling for the input container (optional, but good for grouping) */
