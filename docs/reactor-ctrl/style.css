@@ -1,0 +1,100 @@
+/* Basic body styling for a dark background and monospaced font */
+body {
+    background-color: #1a1a1a; /* Dark gray background */
+    color: #00ff00; /* Bright green text color */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    margin: 0;
+    padding: 20px;
+    overflow: hidden; /* Hide scrollbars */
+    display: flex; /* Use Flexbox for layout */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    min-height: 100vh; /* Minimum height of the viewport */
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    width: 90%; /* Adjust as needed */
+    max-width: 800px; /* Max width for better readability */
+    border: 2px solid #00ff00; /* Green border */
+    padding: 15px;
+    box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
+    background-color: #1a1a1a; /* Match background */
+}
+
+/* Styling for the game title */
+#game-title {
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    margin-bottom: 15px;
+}
+
+/* Styling for the stat bar */
+#stat-bar {
+    color: #00ff00;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    text-shadow: 0 0 3px #00ff00;
+    border-bottom: 1px dashed #00ff00; /* Separator line */
+    padding-bottom: 10px;
+}
+
+/* Styling for the map area */
+#map-area {
+    color: #00ff00;
+    font-size: 0.8em; /* Smaller font for the map */
+    margin-bottom: 15px;
+    text-shadow: 0 0 3px #00ff00;
+    white-space: pre; /* Preserve whitespace for map characters */
+    overflow-x: auto; /* Add horizontal scroll if map is too wide */
+    border-bottom: 1px dashed #00ff00; /* Separator line */
+    padding-bottom: 10px;
+}
+
+/* Styling for the output area */
+#output-area {
+    flex-grow: 1; /* Allow output area to take up available space */
+    overflow-y: auto; /* Enable scrolling for output */
+    word-break: break-all; /* Break long words */
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    /* CRT-like text effect */
+    text-shadow: 0 0 5px #00ff00;
+    /* Subtle scanline effect (optional) */
+    background: repeating-linear-gradient(
+        #1a1a1a,
+        #1a1a1a 1px,
+        #00ff001a 1px,
+        #00ff001a 2px
+    );
+    margin-bottom: 10px; /* Space before the input */
+}
+
+/* Styling for the input container (optional, but good for grouping) */
+#input-container {
+    display: flex;
+}
+
+/* Styling for the command input */
+#command-input {
+    background-color: #1a1a1a; /* Match background */
+    color: #00ff00; /* Match text color */
+    font-family: 'Courier New', Courier, monospace; /* Match font */
+    border: none; /* No border */
+    outline: none; /* Remove outline on focus */
+    width: 100%; /* Full width */
+    padding: 10px 0;
+    caret-color: #00ff00; /* Green cursor */
+    font-size: 1em;
+}
+
+/* Add a blinking cursor effect (optional) */
+#command-input {
+    animation: blink-caret 1s step-end infinite;
+}
+
+@keyframes blink-caret {
+    from, to { border-right-color: transparent }
+    50% { border-right-color: #00ff00; }
+}

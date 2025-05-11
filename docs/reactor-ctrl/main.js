@@ -1,4 +1,5 @@
 import { processCommand } from './commands.js';
+import { gameLoop } from './gameLogic.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const commandInput = document.getElementById('command-input');
@@ -13,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('Error: Could not find element with ID "command-input". Command input will not work.');
     }
+
+    // Start the game loop
+    requestAnimationFrame(gameLoop);
 });
 
 function handleUserCommand(command) {
