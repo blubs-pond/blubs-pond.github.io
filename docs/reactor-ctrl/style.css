@@ -61,7 +61,7 @@ body {
 
 /* Styling for the output area */
 #output-area {
-    overflow-y: auto; /* Enable scrolling for output */
+    overflow-y: scroll; /* Enable scrolling for output */
     word-break: break-all; /* Break long words */
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
     /* CRT-like text effect */
@@ -73,9 +73,10 @@ body {
         #00ff001a 1px,
         #00ff001a 2px
     );
-    margin-bottom: 10px; /* Space before the input */
+    margin-bottom: 5px; /* Space before the input */
     /* Set a fixed height for the output area */
-    height: 400px; /* Adjust this value as needed */
+    height: 200px; /* Adjust this value as needed */
+    max-height: 40%;
 }
 
 /* Styling for the input container (optional, but good for grouping) */
