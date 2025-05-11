@@ -69,6 +69,9 @@ body {
         #00ff001a 2px
     );
     margin-bottom: 10px; /* Space before the input */
+
+    /* Add a maximum height and enable scrolling */
+    max-height: 300px; /* Adjust this value as needed */
 }
 
 /* Styling for the input container (optional, but good for grouping) */
