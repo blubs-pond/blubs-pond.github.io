@@ -8,7 +8,7 @@ body {
     overflow: hidden; /* Hide scrollbars */
     display: flex; /* Use Flexbox for layout */
     flex-direction: column; /* Stack elements vertically */
-    justify-content: flex-end; /* Push content to the bottom */
+    justify-content: center; /* Push content to the bottom */
     align-items: center; /* Center content horizontally */
     min-height: 100vh; /* Minimum height of the viewport */
 }
