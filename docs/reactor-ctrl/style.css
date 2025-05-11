@@ -22,9 +22,6 @@ body {
     padding: 15px;
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
-    /* Remove flex-grow and max-height from container */
-    /* flex-grow: 1; */
-    /* max-height: calc(100vh - 40px); */
 }
 
 /* Styling for the game title */
@@ -55,12 +52,13 @@ body {
     overflow-x: auto; /* Add horizontal scroll if map is too wide */
     border-bottom: 1px dashed #00ff00; /* Separator line */
     padding-bottom: 10px;
+    /* Set a fixed height for the map area and enable vertical scrolling */
+    height: 200px; /* Adjust this value as needed */
+    overflow-y: auto;
 }
 
 /* Styling for the output area */
 #output-area {
-    /* Remove flex-grow from output area */
-    /* flex-grow: 1; */
     overflow-y: auto; /* Enable scrolling for output */
     word-break: break-all; /* Break long words */
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
@@ -74,7 +72,6 @@ body {
         #00ff001a 2px
     );
     margin-bottom: 10px; /* Space before the input */
-
     /* Set a fixed height for the output area */
     height: 400px; /* Adjust this value as needed */
 }

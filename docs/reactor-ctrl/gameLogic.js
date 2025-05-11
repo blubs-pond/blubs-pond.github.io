@@ -29,7 +29,7 @@ export function gameLoop(timestamp) {
 
 function updateGameState(dt) {
     const realLifeMinutesElapsed = dt / 60.0;
-    gameTimeInMinutesReal += realLifeMinutesElapsed;
+    gameTimeInMinutesReal += realLifeMinutesReal;
 
     // Calculate in-game time (assuming 48 real minutes = 1 in-game day = 1440 in-game minutes)
     const totalInGameMinutes = (gameTimeInMinutesReal / 48.0) * 1440;
@@ -118,22 +118,30 @@ export function parseMapString(mapString) {
     return matrix;
 }
 
-// New function to process user commands
+// New function to process user commands with shorter aliases
 export function processCommand(commandInput) {
     const [command, ...args] = commandInput.trim().toLowerCase().split(' '); // Split command and arguments
 
-    if (command === 'go') {
-        handleGoCommand(args);
-    } else if (command === 'help') {
-        handleHelpCommand();
-    } else if (command === 'look') { // Placeholder for 'look' command
-        handleLookCommand(args);
-    } else if (command === 'inventory') { // Placeholder for 'inventory' command
-        handleInventoryCommand();
-    } else if (command === 'examine') { // Placeholder for 'examine' command
-        handleExamineCommand(args);
-    }
-    else {
+    // Map shorter aliases to handler functions
+    const commandMap = {
+        'go': handleGoCommand,
+        'g': handleGoCommand, // Alias
+        'look': handleLookCommand,
+        'l': handleLookCommand, // Alias
+        'inventory': handleInventoryCommand,
+        'inv': handleInventoryCommand, // Alias
+        'examine': handleExamineCommand,
+        'exam': handleExamineCommand, // Alias
+        'help': handleHelpCommand,
+        'h': handleHelpCommand, // Alias
+        // Add other commands and their aliases here
+    };
+
+    const handler = commandMap[command];
+
+    if (handler) {
+        handler(args);
+    } else {
         appendOutput(`Unknown command: ${command}`);
     }
 }
@@ -143,9 +151,26 @@ function handleGoCommand(args) {
     const direction = args[0]; // Get the direction (e.g., 'north', 'east')
 
     if (!direction) {
-        appendOutput("Go where? You need to specify a direction.");
+        appendOutput("Go where? You need to specify a direction (e.g., g n).");
         return;
     }
+
+    // You might want to also handle direction aliases (n, s, e, w) here
+    const directionMap = {
+        'north': 'north', 'n': 'north',
+        'south': 'south', 's': 'south',
+        'east': 'east', 'e': 'east',
+        'west': 'west', 'w': 'west',
+        // Add other directions if needed
+    };
+
+    const fullDirection = directionMap[direction.toLowerCase()];
+
+    if (!fullDirection) {
+         appendOutput(`Invalid direction: ${direction}. Use north, south, east, or west (or n, s, e, w).`);
+         return;
+    }
+
 
     const currentLocationKey = gameState.player.location;
     const currentLocation = gameSettings.locations[currentLocationKey];
@@ -159,40 +184,40 @@ function handleGoCommand(args) {
     const exits = currentLocation.exits;
 
     // Check if the direction is a valid exit
-    if (exits && exits[direction]) {
-        const nextLocationKey = exits[direction];
+    if (exits && exits[fullDirection]) {
+        const nextLocationKey = exits[fullDirection];
         const nextLocation = gameSettings.locations[nextLocationKey];
 
         if (nextLocation) {
             gameState.player.location = nextLocationKey; // Update player's location
-            appendOutput(`You go ${direction} to the ${nextLocation.friendlyName}.`);
+            appendOutput(`You go ${fullDirection} to the ${nextLocation.friendlyName}.`);
             // You might want to add a function here to display the description of the new location
         } else {
             appendOutput(`Error: The exit to ${nextLocationKey} is defined but the location is not found.`);
             console.error("Invalid next location key in exits:", nextLocationKey);
         }
     } else {
-        appendOutput(`You cannot go ${direction} from here.`);
+        appendOutput(`You cannot go ${fullDirection} from here.`);
         // You might want to list the available exits here
     }
 }
 
-// New function to handle the 'help' command
+// New function to handle the 'help' command with shorter aliases
 function handleHelpCommand() {
     appendOutput("Available commands:");
-    appendOutput("- go [direction] (e.g., go north)");
-    appendOutput("- look (Look around your current location)");
-    appendOutput("- inventory (Check your inventory)");
-    appendOutput("- examine [object] (Examine an object in your location or inventory)");
-    appendOutput("- help (Displays this help message)");
-    // Add other commands here as you implement them
+    appendOutput("- go / g [direction] (e.g., g n)");
+    appendOutput("- look / l (Look around your current location)");
+    appendOutput("- inventory / inv (Check your inventory)");
+    appendOutput("- examine / exam [object] (Examine an object)");
+    appendOutput("- help / h (Displays this help message)");
+    // Add other commands and their aliases here as you implement them
 }
 
 // Placeholder function for the 'look' command
 function handleLookCommand(args) {
     // TODO: Implement logic to display current location description and items/features
     if (args.length > 0) {
-        appendOutput("You can just 'look' or 'look [something]' later.");
+        appendOutput("You can just 'look' (l) to look around.");
     } else {
         appendOutput("You look around. (Location description and details will go here)");
         // In the future, get the description from gameSettings.locations[gameState.player.location].description
@@ -216,7 +241,7 @@ function handleExamineCommand(args) {
         // In the future, check if the object is in the current location or inventory
         // and display its description.
     } else {
-        appendOutput("Examine what? You need to specify an object to examine.");
+        appendOutput("Examine what? You need to specify an object to examine (e.g., exam key).");
     }
 }
 
