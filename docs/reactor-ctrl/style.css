@@ -7,8 +7,9 @@ body {
     padding: 20px;
     overflow: hidden; /* Hide scrollbars */
     display: flex; /* Use Flexbox for layout */
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center content vertically */
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: flex-end; /* Push content to the bottom */
+    align-items: center; /* Center content horizontally */
     min-height: 100vh; /* Minimum height of the viewport */
 }
 
@@ -21,6 +22,10 @@ body {
     padding: 15px;
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
+    flex-grow: 1; /* Allow the container to grow and take up space */
+    display: flex; /* Make the container a flex container */
+    flex-direction: column; /* Stack elements vertically within the container */
+    max-height: calc(100vh - 40px); /* Adjust based on body padding */
 }
 
 /* Styling for the game title */
@@ -69,14 +74,15 @@ body {
         #00ff001a 2px
     );
     margin-bottom: 10px; /* Space before the input */
-
-    /* Add a maximum height and enable scrolling */
-    max-height: 300px; /* Adjust this value as needed */
+    /* Remove max-height and let flex-grow manage height */
+    /* max-height: 300px; */
 }
 
 /* Styling for the input container (optional, but good for grouping) */
 #input-container {
     display: flex;
+    /* Ensure input container doesn't grow */
+    flex-shrink: 0;
 }
 
 /* Styling for the command input */
