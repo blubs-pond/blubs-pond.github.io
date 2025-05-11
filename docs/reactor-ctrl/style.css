@@ -22,6 +22,8 @@ body {
     padding: 15px;
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
+    /* Add box-sizing to include padding and border in the element's total width */
+    box-sizing: border-box;
 }
 
 /* Styling for the game title */
