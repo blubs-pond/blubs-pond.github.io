@@ -137,7 +137,7 @@ export function processCommand(commandInput) {
         // Add other commands and their aliases here
     };
 
-    const handler = commandMap[command];
+    const handler = commandMap[command]; // Look up the handler using the command
 
     if (handler) {
         handler(args);
@@ -145,6 +145,7 @@ export function processCommand(commandInput) {
         appendOutput(`Unknown command: ${command}`);
     }
 }
+
 
 // New function to handle the 'go' command
 function handleGoCommand(args) {
