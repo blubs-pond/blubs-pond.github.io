@@ -53,27 +53,14 @@ function displayMap(state = 'default') {
     const playerLocationKey = gameState.currentLocation || gameState.playerLocation;
     const playerLocation = gameSettings.locations?.[playerLocationKey]; // Use optional chaining
 
-    // Prioritize coordinate-based placement
-    if (playerLocation?.line !== undefined && playerLocation?.column !== undefined) {
-        // Ensure coordinates are numbers
-        const line = parseInt(playerLocation.line, 10);
-        const column = parseInt(playerLocation.column, 10);
-        if (!isNaN(line) && !isNaN(column)) {
-             placeMarker({ line: line, column: column }, '@');
-        } else {
-            console.warn(`Invalid numeric coordinates for player location ${playerLocationKey}. Attempting marker replacement fallback.`);
-            // Fallback to marker replacement if coordinates are invalid
-             if (playerLocation?.mapMarker) {
-        // Fallback if only mapMarker string is available, not coordinates
-        const markerRegex = new RegExp(escapeRegExp(playerLocation.mapMarker), 'gi');
-        for (let i = 0; i < finalMapLines.length; i++) { // Use finalMapLines here
-            const match = markerRegex.exec(finalMapLines[i].join('')); // Search in the string representation
-            if (match) {
-                const colIndex = match.index;
-                placeMarker({ line: i, column: colIndex }, '@'); // Use the index on the original line
-                break;
-            }
-        }
+    // --- Place player marker using coordinates ---
+    const playerLine = parseInt(playerLocation?.line, 10);
+    const playerColumn = parseInt(playerLocation?.column, 10);
+
+    if (!isNaN(playerLine) && !isNaN(playerColumn)) {
+        placeMarker({ line: playerLine, column: playerColumn }, '@');
+    } else {
+        console.warn(`Invalid or missing numeric coordinates for player location: ${playerLocationKey}. Skipping player marker placement.`);
     }
 
     // --- Handle different display states ---
@@ -120,15 +107,6 @@ function displayMap(state = 'default') {
     // --- Render final map ---
     const finalMap = finalMapLines.map(line => line.join('')).join('\n');
     mapArea.textContent = finalMap; // Display the map in the dedicated area
-
-    } else {
-    console.warn(`Map marker or coordinates not found for location: ${playerLocationKey}.`);
-    if (mapArea) {
-    mapArea.textContent = finalMapLines.map(line => line.join('')).join('\n'); // Display map without player marker
-    } else {
-    appendOutput("Error displaying map: Player location not found.");
-    }
-        }
 }
 
 // Function to update the UI elements

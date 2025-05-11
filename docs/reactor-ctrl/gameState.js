@@ -2,12 +2,12 @@ let gameState = {
     currentScene: 'start', // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
     playerInventory: [], // Array of item strings
-    reactorState: {
-        // Placeholder reactor state properties
-        coreTemperature: 500, // Degrees Celsius
-        pressure: 1000, // PSI
-        coolantLevel: 80, // Percentage
-        powerOutput: 100, // Percentage
+    reactorState: { // Updated based on Ren'Py script
+        reactor_temp: 50.0, // Temperature
+        reactor_pressure: 10.0, // Pressure
+        coolant_level: 100.0, // Coolant level
+        radiation_level: 0.0, // Radiation level
+        reactor_power_output: 100.0, // Power Output
         stability: 90 // Percentage
     },
     playerLocation: "ControlRoom", // Player's current location key
@@ -41,7 +41,16 @@ let gameState = {
     monsterState: [], // Array of monster objects
     monsters: { // Object to track individual monster states
         "Shadow": { location: null, state: "dormant", isNearPlayer: false } // Initial state for Shadow, added isNearPlayer
-    },
+    },    
+    // Reactor-related variables from Ren'Py script
+    backup_generator_oil: 100.0, // Backup generator oil level
+    pump_speed: 50, // Pump speed (0-100)
+    temp_increase_rate: 0.1, // Base rate temperature increases
+    temp_cool_rate_multiplier: 0.05, // How much pump speed affects cooling
+    temp_meltdown_threshold: 200.0, // Temperature for meltdown
+    temp_power_cutout_threshold: 20.0, // Temperature for power cutout
+    temp_core_shutdown_overspeed_threshold: 80.0, // Temp above which high speed is safe
+    pump_speed_overspeed_threshold: 80, // Pump speed causing shutdown at low temp
     doorState: {
         door1: { state: 'closed', durability: 100 },
         door2: { state: 'closed', durability: 100 }
@@ -68,4 +77,13 @@ let gameState = {
     shadowVisible: false, // Track if the Shadow is currently visible on a camera
     
     gameFlags: {} // Object to store boolean flags
+    ,
+    recentHallwayMovement: false, // Track if there's been recent monster movement in hallways
+
+    // Ventilation System variables
+    ventilationStatus: 'working', // 'working' or 'blocked'
+    ventilationBlockageLevel: 0, // 0-100, 100 is fully blocked
+    ventilationBlockedTimer: 0, // Tracks how long ventilation has been blocked
+
+    // Control Archives (CA) variables
 };
