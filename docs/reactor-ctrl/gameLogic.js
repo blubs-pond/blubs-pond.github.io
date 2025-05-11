@@ -124,8 +124,14 @@ export function processCommand(commandInput) {
 
     if (command === 'go') {
         handleGoCommand(args);
-    } else if (command === 'help') { // Add a case for the 'help' command
+    } else if (command === 'help') {
         handleHelpCommand();
+    } else if (command === 'look') { // Placeholder for 'look' command
+        handleLookCommand(args);
+    } else if (command === 'inventory') { // Placeholder for 'inventory' command
+        handleInventoryCommand();
+    } else if (command === 'examine') { // Placeholder for 'examine' command
+        handleExamineCommand(args);
     }
     else {
         appendOutput(`Unknown command: ${command}`);
@@ -175,11 +181,44 @@ function handleGoCommand(args) {
 function handleHelpCommand() {
     appendOutput("Available commands:");
     appendOutput("- go [direction] (e.g., go north)");
-    // Add other commands here as you implement them
+    appendOutput("- look (Look around your current location)");
+    appendOutput("- inventory (Check your inventory)");
+    appendOutput("- examine [object] (Examine an object in your location or inventory)");
     appendOutput("- help (Displays this help message)");
-    // You could also add commands like 'look', 'inventory', 'examine', etc.
+    // Add other commands here as you implement them
 }
 
+// Placeholder function for the 'look' command
+function handleLookCommand(args) {
+    // TODO: Implement logic to display current location description and items/features
+    if (args.length > 0) {
+        appendOutput("You can just 'look' or 'look [something]' later.");
+    } else {
+        appendOutput("You look around. (Location description and details will go here)");
+        // In the future, get the description from gameSettings.locations[gameState.player.location].description
+        // and list items or features in the location.
+    }
+}
+
+// Placeholder function for the 'inventory' command
+function handleInventoryCommand() {
+    // TODO: Implement logic to list player's inventory
+    appendOutput("You check your inventory. (Inventory items will be listed here)");
+    // In the future, iterate through gameState.player.inventory and list items.
+}
+
+// Placeholder function for the 'examine' command
+function handleExamineCommand(args) {
+    // TODO: Implement logic to examine a specific object
+    if (args.length > 0) {
+        const objectToExamine = args.join(' '); // Join arguments to handle multi-word objects
+        appendOutput(`You examine the ${objectToExamine}. (Details about the object will appear here)`);
+        // In the future, check if the object is in the current location or inventory
+        // and display its description.
+    } else {
+        appendOutput("Examine what? You need to specify an object to examine.");
+    }
+}
 
 // You may need to export other functions as they are implemented and needed elsewhere
 // export { updateReactorTemp, updateVentilation, updateGeneratorOil, updateReactorPowerOutput, updateControlArchives, processCommand }; // Added processCommand to export
