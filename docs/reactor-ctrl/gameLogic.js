@@ -1,3 +1,31 @@
+// Function to update the state of the Control Archives panels and related effects
+function updateControlArchives(dt) {
+    const criticalRooms = ['RR', 'CP', 'BW'];
+
+    // Implement chance for critical panels to break
+    criticalRooms.forEach(roomCode => {
+        // Only a chance to break if currently working
+        if (gameState.roomPanelStatus[roomCode] === 'working') {
+            // Simple random chance per second (adjust rate as needed)
+            if (Math.random() < 0.005 * dt) { // 0.5% chance per second
+                gameState.roomPanelStatus[roomCode] = 'broken';
+                appendOutput(`Control panel in the ${getUserFriendlyLocationName(roomCode)} has failed!`);
+
+                // Recalculate critical temperature increase rate only if this is a critical room
+                if (criticalRooms.includes(roomCode)) {
+                    gameState.criticalReactorTempIncreaseRate = calculateCriticalTempIncreaseRate();
+                }
+            }
+        }
+    });
+
+    // Update reboot cooldown (for 'reboot ca all')
+    if (gameState.rebootAllCaCooldown > 0) {
+        gameState.rebootAllCaCooldown = Math.max(0, gameState.rebootAllCaCooldown - dt);
+    }
+
+    // TODO: Implement reboot progress for individual rooms
+}
 // Handles the transition between game phases (e.g., survival, repair, etc.)
 function handlePhaseTransition(phase) {
     appendOutput(`--- Phase changed: ${phase.toUpperCase()} ---`);
@@ -11,11 +39,20 @@ function updateReactorTemp(dt) {
         return;
     }
 
-    // Temperature increases over time
-    gameState.reactor_temp += gameState.temp_increase_rate * dt;
+    // Temperature increases over time based on critical panel status
+    let currentTempIncreaseRate = gameState.temp_increase_rate;
+
+    // If critical panels are broken, use the critical increase rate
+    // Otherwise, normal temperature increase and cooling apply
+    // Apply critical temperature increase rate if any critical panel is broken
+    if (gameState.criticalReactorTempIncreaseRate > 0) {
+        currentTempIncreaseRate = gameState.criticalReactorTempIncreaseRate;
+    }
+    gameState.reactor_temp += currentTempIncreaseRate * dt;
     const coolingEffect = gameState.pump_speed * gameState.temp_cool_rate_multiplier * dt;
     gameState.reactor_temp -= coolingEffect;
     gameState.reactor_temp = Math.max(gameState.reactor_temp, 0);
+
 
     // Check for power cutout and meltdown
     if (gameState.reactor_temp < gameState.temp_power_cutout_threshold) {
@@ -141,6 +178,10 @@ function rebootReactorComponent(component) {
     appendOutput(`Attempting to reboot the ${component}...`);
 }
 
+function rebootCaPanel(roomCode) {
+    // TODO: Implement specific reboot logic for CA panels, including progress and setting status back to 'working'.
+}
+
 // Overclock a reactor component with a potential risk/reward system
 function overclockReactorComponent(component) {
     appendOutput(`Attempting to overclock the ${component}...`);
@@ -225,4 +266,27 @@ function checkWinLoseConditions() {
 // Randomly decides if a monster moves
 function maybeMoveMonster(monster) {
     // Random movement logic here
+}
+
+// Helper function to calculate the critical temperature increase rate based on broken critical panels
+function calculateCriticalTempIncreaseRate() {
+    let brokenCount = 0;
+    if (gameState.roomPanelStatus['RR'] === 'broken') brokenCount++;
+    if (gameState.roomPanelStatus['CP'] === 'broken') brokenCount++;
+    if (gameState.roomPanelStatus['BW'] === 'broken') brokenCount++;
+
+    // Define different critical rates based on the number of broken panels
+    // These are placeholder values and should be adjusted in gameSettings.js
+    switch (brokenCount) {
+        case 0:
+            return 0; // No critical panels broken, no critical increase
+        case 1:
+            return 0.5; // One critical panel broken
+        case 2:
+            return 1.5; // Two critical panels broken
+        case 3:
+            return 3.0; // All three critical panels broken (very rapid increase)
+        default:
+            return 0; // Should not happen
+    }
 }

@@ -4,6 +4,11 @@ let gameSettings = {
         "device2": { line: 14, column: 65 }
     },
 
+    // Reactor Temperature Settings
+    baseTempIncreaseRate: 0.1, // Base temperature increase per second
+    cpTempModulation: -0.05, // Cooling effect from working CP per second (negative value)
+    bwTempModulation: -0.03, // Cooling effect from working BW per second (negative value)
+
     tasks: {
         "task1": { line: 28, column: 38 },
         "task2": { line: 37, column: 45 }

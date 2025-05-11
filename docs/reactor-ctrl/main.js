@@ -84,6 +84,6 @@ function handleUserCommand(command) {
     if (awaitingExitConfirmation) {
         handleExitConfirmation(command);
     } else {
-        processInputCommand(command);
+        processCommand(command);
     }
 }
