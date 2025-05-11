@@ -29,7 +29,7 @@ export function gameLoop(timestamp) {
 
 function updateGameState(dt) {
     const realLifeMinutesElapsed = dt / 60.0;
-    gameTimeInMinutesReal += realLifeMinutesMinutesElapsed; // Corrected variable name
+    gameTimeInMinutesReal += realLifeMinutesElapsed;
 
     // Calculate in-game time (assuming 48 real minutes = 1 in-game day = 1440 in-game minutes)
     const totalInGameMinutes = (gameTimeInMinutesReal / 48.0) * 1440;
@@ -124,7 +124,10 @@ export function processCommand(commandInput) {
 
     if (command === 'go') {
         handleGoCommand(args);
-    } else {
+    } else if (command === 'help') { // Add a case for the 'help' command
+        handleHelpCommand();
+    }
+    else {
         appendOutput(`Unknown command: ${command}`);
     }
 }
@@ -167,6 +170,16 @@ function handleGoCommand(args) {
         // You might want to list the available exits here
     }
 }
+
+// New function to handle the 'help' command
+function handleHelpCommand() {
+    appendOutput("Available commands:");
+    appendOutput("- go [direction] (e.g., go north)");
+    // Add other commands here as you implement them
+    appendOutput("- help (Displays this help message)");
+    // You could also add commands like 'look', 'inventory', 'examine', etc.
+}
+
 
 // You may need to export other functions as they are implemented and needed elsewhere
 // export { updateReactorTemp, updateVentilation, updateGeneratorOil, updateReactorPowerOutput, updateControlArchives, processCommand }; // Added processCommand to export
