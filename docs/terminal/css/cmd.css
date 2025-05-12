@@ -1,6 +1,6 @@
 /* Pseudo Terminal Styling */
 #pseudo-terminal {
-    display: none; /* Initially hide the terminal */
+    display: flex;
     position: fixed; /* Position it relative to the viewport */
     top: 0;
     left: 0;
