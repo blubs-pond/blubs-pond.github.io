@@ -4,11 +4,11 @@ body {
     color: #00ff00; /* Bright green text color */
     font-family: 'Courier New', Courier, monospace; /* Monospaced font */
     margin: auto;
-    padding: 5px 5px 5px 5px;
+    padding: 5px; /* Simplified padding */
     overflow: hidden; /* Hide scrollbars */
     display: flex; /* Use Flexbox for layout */
     flex-direction: column; /* Stack elements vertically */
-    justify-content: center; /* Push content to the bottom */
+    justify-content: center; /* Center content vertically */
     align-items: center; /* Center content horizontally */
     min-height: 100vh; /* Minimum height of the viewport */
 }
@@ -19,11 +19,11 @@ body {
     width: 90%; /* Adjust as needed */
     max-width: 800px; /* Max width for better readability */
     border: 2px solid #00ff00; /* Green border */
-    padding: 15px 15px 15px 15px;
+    padding: 15px; /* Simplified padding */
     box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
     background-color: #1a1a1a; /* Match background */
-    /* Add box-sizing to include padding and border in the element's total width */
-    box-sizing: border-box;
+    box-sizing: border-box; /* Include padding and border in width */
+    height: calc(100vh - 10px); /* Make container fill viewport height minus body padding */
 }
 
 /* Styling for the game title */
@@ -32,6 +32,7 @@ body {
     color: #00ff00;
     text-shadow: 0 0 5px #00ff00;
     margin-bottom: 15px;
+    flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 /* Styling for the stat bar */
@@ -42,6 +43,7 @@ body {
     text-shadow: 0 0 3px #00ff00;
     border-bottom: 1px dashed #00ff00; /* Separator line */
     padding-bottom: 10px;
+    flex-shrink: 0; /* Prevent stat bar from shrinking */
 }
 
 /* Styling for the map area */
@@ -54,14 +56,14 @@ body {
     overflow-x: auto; /* Add horizontal scroll if map is too wide */
     border-bottom: 1px dashed #00ff00; /* Separator line */
     padding-bottom: 10px;
-    /* Set a fixed height for the map area and enable vertical scrolling */
-    height: 200px; /* Adjust this value as needed */
+    /* Allow map area to grow and enable vertical scrolling */
+    flex-grow: 1;
     overflow-y: auto;
 }
 
 /* Styling for the output area */
 #output-area {
-    overflow-y: scroll; /* Enable scrolling for output */
+    overflow-y: auto; /* Enable scrolling for output */
     word-break: break-all; /* Break long words */
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
     /* CRT-like text effect */
@@ -74,16 +76,15 @@ body {
         #00ff001a 2px
     );
     margin-bottom: 5px; /* Space before the input */
-    /* Set a fixed height for the output area */
-    height: 200px; /* Adjust this value as needed */
-    max-height: 40%;
+    /* Allow output area to grow and enable vertical scrolling */
+    flex-grow: 2; /* Give output area more space than the map */
+    overflow-y: auto;
 }
 
 /* Styling for the input container (optional, but good for grouping) */
 #input-container {
     display: flex;
-    /* Ensure input container doesn't grow */
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent input container from shrinking */
 }
 
 /* Styling for the command input */
