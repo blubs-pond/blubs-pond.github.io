@@ -1,3 +1,5 @@
+console.log("cmd.js script loaded and running!");
+
 import { appendTerminalOutput } from './ui.js'; // Import the output function
 
 document.addEventListener('DOMContentLoaded', () => {
