@@ -1,31 +1,3 @@
-/* Basic body styling for a dark background and monospaced font */
-body {
-    background-color: #1a1a1a; /* Dark gray background */
-    color: #00ff00; /* Bright green text color */
-    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
-    margin: auto;
-    padding: 5px; /* Simplified padding */
-    overflow: hidden; /* Hide scrollbars */
-    display: flex; /* Use Flexbox for layout */
-    flex-direction: column; /* Stack elements vertically */
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
-    min-height: 100vh; /* Minimum height of the viewport */
-}
-
-.container {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    width: 90%; /* Adjust as needed */
-    max-width: 800px; /* Max width for better readability */
-    border: 2px solid #00ff00; /* Green border */
-    padding: 15px; /* Simplified padding */
-    box-shadow: 0 0 20px #00ff0080; /* Green outer glow */
-    background-color: #1a1a1a; /* Match background */
-    box-sizing: border-box; /* Include padding and border in width */
-    height: calc(100vh - 10px); /* Make container fill viewport height minus body padding */
-}
-
 /* Styling for the game title */
 #game-title {
     text-align: center;
@@ -59,53 +31,4 @@ body {
     /* Allow map area to grow and enable vertical scrolling */
     flex-grow: 1;
     overflow-y: auto;
-}
-
-/* Styling for the output area */
-#output-area {
-    overflow-y: auto; /* Enable scrolling for output */
-    word-break: break-all; /* Break long words */
-    white-space: pre-wrap; /* Preserve whitespace and wrap text */
-    /* CRT-like text effect */
-    text-shadow: 0 0 5px #00ff00;
-    /* Subtle scanline effect (optional) */
-    background: repeating-linear-gradient(
-        #1a1a1a,
-        #1a1a1a 1px,
-        #00ff001a 1px,
-        #00ff001a 2px
-    );
-    margin-bottom: 5px; /* Space before the input */
-    /* Allow output area to grow and enable vertical scrolling */
-    flex-grow: 2; /* Give output area more space than the map */
-    overflow-y: auto;
-}
-
-/* Styling for the input container (optional, but good for grouping) */
-#input-container {
-    display: flex;
-    flex-shrink: 0; /* Prevent input container from shrinking */
-}
-
-/* Styling for the command input */
-#command-input {
-    background-color: #1a1a1a; /* Match background */
-    color: #00ff00; /* Match text color */
-    font-family: 'Courier New', Courier, monospace; /* Match font */
-    border: none; /* No border */
-    outline: none; /* Remove outline on focus */
-    width: 100%; /* Full width */
-    padding: 10px 0;
-    caret-color: #00ff00; /* Green cursor */
-    font-size: 1em;
-}
-
-/* Add a blinking cursor effect (optional) */
-#command-input {
-    animation: blink-caret 1s step-end infinite;
-}
-
-@keyframes blink-caret {
-    from, to { border-right-color: transparent }
-    50% { border-right-color: #00ff00; }
 }
