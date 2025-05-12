@@ -1,0 +1,60 @@
+/* Pseudo Terminal Styling */
+#pseudo-terminal {
+    display: none; /* Initially hide the terminal */
+    position: fixed; /* Position it relative to the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black background */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    z-index: 1000; /* Ensure it's on top of other content */
+    padding: 10px;
+    box-sizing: border-box; /* Include padding in width and height */
+    flex-direction: column; /* Arrange children vertically */
+}
+
+#terminalOutput {
+    flex-grow: 1; /* Allow output area to take up available space */
+    overflow-y: auto; /* Enable scrolling */
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-break: break-all; /* Break long words */
+    margin-bottom: 10px; /* Space between output and input */
+    /* Optional: Add a subtle border or indicator for the output area */
+    border-bottom: 1px dashed #00ff00;
+    padding-bottom: 10px;
+}
+
+#terminal-input-container {
+    display: flex; /* Arrange prompt and input horizontally */
+    align-items: center; /* Vertically align items */
+    flex-shrink: 0; /* Prevent input container from shrinking */
+}
+
+#terminal-prompt {
+    margin-right: 5px; /* Space between prompt and input */
+    color: #00ff00; /* Green prompt */
+}
+
+#terminal-command-input {
+    flex-grow: 1; /* Allow input to take up available space */
+    background-color: transparent; /* Transparent background */
+    color: #00ff00; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    border: none; /* No border */
+    outline: none; /* Remove outline on focus */
+    font-size: 1em;
+    caret-color: #00ff00; /* Green cursor */
+    padding: 0; /* Remove default padding */
+}
+
+/* Add a blinking cursor effect (optional) */
+#terminal-command-input {
+    animation: blink-caret 1s step-end infinite;
+}
+
+@keyframes blink-caret {
+    from, to { border-right-color: transparent }
+    50% { border-right-color: #00ff00; }
+}

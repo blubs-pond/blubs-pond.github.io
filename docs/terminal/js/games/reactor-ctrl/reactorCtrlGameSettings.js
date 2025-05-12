@@ -1,4 +1,4 @@
-import { parseMapString } from './gameLogic.js'; // Import the parsing function
+import { parseMapString } from './reactorCtrlGameLogic.js'; // Import the parsing function
 
 const facilityMapString = `
 +-------------+ +---+ +-------+ +-------------------------+ +-------+ +---+  +-------------+

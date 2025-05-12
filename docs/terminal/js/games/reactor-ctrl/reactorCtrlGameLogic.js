@@ -1,6 +1,6 @@
-import { gameState } from './gameState.js';
-import { gameSettings } from './gameSettings.js';
-import { appendOutput } from './ui.js';
+import { gameState } from './reactorCtrlGameState.js';
+import { gameSettings } from './reactorCtrlGameSettings.js';
+import { appendTerminalOutput } from '../../ui.js';
 
 let lastUpdateTime = 0;
 let gameTimeInMinutesReal = 0; // Initialize gameTimeInMinutesReal here
@@ -56,7 +56,7 @@ function getPhaseForTime(hours) {
 
 // Handles the transition between game phases
 function handlePhaseTransition(phase) {
-    appendOutput(`--- Phase changed: ${phase.toUpperCase()} ---`);
+    appendTerminalOutput(`--- Phase changed: ${phase.toUpperCase()} ---`);
     // TODO: Trigger phase-specific setup like monster spawns, system changes, etc.
     // This is where you would add logic that happens ONLY when a phase changes.
 }
@@ -142,7 +142,7 @@ export function processCommand(commandInput) {
     if (handler) {
         handler(args);
     } else {
-        appendOutput(`Unknown command: ${command}`);
+        appendTerminalOutput(`Unknown command: ${command}`);
     }
 }
 
@@ -152,7 +152,7 @@ function handleGoCommand(args) {
     const direction = args[0]; // Get the direction (e.g., 'north', 'east')
 
     if (!direction) {
-        appendOutput("Go where? You need to specify a direction (e.g., g n).");
+        appendTerminalOutput("Go where? You need to specify a direction (e.g., g n).");
         return;
     }
 
@@ -168,7 +168,7 @@ function handleGoCommand(args) {
     const fullDirection = directionMap[direction.toLowerCase()];
 
     if (!fullDirection) {
-         appendOutput(`Invalid direction: ${direction}. Use north, south, east, or west (or n, s, e, w).`);
+         appendTerminalOutput(`Invalid direction: ${direction}. Use north, south, east, or west (or n, s, e, w).`);
          return;
     }
 
@@ -177,7 +177,7 @@ function handleGoCommand(args) {
     const currentLocation = gameSettings.locations[currentLocationKey];
 
     if (!currentLocation) {
-        appendOutput("Error: Your current location is not defined in gameSettings.locations.");
+        appendTerminalOutput("Error: Your current location is not defined in gameSettings.locations.");
         console.error("Invalid player location key:", currentLocationKey);
         return;
     }
@@ -191,26 +191,26 @@ function handleGoCommand(args) {
 
         if (nextLocation) {
             gameState.player.location = nextLocationKey; // Update player's location
-            appendOutput(`You go ${fullDirection} to the ${nextLocation.friendlyName}.`);
+            appendTerminalOutput(`You go ${fullDirection} to the ${nextLocation.friendlyName}.`);
             // You might want to add a function here to display the description of the new location
         } else {
-            appendOutput(`Error: The exit to ${nextLocationKey} is defined but the location is not found.`);
+            appendTerminalOutput(`Error: The exit to ${nextLocationKey} is defined but the location is not found.`);
             console.error("Invalid next location key in exits:", nextLocationKey);
         }
     } else {
-        appendOutput(`You cannot go ${fullDirection} from here.`);
+        appendTerminalOutput(`You cannot go ${fullDirection} from here.`);
         // You might want to list the available exits here
     }
 }
 
 // New function to handle the 'help' command with shorter aliases
 function handleHelpCommand() {
-    appendOutput("Available commands:");
-    appendOutput("- go / g [direction] (e.g., g n)");
-    appendOutput("- look / l (Look around your current location)");
-    appendOutput("- inventory / inv (Check your inventory)");
-    appendOutput("- examine / exam [object] (Examine an object)");
-    appendOutput("- help / h (Displays this help message)");
+    appendTerminalOutput("Available commands:");
+    appendTerminalOutput("- go / g [direction] (e.g., g n)");
+    appendTerminalOutput("- look / l (Look around your current location)");
+    appendTerminalOutput("- inventory / inv (Check your inventory)");
+    appendTerminalOutput("- examine / exam [object] (Examine an object)");
+    appendTerminalOutput("- help / h (Displays this help message)");
     // Add other commands and their aliases here as you implement them
 }
 
@@ -218,9 +218,9 @@ function handleHelpCommand() {
 function handleLookCommand(args) {
     // TODO: Implement logic to display current location description and items/features
     if (args.length > 0) {
-        appendOutput("You can just 'look' (l) to look around.");
+        appendTerminalOutput("You can just 'look' (l) to look around.");
     } else {
-        appendOutput("You look around. (Location description and details will go here)");
+        appendTerminalOutput("You look around. (Location description and details will go here)");
         // In the future, get the description from gameSettings.locations[gameState.player.location].description
         // and list items or features in the location.
     }
@@ -229,7 +229,7 @@ function handleLookCommand(args) {
 // Placeholder function for the 'inventory' command
 function handleInventoryCommand() {
     // TODO: Implement logic to list player's inventory
-    appendOutput("You check your inventory. (Inventory items will be listed here)");
+    appendTerminalOutput("You check your inventory. (Inventory items will be listed here)");
     // In the future, iterate through gameState.player.inventory and list items.
 }
 
@@ -238,11 +238,11 @@ function handleExamineCommand(args) {
     // TODO: Implement logic to examine a specific object
     if (args.length > 0) {
         const objectToExamine = args.join(' '); // Join arguments to handle multi-word objects
-        appendOutput(`You examine the ${objectToExamine}. (Details about the object will appear here)`);
+        appendTerminalOutput(`You examine the ${objectToExamine}. (Details about the object will appear here)`);
         // In the future, check if the object is in the current location or inventory
         // and display its description.
     } else {
-        appendOutput("Examine what? You need to specify an object to examine (e.g., exam key).");
+        appendTerminalOutput("Examine what? You need to specify an object to examine (e.g., exam key).");
     }
 }
 
