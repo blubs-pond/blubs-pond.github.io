@@ -182,6 +182,13 @@ function handleHelpCommand() {
     appendTerminalOutput("- look / l (Look around your current location)");
     appendTerminalOutput("- inventory / inv (Check your inventory)");
     appendTerminalOutput("- examine / exam [object] (Examine an object)");
+    appendTerminalOutput("- map (Displays the game map)");
+    appendTerminalOutput("- fix [component] (Attempts to fix a broken component)");
+    appendTerminalOutput("- reboot [component] (Attempts to reboot a system component)");
+    appendTerminalOutput("- stat [category] (Displays game statistics)");
+    appendTerminalOutput("- upgrade [component] (Attempts to upgrade a component)");
+    appendTerminalOutput("- flush [system] (Attempts to flush a system, e.g., ventilation)");
+    appendTerminalOutput("- clear (Clears the terminal output)");
     appendTerminalOutput("- help / h (Displays this help message)");
     // Add other commands and their aliases here as you implement them
 }
@@ -218,48 +225,42 @@ function handleExamineCommand(args) {
     }
 }
 
-function settingsCommand(args) {
- const setting = args[0];
- const value = args[1];
-
- if (!setting) {
- appendTerminalOutput("Usage: settings [show/sound/music] [on/off]");
- return;
- }
-
- switch (setting.toLowerCase()) {
- case 'show':
- // TODO: Implement showing current settings
- appendTerminalOutput("Current settings: (Settings will be displayed here)");
- break;
- case 'sound':
- if (value === 'on') {
- // TODO: Implement turning sound on
- appendTerminalOutput("Sound turned on.");
- } else if (value === 'off') {
- // TODO: Implement turning sound off
- appendTerminalOutput("Sound turned off.");
- } else {
- appendTerminalOutput("Usage: settings sound [on/off]");
- }
- break;
- case 'music':
- if (value === 'on') {
- // TODO: Implement turning music on
- appendTerminalOutput("Music turned on.");
- } else if (value === 'off') {
- // TODO: Implement turning music off
- appendTerminalOutput("Music turned off.");
- } else {
- appendTerminalOutput("Usage: settings music [on/off]");
- }
- break;
- default:
- appendTerminalOutput("Unknown setting. Usage: settings [show/sound/music] [on/off]");
- }
+function handleRebootCommand(args) {
+ // TODO: Implement rebooting actions
+ appendTerminalOutput("Attempting to reboot...");
 }
 
-function camCommand(args) {
+function handleStatCommand(args) {
+ // TODO: Implement displaying stats
+ appendTerminalOutput("Displaying stats...");
+}
+
+function handleUpgradeCommand(args) {
+ // TODO: Implement upgrading actions
+ appendTerminalOutput("Attempting to upgrade...");
+}
+
+function handleFlushCommand(args) {
+ // TODO: Implement flushing actions
+ appendTerminalOutput("Attempting to flush...");
+}
+
+function handleDisplayMap() {
+    // TODO: Implement displaying the game map
+    appendTerminalOutput("Displaying map...");
+}
+function handleFixCommand(args) {
+ // TODO: Implement fixing actions
+ appendTerminalOutput("Attempting to fix...");
+}
+
+// Function to handle the 'displaymap' command
+function handleDisplayMap() {
+    // TODO: Implement displaying the game map
+    appendTerminalOutput("Displaying map...");
+}
+
+function handleCamCommand(args) {
     const cameraNumber = args[0];
     if (cameraNumber) {
         // TODO: Implement camera view logic
@@ -268,12 +269,12 @@ function camCommand(args) {
         appendTerminalOutput("Specify camera number (e.g., cam 1).");
     }
 }
-function startCommand() {
+function handleStartCommand() {
     appendTerminalOutput("Starting the game...");
     requestAnimationFrame(gameLoop);
 }
 
-function peakCommand() {
+function handlePeakCommand() {
     if (gameState.isHiding) {
         appendTerminalOutput("You cautiously peek from your hiding spot.");
         // TODO: Implement peek logic, e.g., brief view of the location, chance to spot monster
@@ -282,28 +283,47 @@ function peakCommand() {
     }
 }
 
+function handleAboutCommand() {
+    appendTerminalOutput("Reactor Control Terminal - Version 0.1");
+    appendTerminalOutput("Developed by [Your Name/Team Name]");
+    appendTerminalOutput("A text-based survival game.");
+}
+
+// Function to handle the 'clear' command
+function handleClearCommand() {
+    // TODO: Implement clearing the terminal output
+    appendTerminalOutput("Terminal cleared.");
+}
+
 export {
- gameLoop,
- updateGameState,
- getPhaseForTime,
- handlePhaseTransition,
- updateGame,
- updateReactorTemp,
- updateVentilation,
- updateGeneratorOil,
- updateReactorPowerOutput,
- updateControlArchives,
- handleMonsterMovement,
- checkSanityEffects,
- checkWinLoseConditions,
- parseMapString,
- handleGoCommand,
- handleHelpCommand,
- handleLookCommand,
- handleInventoryCommand,
- handleExamineCommand,
- startCommand,
- peakCommand,
- camCommand,
- settingsCommand
+    gameLoop,
+    getPhaseForTime,
+    updateGameState,
+    updateGame,
+    updateReactorTemp,
+    updateVentilation,
+    updateGeneratorOil,
+    updateReactorPowerOutput,
+    updateControlArchives,
+    checkSanityEffects,
+    checkWinLoseConditions,
+    parseMapString,
+    handleMonsterMovement,
+    handleStartCommand,
+    handleHelpCommand,
+    handlePhaseTransition,
+    handleGoCommand,
+    handleLookCommand,
+    handleInventoryCommand,
+    handleExamineCommand,
+    handlePeakCommand,
+    handleCamCommand,
+    handleAboutCommand,
+    handleClearCommand,
+    handleDisplayMap,
+    handleFixCommand,
+    handleRebootCommand,
+    handleStatCommand,
+    handleUpgradeCommand,
+    handleFlushCommand
 };

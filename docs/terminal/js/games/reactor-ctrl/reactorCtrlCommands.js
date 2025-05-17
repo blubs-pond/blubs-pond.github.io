@@ -1,15 +1,29 @@
 import { appendTerminalOutput } from '../../ui.js';
 import {
+    handleStartCommand,
+    handleHelpCommand,
     handleGoCommand,
     handleLookCommand,
     handleInventoryCommand,
     handleExamineCommand,
-    handleHelpCommand
+    handlePeakCommand,
+    handleCamCommand,
+    handleAboutCommand,
+    handleClearCommand,
+    handleDisplayMap,
+    handleFixCommand,
+    handleRebootCommand,
+    handleStatCommand,
+    handleUpgradeCommand,
+    handleFlushCommand
 } from './reactorCtrlGameLogic.js';
 
 async function processCommand(command) {
     // Map shorter aliases to handler functions
     const commandMap = {
+        'start': handleStartCommand,
+        'reactor-ctrl': handleStartCommand,
+        'r-ctrl': handleStartCommand, // Alias
         'go': handleGoCommand,
         'g': handleGoCommand, // Alias
         'look': handleLookCommand,
@@ -20,6 +34,17 @@ async function processCommand(command) {
         'exam': handleExamineCommand, // Alias
         'help': handleHelpCommand,
         'h': handleHelpCommand, // Alias
+        'fix': handleFixCommand,
+        'reboot': handleRebootCommand,
+        'stat': handleStatCommand,
+        'upgrade': handleUpgradeCommand,
+        'flush': handleFlushCommand,
+        'peak': handlePeakCommand,
+        'cam': handleCamCommand,
+        'about': handleAboutCommand,
+        'clear': handleClearCommand,
+        'cls': handleClearCommand, // Alias
+        'map': handleDisplayMap
         // Add other commands and their aliases here
     };
 

@@ -39,7 +39,7 @@ const facilityMapString = `
 |             +-------+                                             | |<4>|  |             |
 +-------------+       +---------------------------------------------+ +---+  +-------------+`;
 
-export const gameSettings = {
+const gameSettings = {
     soundEnabled: true,
     musicEnabled: true,
     showGameName: true,
