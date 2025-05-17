@@ -8,10 +8,6 @@ import {
 } from './reactorCtrlGameLogic.js';
 
 async function processCommand(command, ...args) {
-    appendTerminalOutput(`> ${command}`); // Echo command
-
-    const [command, ...args] = commandInput.trim().toLowerCase().split(' '); // Split command and arguments
-
     // Map shorter aliases to handler functions
     const commandMap = {
         'go': handleGoCommand,
