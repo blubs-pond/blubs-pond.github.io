@@ -1,8 +1,10 @@
 import { appendTerminalOutput } from './ui.js';
 // We'll import the Reactor Control main function later
-// import { startReactorGame, processReactorCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
+import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
 
 let currentGame = null; // Variable to track the currently active game
+
+const commandHistory = []; // Array to store command history
 
 document.addEventListener('DOMContentLoaded', () => {
     const terminalInput = document.getElementById('terminal-command-input');
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const command = terminalInput.value.trim();
             terminalInput.value = '';
 
+            commandHistory.push(command); // Add the command to history
             if (command) {
                 processCommand(command);
             }
@@ -30,40 +33,123 @@ document.addEventListener('DOMContentLoaded', () => {
 function processCommand(command) {
     appendTerminalOutput(`> ${command}`); // Display the command the user entered
 
-    if (currentGame === 'reactor') {
-        // If a game is active, send the command to the game's processor
+    const [command, ...args] = (command.trim().includes('!'))? ["!", command.trim().toLowerCase().replace("!","")] : command.trim().toLowerCase().split(' ');
+
+    const commandMap = {
+        'reactor-ctrl': handleGameReactor,
+        'r-ctrl': handleGameReactor, // Alias
+        'reactor': handleGameReactor, //Alias
+        'date': getDateTime, 
+        'time': getDateTime, //Alias
+        'ls': dirHandlerCmd,
+        'cd': dirHandlerCmd, //Alias
+        'pwd': dirHandlerCmd, //Alias
+        'clear': clearTerminal,
+        'cls': clearTerminal, //Alias
+        'echo': echoCommand,
+        'cat': catCommand,
+        'history': historyCommand,
+        '!': historyCommand,
+        'help': handleCmdHelpCommand,
+        'h': handleCmdHelpCommand, // Alias
+        '?':handleCmdHelpCommand, //Alias
+        // Add other commands and their aliases here
+    };
+
+    const handler = commandMap[command];
+
+    if (handler && currentGame === null) {
+        handler(args);
+    } else {
+        switch (currentGame) {
+            case 'reactor':
+                handleGameReactor(args);
+                break;
+            default: // aka null
+                appendTerminalOutput(`Unknown command: ${command}`);
+                appendTerminalOutput("Type 'help' for a list of commands.");
+                break;
+        }
+    }
+}
+
+function handleGameReactor(args) {
+    if (currentGame === 'reactor' && (arg === 'reactor-ctrl' || 'r-ctrl' || 'reactor')) {
+        appendTerminalOutput("Reactor Control is already running.");
+    } else if (currentGame === 'reactor' && (arg !== 'reactor-ctrl' || 'r-ctrl' || 'reactor')) {// If a game is active, send the command to the game's processor
         if (command.toLowerCase() === 'exit') {
             currentGame = null; // Exit the game
             appendTerminalOutput("Exited Reactor Control.");
             appendTerminalOutput("Type 'help' for a list of commands.");
         } else {
             // Placeholder: Call the actual Reactor Control command processor here
-            appendTerminalOutput("Reactor Control command received: " + command); // Temporary message
-            // processReactorCommand(command); // This will be the actual call
+            // appendTerminalOutput("Reactor Control command received: " + command); // Temporary message
+            handleUserCommand(command); // This will be the actual call
         }
     } else {
-        // If no game is active, check for main terminal commands
-        switch (command.toLowerCase()) {
-            case 'help':
-                displayHelp(); // Display main terminal help
-                break;
-            case 'reactor':
-                currentGame = 'reactor';
-                appendTerminalOutput("Launching Reactor Control...");
-                // Placeholder: Call the actual Reactor Control game start function here
-                appendTerminalOutput("Reactor Control launched."); // Temporary message
-                // startReactorGame(); // This will be the actual call
-                break;
-            default:
-                appendTerminalOutput(`Unknown command: ${command}`);
-                appendTerminalOutput("Type 'help' for a list of commands.");
-        }
+        currentGame = 'reactor';
+        appendTerminalOutput("Launching Reactor Control...");
+        // Placeholder: Call the actual Reactor Control game start function here
+        // appendTerminalOutput("Reactor Control launched."); // Temporary message
+        startReactorGame(); // This will be the actual call
     }
 }
 
-function displayHelp() {
+function handleCmdHelpCommand() {
+    const commandMap = {
+        'reactor-ctrl': 'Launches the Reactor Control game.',
+        'date': 'Displays the current date and time.', 
+        'clear': 'Clears the terminal output.',
+        'echo': 'Echoes the provided arguments.',
+        'history': 'Shows the command history. You can also re-run a command by typing \'!\' followed by the history number.',
+        'help': 'Displays a list of available commands.',
+    };
     appendTerminalOutput("Available commands:");
-    appendTerminalOutput("- help: Display this help message");
-    appendTerminalOutput("- reactor: Launch the Reactor Control game");
-    // Add other main terminal commands here later
+    Object.keys(commandMap).forEach(command => {
+        appendTerminalOutput(`- ${command}: ${commandMap[command]}`);
+    });
+}
+
+function getDateTime() {
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString();
+    appendTerminalOutput(`Date: ${date}`);
+    appendTerminalOutput(`Time: ${time}`);
+}
+
+function clearTerminal() {
+    const terminalOutput = document.getElementById('terminalOutput');
+    terminalOutput.innerHTML = '';
+}
+
+function dirHandlerCmd() {
+    appendTerminalOutput('YOU DO NOT HAVE PERMISION TO DO SO YET');
+}
+
+function echoCommand(args) {
+    appendTerminalOutput(args.join(' '));
+}
+
+function catCommand(args) {
+    appendTerminalOutput('YOU DO NOT HAVE PERMISION TO DO SO YET')
+}
+
+function historyCommand(args) {
+    if (args && args.length > 0 && !isNaN(args[0])) {
+        const index = parseInt(args[0], 10) - 1;
+        if (index >= 0 && index < commandHistory.length) {
+            const commandToRun = commandHistory[index];
+            appendTerminalOutput(`Running command from history: ${commandToRun}`);
+            processCommand(commandToRun); // Re-process the command from history
+            return; // Exit the function after processing the history command
+        } else {
+            appendTerminalOutput("Invalid history index.");
+            return; // Exit the function if the index is invalid
+        }
+    }
+    appendTerminalOutput("Command History:");
+    commandHistory.forEach((cmd, index) => {
+        appendTerminalOutput(`${index + 1}: ${cmd}`);
+    });
 }
