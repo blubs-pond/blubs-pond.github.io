@@ -24,4 +24,5 @@ function startReactorGame() {
     appendTerminalOutput('Reactor Control System Initiated. Type "help" for commands.'); // Initial prompt
 }
 
+
 export { handleUserCommand, startReactorGame };
