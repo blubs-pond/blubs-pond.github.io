@@ -48,12 +48,12 @@ async function reactorCtrlProcessCommand(cmdName, ...args) {
         // Add other commands and their aliases here
     };
 
-    const handler = commandMap[command]; // Look up the handler using the command
+    const handler = commandMap[cmdName]; // Look up the handler using the command
 
     if (handler) {
         handler(args);
     } else {
-        appendTerminalOutput(`Unknown command: ${command}`);
+        appendTerminalOutput(`Unknown command: ${cmdName}`);
     }
 }
 
