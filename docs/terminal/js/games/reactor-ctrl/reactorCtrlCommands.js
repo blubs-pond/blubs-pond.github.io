@@ -57,5 +57,5 @@ async function reactorCtrlProcessCommand(command) {
     }
 }
 
-export { processCommand };
+export { reactorCtrlProcessCommand };
 
