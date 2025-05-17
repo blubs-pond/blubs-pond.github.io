@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     terminalInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault();
+            //Sevent.preventDefault();
 
-            const command = terminalInput.value.trim();terminalInput.value = '';
+            const command = terminalInput.value.trim();terminalInput.value = ' ';
 
             commandHistory.push(command); // Add the command to history
             if (command) {
