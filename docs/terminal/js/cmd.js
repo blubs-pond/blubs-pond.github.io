@@ -37,10 +37,19 @@ function processCommand(command) {
     let cmdName;
     let args = [];
 
-    if (command.trim().startsWith('!')) {
-        const historyIndex = parseInt(command.trim().substring(1), 10) - 1;
+    const trimmedCommand = command.trim();
+
+    if (trimmedCommand.startsWith('!')) {
+        const historyIndex = parseInt(trimmedCommand.substring(1), 10) - 1;
         if (!isNaN(historyIndex) && historyIndex >= 0 && historyIndex < commandHistory.length) {
             const commandToRun = commandHistory[historyIndex];
+            // Remove the recursive call and just set cmdName and args here
+            const parts = commandToRun.trim().toLowerCase().split(' ');
+            cmdName = parts[0];
+            args = parts.slice(1);
+             // We need to explicitly set cmdName and args for the history command handler
+            cmdName = '!';
+            args = [historyIndex + 1]; // Pass the original history number as an argument
             appendTerminalOutput(`Running command from history: ${commandToRun}`);
             processCommand(commandToRun); // Recursively call processCommand with the history command
             return; // Stop processing the current command
@@ -49,15 +58,15 @@ function processCommand(command) {
             return; // Stop processing if history index is invalid
         }
     } else {
-        const parts = command.trim().toLowerCase().split(' ');
+        const parts = trimmedCommand.toLowerCase().split(' ');
         cmdName = parts[0];
         args = parts.slice(1);
     }
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
-        'r-ctrl': handleGameReactor, // Alias
-        'reactor': handleGameReactor, //Alias
+ 'r-ctrl': handleGameReactor, // Alias
+ 'reactor': handleGameReactor, //Alias
         'date': getDateTime, 
         'time': getDateTime, //Alias
         'ls': dirHandlerCmd,
