@@ -245,10 +245,6 @@ function handleFlushCommand(args) {
  appendTerminalOutput("Attempting to flush...");
 }
 
-function handleDisplayMap() {
-    // TODO: Implement displaying the game map
-    appendTerminalOutput("Displaying map...");
-}
 function handleFixCommand(args) {
  // TODO: Implement fixing actions
  appendTerminalOutput("Attempting to fix...");
