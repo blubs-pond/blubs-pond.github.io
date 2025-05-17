@@ -7,6 +7,7 @@ let currentGame = null; // Variable to track the currently active game
 const commandHistory = []; // Array to store command history
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded fired');
     const terminalInput = document.getElementById('terminal-command-input');
     const terminalOutput = document.getElementById('terminalOutput');
 
