@@ -2,10 +2,8 @@ import { appendTerminalOutput } from './ui.js';
 // We'll import the Reactor Control main function later
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
 
-let currentGame = null; // Variable to track the currently active game
-
 const commandHistory = []; // Array to store command history
-
+let currentGame = null; // Variable to track the currently active game
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired');
     const terminalInput = document.getElementById('terminal-command-input');
@@ -44,8 +42,6 @@ function processCommand(command) {
             const commandToRun = commandHistory[historyIndex];
             // Remove the recursive call and just set cmdName and args here
             const parts = commandToRun.trim().toLowerCase().split(' ');
-            cmdName = parts[0];
-            args = parts.slice(1);
              // We need to explicitly set cmdName and args for the history command handler
             cmdName = '!';
             args = [historyIndex + 1]; // Pass the original history number as an argument
@@ -180,3 +176,4 @@ function historyCommand(args) {
         appendTerminalOutput(`${index + 1}: ${cmd}`);
     });
 }
+export { commandHistory, currentGame, processCommand, handleGameReactor, handleCmdHelpCommand, getDateTime, clearTerminal, dirHandlerCmd, echoCommand, catCommand, historyCommand };

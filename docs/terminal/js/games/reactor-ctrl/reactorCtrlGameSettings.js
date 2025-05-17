@@ -368,7 +368,8 @@ export const gameSettings = {
             "ElectricalSwitchyard": {
                 friendlyName: "Electrical Switchyard",
                 description: "High-voltage equipment for external power distribution.",
-                mapMarker: "<Elect>",
+                // Changed map marker to fit within the character limit per grid cell
+                mapMarker: "<E>",
                 exits: {
                     "HallwayD": "HallwayD"
                 },
@@ -466,9 +467,6 @@ export const gameSettings = {
     };
 
 // Make gameSettings globally accessible (or import where needed)
-// For now, we'll keep it in this file and import it where required.
-
 export {
-    gameSettings,
-    facilityMapString
-} // export all
+  facilityMapString, gameSettings
+};

@@ -1,4 +1,4 @@
-export let gameState = {
+let gameState = {
     currentScene: 'start', // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
     // playerInventory: [], // Moved to player object
@@ -138,3 +138,6 @@ export let gameState = {
     },
     criticalReactorTempIncreaseRate: 0 // Increased temperature rate when critical panels are broken
 };
+
+
+export { gameState };

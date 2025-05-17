@@ -6,7 +6,7 @@ let lastUpdateTime = 0;
 let gameTimeInMinutesReal = 0; // Initialize gameTimeInMinutesReal here
 let currentPhase = "survival"; // Initial phase
 
-export function gameLoop(timestamp) {
+function gameLoop(timestamp) {
     if (!lastUpdateTime) lastUpdateTime = timestamp;
     const dt = (timestamp - lastUpdateTime) / 1000; // Time delta in seconds
     lastUpdateTime = timestamp;
@@ -112,7 +112,7 @@ function checkWinLoseConditions() {
 }
 
 // This function parses the map string into a 2D array (matrix)
-export function parseMapString(mapString) {
+function parseMapString(mapString) {
     const lines = mapString.trim().split('\n');
     const matrix = lines.map(line => line.split(''));
     return matrix;
@@ -218,20 +218,92 @@ function handleExamineCommand(args) {
     }
 }
 
-// You may need to export other functions as they are implemented and needed elsewhere
-export { 
-    updateReactorTemp, 
-    updateVentilation, 
-    updateGeneratorOil, 
-    updateReactorPowerOutput, 
-    updateControlArchives, 
-    handleExamineCommand, 
-    handleGoCommand, 
-    handleHelpCommand, 
-    handleInventoryCommand,
-    handleLookCommand,
-    handleMonsterMovement,
-    checkSanityEffects,
-    checkWinLoseConditions,
-    parseMapString
+function settingsCommand(args) {
+ const setting = args[0];
+ const value = args[1];
+
+ if (!setting) {
+ appendTerminalOutput("Usage: settings [show/sound/music] [on/off]");
+ return;
+ }
+
+ switch (setting.toLowerCase()) {
+ case 'show':
+ // TODO: Implement showing current settings
+ appendTerminalOutput("Current settings: (Settings will be displayed here)");
+ break;
+ case 'sound':
+ if (value === 'on') {
+ // TODO: Implement turning sound on
+ appendTerminalOutput("Sound turned on.");
+ } else if (value === 'off') {
+ // TODO: Implement turning sound off
+ appendTerminalOutput("Sound turned off.");
+ } else {
+ appendTerminalOutput("Usage: settings sound [on/off]");
+ }
+ break;
+ case 'music':
+ if (value === 'on') {
+ // TODO: Implement turning music on
+ appendTerminalOutput("Music turned on.");
+ } else if (value === 'off') {
+ // TODO: Implement turning music off
+ appendTerminalOutput("Music turned off.");
+ } else {
+ appendTerminalOutput("Usage: settings music [on/off]");
+ }
+ break;
+ default:
+ appendTerminalOutput("Unknown setting. Usage: settings [show/sound/music] [on/off]");
+ }
+}
+
+function camCommand(args) {
+    const cameraNumber = args[0];
+    if (cameraNumber) {
+        // TODO: Implement camera view logic
+        appendTerminalOutput(`Viewing camera ${cameraNumber}... (Camera view will be displayed here)`);
+    } else {
+        appendTerminalOutput("Specify camera number (e.g., cam 1).");
+    }
+}
+function startCommand() {
+    appendTerminalOutput("Starting the game...");
+    requestAnimationFrame(gameLoop);
+}
+
+function peakCommand() {
+    if (gameState.isHiding) {
+        appendTerminalOutput("You cautiously peek from your hiding spot.");
+        // TODO: Implement peek logic, e.g., brief view of the location, chance to spot monster
+    } else {
+        appendTerminalOutput("You are not hiding.");
+    }
+}
+
+export {
+ gameLoop,
+ updateGameState,
+ getPhaseForTime,
+ handlePhaseTransition,
+ updateGame,
+ updateReactorTemp,
+ updateVentilation,
+ updateGeneratorOil,
+ updateReactorPowerOutput,
+ updateControlArchives,
+ handleMonsterMovement,
+ checkSanityEffects,
+ checkWinLoseConditions,
+ parseMapString,
+ handleGoCommand,
+ handleHelpCommand,
+ handleLookCommand,
+ handleInventoryCommand,
+ handleExamineCommand,
+ startCommand,
+ peakCommand,
+ camCommand,
+ settingsCommand
 };

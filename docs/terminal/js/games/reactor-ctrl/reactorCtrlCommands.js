@@ -7,7 +7,7 @@ import {
     handleHelpCommand
 } from './reactorCtrlGameLogic.js';
 
-async function processCommand(command, ...args) {
+async function processCommand(command) {
     // Map shorter aliases to handler functions
     const commandMap = {
         'go': handleGoCommand,
