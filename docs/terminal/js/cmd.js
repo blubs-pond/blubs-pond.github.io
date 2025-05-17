@@ -1,9 +1,9 @@
 import { appendTerminalOutput } from './ui.js';
-// We'll import the Reactor Control main function later
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
 
-const commandHistory = []; // Array to store command history
-let currentGame = null; // Variable to track the currently active game
+const commandHistory = [];
+let currentGame = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired');
     const terminalInput = document.getElementById('terminal-command-input');
@@ -13,12 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     terminalInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
-            //Sevent.preventDefault();
+            const command = terminalInput.value.trim();
+            terminalInput.value = '';
 
-            const command = terminalInput.value.trim();terminalInput.value = ' ';
-
-            commandHistory.push(command); // Add the command to history
             if (command) {
+                commandHistory.push(command);
                 processCommand(command);
             }
         }
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function processCommand(command) {
-    appendTerminalOutput(`> ${command}`); // Display the command the user entered
+    appendTerminalOutput(`> ${command}`);
 
     let cmdName;
     let args = [];
@@ -40,17 +39,12 @@ function processCommand(command) {
         const historyIndex = parseInt(trimmedCommand.substring(1), 10) - 1;
         if (!isNaN(historyIndex) && historyIndex >= 0 && historyIndex < commandHistory.length) {
             const commandToRun = commandHistory[historyIndex];
-            // Remove the recursive call and just set cmdName and args here
-            const parts = commandToRun.trim().toLowerCase().split(' ');
-             // We need to explicitly set cmdName and args for the history command handler
-            cmdName = '!';
-            args = [historyIndex + 1]; // Pass the original history number as an argument
             appendTerminalOutput(`Running command from history: ${commandToRun}`);
-            processCommand(commandToRun); // Recursively call processCommand with the history command
-            return; // Stop processing the current command
+            processCommand(commandToRun);
+            return;
         } else {
             appendTerminalOutput("Invalid history index.");
-            return; // Stop processing if history index is invalid
+            return;
         }
     } else {
         const parts = trimmedCommand.toLowerCase().split(' ');
@@ -60,85 +54,71 @@ function processCommand(command) {
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
-        'r-ctrl': handleGameReactor, // Alias
-        'reactor': handleGameReactor, //Alias
-        'date': getDateTime, 
-        'time': getDateTime, //Alias
+        'r-ctrl': handleGameReactor,
+        'reactor': handleGameReactor,
+        'date': getDateTime,
+        'time': getDateTime,
         'ls': dirHandlerCmd,
-        'cd': dirHandlerCmd, //Alias
-        'pwd': dirHandlerCmd, //Alias
+        'cd': dirHandlerCmd,
+        'pwd': dirHandlerCmd,
         'clear': clearTerminal,
-        'cls': clearTerminal, //Alias
+        'cls': clearTerminal,
         'echo': echoCommand,
         'cat': catCommand,
         'history': historyCommand,
         '!': historyCommand,
         'help': handleCmdHelpCommand,
-        'h': handleCmdHelpCommand, // Alias
-        '?':handleCmdHelpCommand, //Alias
-        // Add other commands and their aliases here
+        'h': handleCmdHelpCommand,
+        '?': handleCmdHelpCommand,
     };
 
     const handler = commandMap[cmdName];
 
     if (handler && currentGame === null) {
         handler(args);
-    } else {
-        switch (currentGame) {
-            case 'reactor':
-                handleGameReactor(args);
-                break;
-            default: // aka null
-                appendTerminalOutput(`Unknown command: ${cmdName}`);
-                appendTerminalOutput("Type 'help' for a list of commands.");
-                break;
+    } else if (currentGame === 'reactor') {
+        if (trimmedCommand.toLowerCase() === 'exit') {
+            currentGame = null;
+            appendTerminalOutput("Exited Reactor Control.");
+            appendTerminalOutput("Type 'help' for a list of commands.");
+        } else {
+            handleUserCommand(trimmedCommand);
         }
+    } else {
+        appendTerminalOutput(`Unknown command: ${cmdName}`);
+        appendTerminalOutput("Type 'help' for a list of commands.");
     }
 }
 
 function handleGameReactor(args) {
-    if (currentGame === 'reactor' && (arg === 'reactor-ctrl' || 'r-ctrl' || 'reactor')) {
+    if (currentGame === 'reactor') {
         appendTerminalOutput("Reactor Control is already running.");
-    } else if (currentGame === 'reactor' && (arg !== 'reactor-ctrl' || 'r-ctrl' || 'reactor')) {// If a game is active, send the command to the game's processor
-        if (command.toLowerCase() === 'exit') {
-            currentGame = null; // Exit the game
-            appendTerminalOutput("Exited Reactor Control.");
-            appendTerminalOutput("Type 'help' for a list of commands.");
-        } else {
-            // Placeholder: Call the actual Reactor Control command processor here
-            // appendTerminalOutput("Reactor Control command received: " + command); // Temporary message
-            handleUserCommand(command); // This will be the actual call
-        }
     } else {
         currentGame = 'reactor';
         appendTerminalOutput("Launching Reactor Control...");
-        // Placeholder: Call the actual Reactor Control game start function here
-        // appendTerminalOutput("Reactor Control launched."); // Temporary message
-        startReactorGame(); // This will be the actual call
+        startReactorGame();
     }
 }
 
 function handleCmdHelpCommand() {
-    const commandMap = {
+    const commandDescriptions = {
         'reactor-ctrl': 'Launches the Reactor Control game.',
-        'date': 'Displays the current date and time.', 
+        'date': 'Displays the current date and time.',
         'clear': 'Clears the terminal output.',
         'echo': 'Echoes the provided arguments.',
-        'history': 'Shows the command history. You can also re-run a command by typing \'!\' followed by the history number.',
-        'help': 'Displays a list of available commands.',
+        'history': 'Shows the command history. Use !<number> to rerun a command.',
+        'help': 'Displays this list of commands.',
     };
     appendTerminalOutput("Available commands:");
-    Object.keys(commandMap).forEach(command => {
-        appendTerminalOutput(`- ${command}: ${commandMap[command]}`);
+    Object.keys(commandDescriptions).forEach(command => {
+        appendTerminalOutput(`- ${command}: ${commandDescriptions[command]}`);
     });
 }
 
 function getDateTime() {
     const now = new Date();
-    const date = now.toLocaleDateString();
-    const time = now.toLocaleTimeString();
-    appendTerminalOutput(`Date: ${date}`);
-    appendTerminalOutput(`Time: ${time}`);
+    appendTerminalOutput(`Date: ${now.toLocaleDateString()}`);
+    appendTerminalOutput(`Time: ${now.toLocaleTimeString()}`);
 }
 
 function clearTerminal() {
@@ -147,15 +127,15 @@ function clearTerminal() {
 }
 
 function dirHandlerCmd() {
-    appendTerminalOutput('YOU DO NOT HAVE PERMISION TO DO SO YET');
+    appendTerminalOutput('YOU DO NOT HAVE PERMISSION TO DO SO YET');
 }
 
 function echoCommand(args) {
     appendTerminalOutput(args.join(' '));
 }
 
-function catCommand(args) {
-    appendTerminalOutput('YOU DO NOT HAVE PERMISION TO DO SO YET')
+function catCommand() {
+    appendTerminalOutput('YOU DO NOT HAVE PERMISSION TO DO SO YET');
 }
 
 function historyCommand(args) {
@@ -164,16 +144,30 @@ function historyCommand(args) {
         if (index >= 0 && index < commandHistory.length) {
             const commandToRun = commandHistory[index];
             appendTerminalOutput(`Running command from history: ${commandToRun}`);
-            processCommand(commandToRun); // Re-process the command from history
-            return; // Exit the function after processing the history command
+            processCommand(commandToRun);
+            return;
         } else {
             appendTerminalOutput("Invalid history index.");
-            return; // Exit the function if the index is invalid
+            return;
         }
     }
+
     appendTerminalOutput("Command History:");
     commandHistory.forEach((cmd, index) => {
         appendTerminalOutput(`${index + 1}: ${cmd}`);
     });
 }
-export { commandHistory, currentGame, processCommand, handleGameReactor, handleCmdHelpCommand, getDateTime, clearTerminal, dirHandlerCmd, echoCommand, catCommand, historyCommand };
+
+export {
+    commandHistory,
+    currentGame,
+    processCommand,
+    handleGameReactor,
+    handleCmdHelpCommand,
+    getDateTime,
+    clearTerminal,
+    dirHandlerCmd,
+    echoCommand,
+    catCommand,
+    historyCommand
+};
