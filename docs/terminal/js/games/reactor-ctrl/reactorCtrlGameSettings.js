@@ -467,3 +467,8 @@ export const gameSettings = {
 
 // Make gameSettings globally accessible (or import where needed)
 // For now, we'll keep it in this file and import it where required.
+
+export {
+    gameSettings,
+    facilityMapString
+} // export all

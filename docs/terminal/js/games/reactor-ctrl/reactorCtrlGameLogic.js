@@ -219,4 +219,19 @@ function handleExamineCommand(args) {
 }
 
 // You may need to export other functions as they are implemented and needed elsewhere
-// export { updateReactorTemp, updateVentilation, updateGeneratorOil, updateReactorPowerOutput, updateControlArchives, processCommand }; // Added processCommand to export
+export { 
+    updateReactorTemp, 
+    updateVentilation, 
+    updateGeneratorOil, 
+    updateReactorPowerOutput, 
+    updateControlArchives, 
+    handleExamineCommand, 
+    handleGoCommand, 
+    handleHelpCommand, 
+    handleInventoryCommand,
+    handleLookCommand,
+    handleMonsterMovement,
+    checkSanityEffects,
+    checkWinLoseConditions,
+    parseMapString
+};
