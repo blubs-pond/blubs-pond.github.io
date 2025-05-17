@@ -2,12 +2,19 @@ import { reactorCtrlProcessCommand } from './reactorCtrlCommands.js'; // Correct
 import { gameLoop } from './reactorCtrlGameLogic.js'; // gameLoop is also in gameLogic.js
 import { appendTerminalOutput } from '../../ui.js'; // Make sure appendTerminalOutput is imported
 
-function handleUserCommand(command, ...arg) {
+function handleUserCommand(command) {
+    let cmdName;
+    let args = [];
+
+    const parts = command.toLowerCase().split(' ');
+    cmdName = parts[0];
+    args = parts.slice(1);
+
     if (!command) {
         // appendTerminalOutput(''); // Or provide a different message for empty input if desired
         return; // Skip empty input but don't add to output
     }
-    reactorCtrlProcessCommand(command, ...arg);
+    reactorCtrlProcessCommand(cmdName, ...arg);
     // Clear the input field
     const commandInput = document.getElementById('terminal-command-input');
     if (commandInput) {

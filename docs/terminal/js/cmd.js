@@ -82,7 +82,7 @@ function processCommand(command) {
             appendTerminalOutput("Exited Reactor Control.");
             appendTerminalOutput("Type 'help' for a list of commands.");
         } else {
-            handleUserCommand(cmdName, args);
+            handleUserCommand(trimmedCommand);
         }
     } else {
         appendTerminalOutput(`Unknown command: ${cmdName}`);
