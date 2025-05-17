@@ -1,5 +1,6 @@
 import { gameState } from './reactorCtrlGameState.js';
 import { gameSettings } from './reactorCtrlGameSettings.js';
+import { confirmExit, exitGame } from '../../cmd.js'; // Assuming exit handling is in cmd.js
 import { appendTerminalOutput } from '../../ui.js';
 
 let lastUpdateTime = 0;
@@ -198,6 +199,21 @@ function handleHelpCommand() {
     });
 }
 
+// Function to handle the 'exit' command
+function handleExitCommand(args) {
+ // The confirmation logic is now handled by the main terminal's input
+ // We just need to trigger the confirmation process
+ appendTerminalOutput("Are you sure you want to exit? (yes/no)");
+ confirmExit();
+}
+
+// Placeholder function for the 'settings' command
+function handleSettingsCommand(args) {
+ // TODO: Implement settings logic (show, sound, music)
+ appendTerminalOutput("Settings command placeholder.");
+}
+
+
 // Placeholder function for the 'look' command
 function handleLookCommand(args) {
     // TODO: Implement logic to display current location description and items/features
@@ -321,6 +337,8 @@ export {
     handleCamCommand,
     handleAboutCommand,
     handleClearCommand,
+    handleExitCommand, // Added exit command handler
+    handleSettingsCommand, // Added settings command handler
     handleDisplayMap,
     handleFixCommand,
     handleRebootCommand,
