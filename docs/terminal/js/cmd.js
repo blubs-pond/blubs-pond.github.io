@@ -34,7 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
 function processCommand(command) {
     appendTerminalOutput(`> ${command}`); // Display the command the user entered
 
-    const [command, ...args] = (command.trim().includes('!'))? ["!", command.trim().toLowerCase().replace("!","")] : command.trim().toLowerCase().split(' ');
+    let cmdName;
+    let args = [];
+
+    if (command.trim().startsWith('!')) {
+        const historyIndex = parseInt(command.trim().substring(1), 10) - 1;
+        if (!isNaN(historyIndex) && historyIndex >= 0 && historyIndex < commandHistory.length) {
+            const commandToRun = commandHistory[historyIndex];
+            appendTerminalOutput(`Running command from history: ${commandToRun}`);
+            processCommand(commandToRun); // Recursively call processCommand with the history command
+            return; // Stop processing the current command
+        } else {
+            appendTerminalOutput("Invalid history index.");
+            return; // Stop processing if history index is invalid
+        }
+    } else {
+        const parts = command.trim().toLowerCase().split(' ');
+        cmdName = parts[0];
+        args = parts.slice(1);
+    }
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
@@ -57,7 +75,7 @@ function processCommand(command) {
         // Add other commands and their aliases here
     };
 
-    const handler = commandMap[command];
+    const handler = commandMap[cmdName];
 
     if (handler && currentGame === null) {
         handler(args);
@@ -67,7 +85,7 @@ function processCommand(command) {
                 handleGameReactor(args);
                 break;
             default: // aka null
-                appendTerminalOutput(`Unknown command: ${command}`);
+                appendTerminalOutput(`Unknown command: ${cmdName}`);
                 appendTerminalOutput("Type 'help' for a list of commands.");
                 break;
         }
