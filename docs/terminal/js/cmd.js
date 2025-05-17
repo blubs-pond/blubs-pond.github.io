@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Enter') {
             event.preventDefault();
 
-            const command = terminalInput.value.trim();
-            terminalInput.value = '';
+            const command = terminalInput.value.trim();terminalInput.value = '';
 
             commandHistory.push(command); // Add the command to history
             if (command) {
@@ -65,8 +64,8 @@ function processCommand(command) {
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
- 'r-ctrl': handleGameReactor, // Alias
- 'reactor': handleGameReactor, //Alias
+        'r-ctrl': handleGameReactor, // Alias
+        'reactor': handleGameReactor, //Alias
         'date': getDateTime, 
         'time': getDateTime, //Alias
         'ls': dirHandlerCmd,
