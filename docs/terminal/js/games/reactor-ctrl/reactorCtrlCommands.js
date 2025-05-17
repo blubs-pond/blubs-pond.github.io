@@ -25,15 +25,11 @@ async function reactorCtrlProcessCommand(cmdName, ...args) {
         'reactor-ctrl': handleStartCommand,
         'r-ctrl': handleStartCommand, // Alias
         'go': handleGoCommand,
-        'g': handleGoCommand, // Alias
         'look': handleLookCommand,
-        'l': handleLookCommand, // Alias
         'inventory': handleInventoryCommand,
         'inv': handleInventoryCommand, // Alias
         'examine': handleExamineCommand,
-        'exam': handleExamineCommand, // Alias
         'help': handleHelpCommand,
-        'h': handleHelpCommand, // Alias
         'fix': handleFixCommand,
         'reboot': handleRebootCommand,
         'stat': handleStatCommand,
