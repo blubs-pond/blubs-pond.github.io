@@ -119,7 +119,7 @@ function parseMapString(mapString) {
 }
 
 
-// New function to handle the 'go' command
+// function to handle the 'go' command
 function handleGoCommand(args) {
     const direction = args[0]; // Get the direction (e.g., 'north', 'east')
 
@@ -175,7 +175,7 @@ function handleGoCommand(args) {
     }
 }
 
-// New function to handle the 'help' command with shorter aliases
+// function to handle the 'help' command with shorter aliases
 function handleHelpCommand() {
     appendTerminalOutput("Available commands:");
     appendTerminalOutput("- go / g [direction] (e.g., g n)");
