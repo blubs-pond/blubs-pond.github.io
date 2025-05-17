@@ -9,7 +9,7 @@ function handleUserCommand(command, ...arg) {
     }
     reactorCtrlProcessCommand(command, ...arg);
     // Clear the input field
-    const commandInput = document.getElementById('command-input');
+    const commandInput = document.getElementById('terminal-command-input');
     if (commandInput) {
         commandInput.value = '';
     }
