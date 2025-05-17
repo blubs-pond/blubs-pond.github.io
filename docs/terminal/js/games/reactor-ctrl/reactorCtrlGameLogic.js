@@ -177,20 +177,25 @@ function handleGoCommand(args) {
 
 // function to handle the 'help' command with shorter aliases
 function handleHelpCommand() {
+    const commandDescriptions = {
+        'go / g [direction]': 'Move in a specified direction (e.g., g n).',
+        'look / l': 'Look around your current location.',
+        'inventory / inv': 'Check your inventory.',
+        'examine / exam [object]': 'Examine an object in your location or inventory.',
+        'help / h': 'Displays this help message.',
+        'map': 'Displays the game map.',
+        'fix [component]': 'Attempts to fix a broken component.',
+        'reboot [component]': 'Attempts to reboot a system component.',
+        'stat [category]': 'Displays game statistics (e.g., player, reactor, inventory).',
+        'upgrade [component]': 'Attempts to upgrade a component.',
+        'flush [system]': 'Attempts to flush a system (e.g., ventilation).',
+        'clear': 'Clears the terminal output.',
+        // Add other commands and their descriptions here
+    };
     appendTerminalOutput("Available commands:");
-    appendTerminalOutput("- go / g [direction] (e.g., g n)");
-    appendTerminalOutput("- look / l (Look around your current location)");
-    appendTerminalOutput("- inventory / inv (Check your inventory)");
-    appendTerminalOutput("- examine / exam [object] (Examine an object)");
-    appendTerminalOutput("- map (Displays the game map)");
-    appendTerminalOutput("- fix [component] (Attempts to fix a broken component)");
-    appendTerminalOutput("- reboot [component] (Attempts to reboot a system component)");
-    appendTerminalOutput("- stat [category] (Displays game statistics)");
-    appendTerminalOutput("- upgrade [component] (Attempts to upgrade a component)");
-    appendTerminalOutput("- flush [system] (Attempts to flush a system, e.g., ventilation)");
-    appendTerminalOutput("- clear (Clears the terminal output)");
-    appendTerminalOutput("- help / h (Displays this help message)");
-    // Add other commands and their aliases here as you implement them
+    Object.keys(commandDescriptions).forEach(command => {
+        appendTerminalOutput(`- ${command}: ${commandDescriptions[command]}`);
+    });
 }
 
 // Placeholder function for the 'look' command
