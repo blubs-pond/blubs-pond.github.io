@@ -18,7 +18,7 @@ import {
     handleFlushCommand
 } from './reactorCtrlGameLogic.js';
 
-async function reactorCtrlProcessCommand(command) {
+async function reactorCtrlProcessCommand(cmdName, ...args) {
     // Map shorter aliases to handler functions
     const commandMap = {
         'start': handleStartCommand,

@@ -14,7 +14,7 @@ function handleUserCommand(command) {
         // appendTerminalOutput(''); // Or provide a different message for empty input if desired
         return; // Skip empty input but don't add to output
     }
-    reactorCtrlProcessCommand(cmdName, ...arg);
+    reactorCtrlProcessCommand(cmdName, ...args);
     // Clear the input field
     const commandInput = document.getElementById('terminal-command-input');
     if (commandInput) {
