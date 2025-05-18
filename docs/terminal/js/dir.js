@@ -155,12 +155,88 @@ function handlePwdCommand() {
     appendTerminalOutput(currentDir.path);
 }
 
+// Handle `mkdir <name>` command
+function handleMkdirCommand(args) {
+    const dirName = args[0];
+    if (!dirName) {
+        appendTerminalOutput("mkdir: missing directory name.");
+        return;
+    }
+
+    const newPath = currentDir.path === '/' ? `/${dirName}` : `${currentDir.path}/${dirName}`;
+
+    if (fileSystem[newPath]) {
+        appendTerminalOutput(`mkdir: '${dirName}' already exists.`);
+        return;
+    }
+
+    const newDir = new Directory(dirName, newPath);
+    fileSystem[newPath] = newDir;
+
+    if (!directoryContents[currentDir.path]) {
+        directoryContents[currentDir.path] = [];
+    }
+    directoryContents[currentDir.path].push(dirName);
+
+    appendTerminalOutput(`Directory '${dirName}' created.`);
+}
+
+// Handle `touch <name>` command
+function handleTouchCommand(args) {
+    const fileName = args[0];
+    if (!fileName) {
+        appendTerminalOutput("touch: missing file name.");
+        return;
+    }
+
+    const newPath = currentDir.path === '/' ? `/${fileName}` : `${currentDir.path}/${fileName}`;
+
+    if (fileSystem[newPath]) {
+        appendTerminalOutput(`touch: '${fileName}' already exists.`);
+        return;
+    }
+
+    const newFile = new File(fileName, newPath, 'text', ''); // Default to empty text file
+    fileSystem[newPath] = newFile;
+
+    if (!directoryContents[currentDir.path]) {
+        directoryContents[currentDir.path] = [];
+    }
+    directoryContents[currentDir.path].push(fileName);
+
+    appendTerminalOutput(`File '${fileName}' created.`);
+}
+
+// Handle `cat <filename>` command
+function handleCatCommand(args) {
+    const fileName = args[0];
+    if (!fileName) {
+        appendTerminalOutput("cat: missing file name.");
+        return;
+    }
+
+    const filePath = currentDir.path === '/' ? `/${fileName}` : `${currentDir.path}/${fileName}`;
+    const file = fileSystem[filePath];
+
+    if (!file || !(file instanceof File)) {
+        appendTerminalOutput(`cat: No such file '${fileName}'`);
+        return;
+    }
+
+    appendTerminalOutput(`Contents of ${file.name}:`);
+    appendTerminalOutput(file.content || "[Empty]");
+}
+
+
 // === Exports ===
 export {
     handleCdCommand,
     handleLsCommand,
     handlePwdCommand,
     handleDirCommand,
+    handleMkdirCommand,
+    handleTouchCommand,
+    handleCatCommand,
     currentDir,
     fileSystem
 };
