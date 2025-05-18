@@ -15,8 +15,12 @@ import {
     handleRebootCommand,
     handleStatCommand,
     handleUpgradeCommand,
-    handleFlushCommand
-} from './reactorCtrlGameLogic.js';
+    handleFlushCommand,
+    handleSettingsCommand,
+    handleExitCommand,
+    awaitingExitConfirmation, // Import the state variable
+    handleExitConfirmationResponse // Import the handler
+} from './reactorCtrlGameLogic.js'; 
 
 async function reactorCtrlProcessCommand(cmdName, ...args) {
     // Map shorter aliases to handler functions
@@ -43,10 +47,18 @@ async function reactorCtrlProcessCommand(cmdName, ...args) {
         'cam': handleCamCommand,
         'about': handleAboutCommand,
         'clear': handleClearCommand,
-        'cls': handleClearCommand, // Alias
-        'map': handleDisplayMap
+        'cls': handleClearCommand, // Alias,
+        'settings': handleSettingsCommand,
+        'map': handleDisplayMap,
+        'exit': handleExitCommand
         // Add other commands and their aliases here
     };
+
+    // Check if awaiting exit confirmation
+    if (awaitingExitConfirmation) {
+        handleExitConfirmationResponse(cmdName);
+        return;
+    }
 
     const handler = commandMap[cmdName]; // Look up the handler using the command
 

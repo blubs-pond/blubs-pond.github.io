@@ -1,12 +1,14 @@
 import { gameState } from './reactorCtrlGameState.js';
 import { gameSettings } from './reactorCtrlGameSettings.js';
-import { confirmExit, exitGame } from '../../cmd.js'; // Assuming exit handling is in cmd.js
+import { exitGame } from '../../cmd.js'; // Assuming exit handling is in cmd.js
+import { getUserFriendlyLocationName } from './reactorCtrlGameSettings.js'; // Import for stat command
 import { appendTerminalOutput } from '../../ui.js';
 
 let lastUpdateTime = 0;
 let gameTimeInMinutesReal = 0; // Initialize gameTimeInMinutesReal here
 let currentPhase = "survival"; // Initial phase
 
+let awaitingExitConfirmation = false;
 function gameLoop(timestamp) {
     if (!lastUpdateTime) lastUpdateTime = timestamp;
     const dt = (timestamp - lastUpdateTime) / 1000; // Time delta in seconds
@@ -202,18 +204,42 @@ function handleHelpCommand() {
 // Function to handle the 'exit' command
 function handleExitCommand(args) {
  // The confirmation logic is now handled by the main terminal's input
- // We just need to trigger the confirmation process
+ // We set a state variable to indicate we're awaiting confirmation
+ awaitingExitConfirmation = true;
  appendTerminalOutput("Are you sure you want to exit? (yes/no)");
- confirmExit();
+}
+
+// Function to handle the response to the exit confirmation
+function handleExitConfirmationResponse(response) {
+    const lowerResponse = response.toLowerCase().trim();
+    if (lowerResponse === 'yes' || lowerResponse === 'y') {
+        exitGame(); // Call the actual exit function
+    } else {
+        appendTerminalOutput("Exit cancelled.");
+    }
 }
 
 // Placeholder function for the 'settings' command
 function handleSettingsCommand(args) {
- // TODO: Implement settings logic (show, sound, music)
- appendTerminalOutput("Settings command placeholder.");
+    const subcommand = args[0]?.toLowerCase();
+
+    switch (subcommand) {
+        case 'show':
+            appendTerminalOutput("--- Current Settings ---");
+            appendTerminalOutput(`Sound: ${gameState.settings.sound ? 'on' : 'off'}`);
+            appendTerminalOutput(`Music: ${gameState.settings.music ? 'on' : 'off'}`);
+            appendTerminalOutput("-----------------------");
+            break;
+ case 'sound':
+ handleToggleSetting(args[1], 'sound', 'Sound');
+ break;
+ case 'music':
+ handleToggleSetting(args[1], 'music', 'Music');
+ break;
+ default:
+ appendTerminalOutput("Usage: settings [show | sound [on/off] | music [on/off]]");
+    }
 }
-
-
 // Placeholder function for the 'look' command
 function handleLookCommand(args) {
     // TODO: Implement logic to display current location description and items/features
@@ -248,22 +274,90 @@ function handleExamineCommand(args) {
 
 function handleRebootCommand(args) {
  // TODO: Implement rebooting actions
+ if (gameState.caPanelStatus === 'broken') {
+ appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+ return;
+ }
  appendTerminalOutput("Attempting to reboot...");
 }
 
 function handleStatCommand(args) {
- // TODO: Implement displaying stats
- appendTerminalOutput("Displaying stats...");
+ const target = args[0]?.toLowerCase();
+ const validSectors = ['reactor', 'lab', 'utility', 'hallway']; // Assuming these are the sectors
+
+ if (!target || target === 'all') {
+ showFacilityStatus();
+    } else if (target === 'player' || target === '@') {
+ showPlayerStatus();
+    } else if (validSectors.includes(target)) {
+ showSectorStatus(target);
+    } else {
+ showRoomStatus(target);
+    }
+}
+
+function showFacilityStatus() {
+ appendTerminalOutput("--- Facility Status Summary ---");
+    appendTerminalOutput(`Reactor Status: ${gameState.core_active ? 'Active' : 'Inactive'}`);
+    appendTerminalOutput(`Reactor Temp: ${gameState.reactor_temp.toFixed(1)} C`);
+    appendTerminalOutput(`Reactor Power: ${gameState.reactor_power_output.toFixed(1)} MW`);
+    appendTerminalOutput("--- Inventory ---");
+        for (const item in gameState.inventory) {
+            appendTerminalOutput(`${capitalize(item)}: ${gameState.inventory[item]}`);
+        }
+    appendTerminalOutput("-------------------------------");
+}
+
+function showPlayerStatus() {
+    appendTerminalOutput("--- Player Status ---");
+    appendTerminalOutput(`Current Location: ${getUserFriendlyLocationName(gameState.player.location)}`);
+    appendTerminalOutput(`Player State: ${gameState.playerState}`);
+    appendTerminalOutput(`Time: ${gameState.gameTime.hours.toString().padStart(2, '0')}:${gameState.gameTime.minutes.toString().padStart(2, '0')}`); // Using new gameTime structure
+    appendTerminalOutput(`Money: $${gameState.playerMoney.toFixed(2)}`);
+    appendTerminalOutput("---------------------");
+}
+
+function showSectorStatus(target) {
+    appendTerminalOutput(`--- ${capitalize(target)} Sector Status ---`);
+    // TODO: Implement sector-specific status outputs based on game state
+    // You'll need to define what information is available for each sector.
+    appendTerminalOutput("Sector status not fully implemented yet.");
+    appendTerminalOutput("----------------------------");
+}
+
+function showRoomStatus(target) {
+ const roomCode = target.toUpperCase();
+    const room = gameSettings.locations[roomCode];
+    if (room) {
+    appendTerminalOutput(`--- ${room.friendlyName} Status ---`);
+            appendTerminalOutput(room.description);
+    appendTerminalOutput(`Exits: ${Object.keys(room.exits).join(', ')}`);
+        } else {
+    appendTerminalOutput(`Invalid room code: ${target}`);
+    }
 }
 
 function handleUpgradeCommand(args) {
  // TODO: Implement upgrading actions
+ if (gameState.caPanelStatus === 'broken') {
+ appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+ return;
+ }
  appendTerminalOutput("Attempting to upgrade...");
 }
 
 function handleFlushCommand(args) {
- // TODO: Implement flushing actions
- appendTerminalOutput("Attempting to flush...");
+    // TODO: Implement flushing actions
+    if (gameState.caPanelStatus === 'broken') {
+        appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+        return;
+    }
+    if (args[0]?.toLowerCase() === 'vent') {
+        // Call a dedicated function for flushing vents if needed
+        appendTerminalOutput("Flushing ventilation system...");
+    } else {
+    appendTerminalOutput("Attempting to flush...");
+    }
 }
 
 function handleFixCommand(args) {
@@ -279,6 +373,10 @@ function handleDisplayMap() {
 
 function handleCamCommand(args) {
     const cameraNumber = args[0];
+    if (gameState.caPanelStatus === 'broken') {
+        appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+        return;
+    }
     if (cameraNumber) {
         // TODO: Implement camera view logic
         appendTerminalOutput(`Viewing camera ${cameraNumber}... (Camera view will be displayed here)`);
@@ -286,6 +384,7 @@ function handleCamCommand(args) {
         appendTerminalOutput("Specify camera number (e.g., cam 1).");
     }
 }
+
 function handleStartCommand() {
     appendTerminalOutput("Starting the game...");
     requestAnimationFrame(gameLoop);
@@ -304,6 +403,23 @@ function handleAboutCommand() {
     appendTerminalOutput("Reactor Control Terminal - Version 0.1");
     appendTerminalOutput("Developed by [Your Name/Team Name]");
     appendTerminalOutput("A text-based survival game.");
+}
+
+// Helper function to handle toggling settings
+function handleToggleSetting(value, settingKey, settingName) {
+    if (value === 'on') {
+        gameState.settings[settingKey] = true;
+        appendTerminalOutput(`${settingName} turned on.`);
+    } else if (value === 'off') {
+        gameState.settings[settingKey] = false;
+        appendTerminalOutput(`${settingName} turned off.`);
+    } else {
+        appendTerminalOutput(`Usage: settings ${settingKey} [on/off]`);
+    }
+}
+
+function capitalize(string) {
+ return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Function to handle the 'clear' command
@@ -338,11 +454,17 @@ export {
     handleAboutCommand,
     handleClearCommand,
     handleExitCommand, // Added exit command handler
+    awaitingExitConfirmation,
     handleSettingsCommand, // Added settings command handler
+    handleExitConfirmationResponse,
     handleDisplayMap,
     handleFixCommand,
     handleRebootCommand,
     handleStatCommand,
+    showFacilityStatus, // Exporting helper functions for stat
+    showPlayerStatus,
+    showSectorStatus,
+    showRoomStatus,
     handleUpgradeCommand,
     handleFlushCommand
 };
