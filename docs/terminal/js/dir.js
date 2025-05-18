@@ -65,7 +65,7 @@ function findDirectoryByPath(path, startDir = rootDirectory) {
 }
 
 function handlePwdCommand() {
-    appendTerminalOutput('YOU DO NOT HAVE PERMISSION TO DO SO YET');
+    appendTerminalOutput(currentDir.path);
 }
 
 function handleCdCommand(dir) {
