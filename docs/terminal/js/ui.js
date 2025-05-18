@@ -5,4 +5,11 @@ function appendTerminalOutput(message) {
     terminalOutput.appendChild(p);
 }
 
-export { appendTerminalOutput };
+function appendTerminalSymbol(message) {
+    const terminalSymbol = document.getElementById('terminal-prompt-symbol');
+    const p = document.createElement('p');
+    p.textContent = message;
+    terminalSymbol.appendChild(p);
+}
+
+export { appendTerminalOutput, appendTerminalSymbol };

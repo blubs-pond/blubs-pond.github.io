@@ -1,4 +1,4 @@
-import { appendTerminalOutput } from './ui.js';
+import { appendTerminalOutput, appendTerminalSymbol } from './ui.js';
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
 import { handlePwdCommand, handleCdCommand, handleLsCommand, currentDir} from './dir.js';
 
@@ -31,8 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function updatePrompt() {
-    const terminalInput = document.getElementById('terminal-command-input');
-    terminalInput.placeholder = `${currentDir.path}>`; // Update placeholder with current path
+    // const terminalSymbol = document.getElementById('terminal-prompt-symbol');
+    // terminalSymbol.placeholder = `${currentDir.path}>`; // Update placeholder with current path
+    appendTerminalSymbol(`${currentDir.path}>`);
 }
 
 function processCommand(command) {
@@ -86,7 +87,7 @@ function processCommand(command) {
     const handler = commandMap[cmdName.toLowerCase()];
 
     if (handler && currentGame === null) {
-        handler(args[0]);
+        handler(args);
     } else if (currentGame === 'reactor') {
         if (trimmedCommand.toLowerCase() === 'exit') {
             currentGame = null;
