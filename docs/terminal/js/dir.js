@@ -55,30 +55,27 @@ function findDirectoryByPath(path, startDir = rootDirectory) {
     console.log("Searching for path:", path);
     console.log("Current directory being checked:", startDir.path);
 
-    // Check direct subdirectories first
-    for (const subDir of startDir.subdirectories) {
-        if (subDir instanceof directory && subDir.path.toLowerCase() === path.toLowerCase()) {
-            console.log("Match found in direct subdirectories:", subDir);
-            return subDir;
-        }
-    }
+    const startDirPathLower = startDir.path.toLowerCase();
+    const pathLower = path.toLowerCase();
 
-    // If not found in direct subdirectories, proceed with recursive search
-    if (startDir.path.toLowerCase() === path.toLowerCase()) {
+    console.log("Comparing:", `"${startDirPathLower}"`, "and", `"${pathLower}"`); // Log the strings
+    console.log("Lengths:", startDirPathLower.length, "and", pathLower.length); // Log their lengths
+
+
+    if (startDirPathLower === pathLower) {
         console.log("Match found:", startDir);
         return startDir;
     }
-
     for (const subDir of startDir.subdirectories) {
         if (subDir instanceof directory) {
             const found = findDirectoryByPath(path, subDir);
             if (found) return found;
         }
     }
-
     console.log("Path not found in this branch.");
     return null;
 }
+
 
 function handlePwdCommand() {
     appendTerminalOutput(currentDir.path);
