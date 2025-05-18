@@ -73,7 +73,7 @@ function handlePwdCommand() {
 }
 
 function handleCdCommand(dir) {
-    dir = dir.trim();
+    dir = dir.trim().replace(/\\/g, '/'); // Replace backslashes with forward slashes
     if (dir === '/') {
         // Handle root directory
         currentDir = rootDirectory;
