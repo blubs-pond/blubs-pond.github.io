@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updatePrompt() {
     const terminalInput = document.getElementById('terminal-command-input');
-    terminalInput.placeholder = `${currentDir.path}>`; // Update placeholder with current path
+    terminalInput.placeholder = `${currentDir}>`; // Update placeholder with current path
 };
 
 function processCommand(command) {
