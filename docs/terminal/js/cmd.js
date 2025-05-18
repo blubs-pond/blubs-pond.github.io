@@ -1,6 +1,6 @@
 import { appendTerminalOutput } from './ui.js';
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
-import { handleDirCommand, handlePwdCommand, handleCdCommand, handleLsCommand } from './dir.js';
+import { handlePwdCommand, handleCdCommand, handleLsCommand, currentDir} from './dir.js';
 
 const commandHistory = [];
 let currentDir = { path: '/' }; // Initialize current directory

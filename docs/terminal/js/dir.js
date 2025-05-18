@@ -64,7 +64,6 @@ function findDirectoryByPath(path, startDir = rootDirectory) {
     return null;
 }
 
-
 function handlePwdCommand() {
     appendTerminalOutput('YOU DO NOT HAVE PERMISSION TO DO SO YET');
 }
@@ -119,7 +118,7 @@ function handleCdCommand(dir) {
     }
 };
 
-function handleLsCommand() {
+function handleLsCommand(dir) {
     let output = '';
     for (const subDir of currentDir.subdirectories) {
         output += `<span class="directory">${subDir.name}</span>  `;
