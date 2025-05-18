@@ -1,6 +1,7 @@
 import { appendTerminalOutput } from './ui.js';
 
-class file {
+// === File and Directory Classes ===
+class File {
     constructor(name, path, type, content) {
         this.name = name;
         this.path = path;
@@ -9,46 +10,43 @@ class file {
     }
 }
 
-class directory {
+class Directory {
     constructor(name, path) {
         this.name = name;
         this.path = path;
     }
 }
 
-// Use a single object to represent the file system
+// === File System Initialization ===
 const fileSystem = {};
 
-// Define root directories
-const rootDirectory = new directory('/', '/');
-const sysDirectory = new directory('C', 'C');
-const dataDirectory = new directory('D', 'D');
+const rootDirectory = new Directory('/', '/');
+const sysDirectory = new Directory('C', 'C');
+const dataDirectory = new Directory('D', 'D');
 
 fileSystem[rootDirectory.path] = rootDirectory;
 fileSystem[sysDirectory.path] = sysDirectory;
 fileSystem[dataDirectory.path] = dataDirectory;
 
-// Define subdirectories and files using their full paths
-const pfDirectory = new directory('Program Files', 'C/Program Files');
+const pfDirectory = new Directory('Program Files', 'C/Program Files');
 fileSystem[pfDirectory.path] = pfDirectory;
 
-const userDirectory = new directory('Users', 'C/Users');
+const userDirectory = new Directory('Users', 'C/Users');
 fileSystem[userDirectory.path] = userDirectory;
 
-const README = new file('README', 'C/README', 'text', '');
+const README = new File('README', 'C/README', 'text', '');
 fileSystem[README.path] = README;
 
-const gameDirectory = new directory('game', 'C/Program Files/game');
+const gameDirectory = new Directory('game', 'C/Program Files/game');
 fileSystem[gameDirectory.path] = gameDirectory;
 
-const reactorDirectory = new directory('reactor-ctrl', 'C/Program Files/game/reactor-ctrl');
+const reactorDirectory = new Directory('reactor-ctrl', 'C/Program Files/game/reactor-ctrl');
 fileSystem[reactorDirectory.path] = reactorDirectory;
 
-const reactorExecutable = new file('reactor.exe', 'C/Program Files/game/reactor-ctrl/reactorCtrl.html', 'exe', 'reactor');
+const reactorExecutable = new File('reactor.exe', 'C/Program Files/game/reactor-ctrl/reactorCtrl.html', 'exe', 'reactor');
 fileSystem[reactorExecutable.path] = reactorExecutable;
 
-
-// Now define the relationships between directories using a structure that allows finding children
+// === Directory Relationships ===
 const directoryContents = {
     '/': ['C', 'D'],
     'C': ['Program Files', 'Users', 'README'],
@@ -57,16 +55,26 @@ const directoryContents = {
     'C/Program Files/game/reactor-ctrl': ['reactor.exe']
 };
 
-
+// === Current Directory State ===
 let currentDir = rootDirectory;
 
+// === Helper Functions ===
 
-// --- Refactored Functions ---
+// Normalize paths and get a Directory object from fileSystem
+function findDirectoryByPath(path) {
+    const normalizedPath = path.replace(/\\/g, '/').replace(/\/+/g, '/');
+    const cleanPath = normalizedPath.endsWith('/') && normalizedPath.length > 1
+        ? normalizedPath.slice(0, -1)
+        : normalizedPath;
+    const dir = fileSystem[cleanPath];
+    return dir instanceof Directory ? dir : null;
+}
 
-// Function to get directory contents (for ls command)
+// Get contents of a directory for `ls`
 function getDirectoryContents(dirPath) {
     const contents = directoryContents[dirPath] || [];
     const items = [];
+
     for (const itemName of contents) {
         const itemPath = dirPath === '/' ? `/${itemName}` : `${dirPath}/${itemName}`;
         const item = fileSystem[itemPath];
@@ -74,42 +82,27 @@ function getDirectoryContents(dirPath) {
             items.push(item);
         }
     }
+
     return items;
 }
 
+// === Terminal Command Handlers ===
 
-// Function to find a directory by its path (simplified)
-function findDirectoryByPath(path) {
-    // Normalize path to handle potential double slashes or backslashes
-    const normalizedPath = path.replace(/\\/g, '/').replace(/\/\//g, '/');
-    // Handle root path explicitly
-    if (normalizedPath === '/') {
-        return fileSystem['/'];
-    }
-     // Remove trailing slash unless it's the root
-    const cleanPath = normalizedPath.endsWith('/') && normalizedPath.length > 1 ? normalizedPath.slice(0, -1) : normalizedPath;
-
-    return fileSystem[cleanPath];
-}
-
-
-// Function to handle the 'cd' command
+// Handle `cd` command
 function handleCdCommand(args) {
     const targetPath = args[0];
 
-    if (targetPath === undefined || targetPath.trim() === '') {
-        // Handle case with no directory argument (e.g., just 'cd')
-        appendTerminalOutput(currentDir.path); // Show current directory
+    if (!targetPath) {
+        appendTerminalOutput(currentDir.path);
         return;
     }
 
-    const trimmedPath = targetPath.trim(); // Just trim, findDirectoryByPath will normalize
+    const trimmedPath = targetPath.trim();
 
-    // Handle navigating up (..)
+    // Handle ".."
     if (trimmedPath === '..') {
         if (currentDir.path === '/') {
-            // Already at root, do nothing
-             appendTerminalOutput(currentDir.path);
+            appendTerminalOutput(currentDir.path);
             return;
         }
         const parentPath = currentDir.path.substring(0, currentDir.path.lastIndexOf('/')) || '/';
@@ -118,23 +111,19 @@ function handleCdCommand(args) {
             currentDir = parentDir;
             appendTerminalOutput(`Changed directory to ${currentDir.path}`);
         } else {
-             // Should not happen if the structure is correct
             appendTerminalOutput(`cd: Error navigating up from ${currentDir.path}`);
         }
         return;
     }
 
-
-    // Handle absolute paths or navigating into a subdirectory
+    // Relative or absolute path
     const newPath = trimmedPath.startsWith('/') || /^[a-zA-Z]:?\/.*$/.test(trimmedPath)
-        ? trimmedPath // Absolute path
-        : `${currentDir.path === '/' ? '' : currentDir.path}/${trimmedPath}`; // Relative path
-
+        ? trimmedPath
+        : `${currentDir.path === '/' ? '' : currentDir.path}/${trimmedPath}`;
 
     const targetDir = findDirectoryByPath(newPath);
 
-
-    if (targetDir && targetDir instanceof directory) {
+    if (targetDir) {
         currentDir = targetDir;
         appendTerminalOutput(`Changed directory to ${currentDir.path}`);
     } else {
@@ -142,8 +131,7 @@ function handleCdCommand(args) {
     }
 }
 
-
-// Function to handle the 'ls' command
+// Handle `ls` command
 function handleLsCommand() {
     const contents = getDirectoryContents(currentDir.path);
     if (contents.length === 0) {
@@ -152,21 +140,27 @@ function handleLsCommand() {
     }
     appendTerminalOutput("Contents of " + currentDir.path + ":");
     for (const item of contents) {
-        appendTerminalOutput(`- ${item.name} (${item instanceof directory ? 'Directory' : 'File'})`);
+        const type = item instanceof Directory ? 'Directory' : 'File';
+        appendTerminalOutput(`- ${item.name} (${type})`);
     }
 }
 
+// `dir` is an alias for `ls`
+function handleDirCommand() {
+    handleLsCommand();
+}
 
-// Function to handle the 'pwd' command
+// Handle `pwd` command
 function handlePwdCommand() {
     appendTerminalOutput(currentDir.path);
 }
 
-
+// === Exports ===
 export {
-    handlePwdCommand,
     handleCdCommand,
     handleLsCommand,
+    handlePwdCommand,
+    handleDirCommand,
     currentDir,
-    fileSystem // Export fileSystem if needed elsewhere
+    fileSystem
 };
