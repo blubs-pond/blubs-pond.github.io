@@ -1,5 +1,6 @@
 import { appendTerminalOutput } from './ui.js';
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
+import { handleDirCommand, handlePwdCommand, handleCdCommand, handleLsCommand } from './dir.js';
 
 const commandHistory = [];
 let currentGame = null;
@@ -58,9 +59,9 @@ function processCommand(command) {
         'reactor': handleGameReactor,
         'date': getDateTime,
         'time': getDateTime,
-        'ls': dirHandlerCmd,
-        'cd': dirHandlerCmd,
-        'pwd': dirHandlerCmd,
+        'ls': handleLsCommand,
+        'cd': handleCdCommand,
+        'pwd': handlePwdCommand,
         'clear': clearTerminal,
         'cls': clearTerminal,
         'echo': echoCommand,
@@ -133,10 +134,6 @@ function clearTerminal() {
     terminalOutput.innerHTML = '';
 }
 
-function dirHandlerCmd() {
-    appendTerminalOutput('YOU DO NOT HAVE PERMISSION TO DO SO YET');
-}
-
 function echoCommand(args) {
     appendTerminalOutput(args.join(' '));
 }
@@ -173,7 +170,6 @@ export {
     handleCmdHelpCommand,
     getDateTime,
     clearTerminal,
-    dirHandlerCmd,
     echoCommand,
     catCommand,
     historyCommand
