@@ -1,6 +1,5 @@
 import { gameState } from './reactorCtrlGameState.js';
 import { gameSettings } from './reactorCtrlGameSettings.js';
-import { getUserFriendlyLocationName } from './reactorCtrlGameSettings.js'; // Import for stat command
 import { appendTerminalOutput } from '../../ui.js';
 
 let lastUpdateTime = 0;
@@ -309,7 +308,7 @@ function showFacilityStatus() {
 
 function showPlayerStatus() {
     appendTerminalOutput("--- Player Status ---");
-    appendTerminalOutput(`Current Location: ${getUserFriendlyLocationName(gameState.player.location)}`);
+    appendTerminalOutput(`Current Location: ${getUserFriendlyLocationName(gameState.player.location)}`); // This function is added below
     appendTerminalOutput(`Player State: ${gameState.playerState}`);
     appendTerminalOutput(`Time: ${gameState.gameTime.hours.toString().padStart(2, '0')}:${gameState.gameTime.minutes.toString().padStart(2, '0')}`); // Using new gameTime structure
     appendTerminalOutput(`Money: $${gameState.playerMoney.toFixed(2)}`);
@@ -427,6 +426,11 @@ function handleClearCommand() {
     appendTerminalOutput("Terminal cleared.");
 }
 
+// Helper function to get the friendly name of a location
+function getUserFriendlyLocationName(locationKey) {
+    const location = gameSettings.locations[locationKey];
+    return location ? location.friendlyName : "Unknown Location";
+}
 export {
     gameLoop,
     getPhaseForTime,
@@ -460,7 +464,8 @@ export {
     handleFixCommand,
     handleRebootCommand,
     handleStatCommand,
-    showFacilityStatus, // Exporting helper functions for stat
+    getUserFriendlyLocationName, // Export the new function
+ showFacilityStatus, // Exporting helper functions for stat
     showPlayerStatus,
     showSectorStatus,
     showRoomStatus,
