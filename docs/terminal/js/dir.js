@@ -52,7 +52,10 @@ let currentDir = rootDirectory;
 
 // Function to find a directory by its path
 function findDirectoryByPath(path, startDir = rootDirectory) {
-    if (startDir.path.toLowerCase() === path) {
+    console.log("Searching for path:", path);
+    console.log("Current directory being checked:", startDir.path);
+    if (startDir.path.toLowerCase() === path.toLowerCase()) { // Add toLowerCase for case-insensitive comparison
+        console.log("Match found:", startDir);
         return startDir;
     }
     for (const subDir of startDir.subdirectories) {
@@ -61,6 +64,7 @@ function findDirectoryByPath(path, startDir = rootDirectory) {
             if (found) return found;
         }
     }
+    console.log("Path not found in this branch.");
     return null;
 }
 
@@ -70,11 +74,11 @@ function handlePwdCommand() {
 
 function handleCdCommand(dir) {
     dir = dir.trim();
-    if (dir.trim() === '/') {
+    if (dir === '/') {
         // Handle root directory
         currentDir = rootDirectory;
         appendTerminalOutput(`Changed directory to ${currentDir.path}`);
-    } else if (/^[a-zA-Z]:\//.test(dir.trim())) {
+    } else if (/^[a-zA-Z]:[\\/]/.test(dir)) { // Use [\\/] to match both / and \\
         // Handle absolute paths
         const targetDir = findDirectoryByPath(dir);
         if (targetDir) {
@@ -83,9 +87,10 @@ function handleCdCommand(dir) {
         } else {
             appendTerminalOutput(`cd: No such file or directory: ${dir}`);
         }
-    } else if (dir.trim().search(/^\.\./) === 0) {
+    } else if (dir.startsWith('..')) { // Use startsWith for clarity
+        // Handle navigating up
         let targetDir = currentDir;
-        const parts = dir.trim().split('/');
+        const parts = dir.split(/[\\/]/); // Split by / or \
         let newPath = targetDir.path;
         for (const part of parts) {
             if (part === '..') {
@@ -94,8 +99,6 @@ function handleCdCommand(dir) {
                 } else if (newPath.lastIndexOf('/') === 0 && newPath.length > 1) {
                     // Handle cases like "C:/" moving to "/"
                     newPath = '/';
-                } else {
-                    // Already at the root or a drive root
                 }
             } else if (part !== '' && part !== '.') {
                 // This part handles navigating into a subdirectory after moving up
@@ -107,16 +110,25 @@ function handleCdCommand(dir) {
                     appendTerminalOutput(`cd: No such file or directory: ${dir}`);
                     return; // Stop processing if a part of the path is invalid
                 }
-
             }
         }
         const finalTargetDir = findDirectoryByPath(newPath);
         if (finalTargetDir) {
             currentDir = finalTargetDir;
             appendTerminalOutput(`Changed directory to ${currentDir.path}`);
+        } else {
+             appendTerminalOutput(`cd: No such file or directory: ${dir}`);
+        }
+    } else { // Handle navigating to a subdirectory
+        const targetDir = currentDir.subdirectories.find(sub => sub instanceof directory && sub.name === dir);
+        if (targetDir) {
+            currentDir = targetDir;
+            appendTerminalOutput(`Changed directory to ${currentDir.path}`);
+        } else {
+            appendTerminalOutput(`cd: No such file or directory: ${dir}`);
         }
     }
-};
+}
 
 function handleLsCommand(dir) {
     // let output = '';
