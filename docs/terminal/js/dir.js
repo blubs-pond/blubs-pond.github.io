@@ -52,7 +52,7 @@ let currentDir = rootDirectory;
 
 // Function to find a directory by its path
 function findDirectoryByPath(path, startDir = rootDirectory) {
-    if (startDir.path === path) {
+    if (startDir.path.toLowerCase() === path) {
         return startDir;
     }
     for (const subDir of startDir.subdirectories) {
@@ -119,14 +119,18 @@ function handleCdCommand(dir) {
 };
 
 function handleLsCommand(dir) {
-    let output = '';
+    // let output = '';
+    appendTerminalOutput('sub Directory');
     for (const subDir of currentDir.subdirectories) {
-        output += `<span class="directory">${subDir.name}</span>  `;
+        // output += ` ${subDir.name}`;
+        appendTerminalOutput(` ${subDir.name}`);
     }
+    appendTerminalOutput('sub file');
     for (const file of currentDir.files) {
-        output += `<span class="file">${file.name}</span>  `;
+        // output += `${file.name}`;
+        appendTerminalOutput(` ${file.name}`);
     }
-    appendTerminalOutput(output.trim());
+    // appendTerminalOutput(output.trim());
 }
 
 export {

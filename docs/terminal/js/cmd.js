@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Enter') {
             const command = terminalInput.value.trim();
             terminalInput.value = '';
+            updatePrompt(); // Display initial prompt
 
             if (command) {
                 commandHistory.push(command);
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updatePrompt() {
     const terminalInput = document.getElementById('terminal-command-input');
     terminalInput.placeholder = `${currentDir.path}>`; // Update placeholder with current path
-};
+}
 
 function processCommand(command) {
     appendTerminalOutput(`${currentDir.path}> ${command}`);
@@ -54,9 +55,11 @@ function processCommand(command) {
             return;
         }
     } else {
-        const parts = trimmedCommand.toLowerCase().split(' ');
+        const parts = trimmedCommand.split(' ');
         cmdName = parts[0];
+        appendTerminalOutput(`cmdName = ${cmdName}`);
         args = parts.slice(1);
+        appendTerminalOutput(`args = ${args}`);
     }
 
     const commandMap = {
@@ -80,7 +83,7 @@ function processCommand(command) {
         'exit': handleExitCommand
     };
 
-    const handler = commandMap[cmdName];
+    const handler = commandMap[cmdName.toLowerCase()];
 
     if (handler && currentGame === null) {
         handler(args);
