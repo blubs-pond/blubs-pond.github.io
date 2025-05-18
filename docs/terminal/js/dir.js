@@ -1,7 +1,5 @@
 import { appendTerminalOutput } from './ui.js';
 
-let currentDir = rootDirectory;
-
 class file {
     constructor(name, path, type, content) {
         this.name = name;
@@ -49,6 +47,8 @@ game.subdirectories.push(reactor);
 
 const reactorCtrl = new file('reactor.exe', 'C:/Program Files/game/reactor-ctrl/reactorCtrl.html', 'exe', 'reactor')
 reactor.subdirectories.push(reactorCtrl)
+
+let currentDir = rootDirectory;
 
 // Function to find a directory by its path
 function findDirectoryByPath(path, startDir = rootDirectory) {
