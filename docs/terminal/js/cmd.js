@@ -3,6 +3,7 @@ import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reacto
 import { handleDirCommand, handlePwdCommand, handleCdCommand, handleLsCommand } from './dir.js';
 
 const commandHistory = [];
+let currentDir = { path: '/' }; // Initialize current directory
 let currentGame = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,7 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     appendTerminalOutput("Welcome to the Blubs-Pond Terminal!");
     appendTerminalOutput("Type 'help' for a list of commands.");
+    updatePrompt(); // Display initial prompt
 });
+
+function updatePrompt() {
+    const terminalInput = document.getElementById('terminal-command-input');
+    terminalInput.placeholder = `${currentDir.path}>`; // Update placeholder with current path
+};
 
 function processCommand(command) {
     appendTerminalOutput(`> ${command}`);
@@ -90,6 +97,7 @@ function processCommand(command) {
         appendTerminalOutput(`Unknown command: ${cmdName}`);
         appendTerminalOutput("Type 'help' for a list of commands.");
     }
+    updatePrompt(); // Update prompt after command execution
 }
 
 function handleGameReactor(args) {
@@ -164,6 +172,7 @@ function historyCommand(args) {
 
 export {
     commandHistory,
+    currentDir, // Export currentDir
     currentGame,
     processCommand,
     handleGameReactor,
