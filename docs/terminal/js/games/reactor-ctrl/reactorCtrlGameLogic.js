@@ -142,8 +142,8 @@ function handleGoCommand(args) {
     const fullDirection = directionMap[direction.toLowerCase()];
 
     if (!fullDirection) {
-         appendTerminalOutput(`Invalid direction: ${direction}. Use north, south, east, or west (or n, s, e, w).`);
-         return;
+            appendTerminalOutput(`Invalid direction: ${direction}. Use north, south, east, or west (or n, s, e, w).`);
+            return;
     }
 
 
@@ -202,10 +202,10 @@ function handleHelpCommand() {
 
 // Function to handle the 'exit' command
 function handleExitCommand(args) {
- // The confirmation logic is now handled by the main terminal's input
- // We set a state variable to indicate we're awaiting confirmation
- awaitingExitConfirmation = true;
- appendTerminalOutput("Are you sure you want to exit? (yes/no)");
+    // The confirmation logic is now handled by the main terminal's input
+    // We set a state variable to indicate we're awaiting confirmation
+    awaitingExitConfirmation = true;
+    appendTerminalOutput("Are you sure you want to exit? (yes/no)");
 }
 
 // Function to handle the response to the exit confirmation
@@ -229,14 +229,14 @@ function handleSettingsCommand(args) {
             appendTerminalOutput(`Music: ${gameState.settings.music ? 'on' : 'off'}`);
             appendTerminalOutput("-----------------------");
             break;
- case 'sound':
- handleToggleSetting(args[1], 'sound', 'Sound');
- break;
- case 'music':
- handleToggleSetting(args[1], 'music', 'Music');
- break;
- default:
- appendTerminalOutput("Usage: settings [show | sound [on/off] | music [on/off]]");
+        case 'sound':
+            handleToggleSetting(args[1], 'sound', 'Sound');
+            break;
+        case 'music':
+            handleToggleSetting(args[1], 'music', 'Music');
+            break;
+        default:
+            appendTerminalOutput("Usage: settings [show | sound [on/off] | music [on/off]]");
     }
 }
 // Placeholder function for the 'look' command
@@ -272,26 +272,26 @@ function handleExamineCommand(args) {
 }
 
 function handleRebootCommand(args) {
- // TODO: Implement rebooting actions
- if (gameState.caPanelStatus === 'broken') {
- appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
- return;
- }
- appendTerminalOutput("Attempting to reboot...");
+    // TODO: Implement rebooting actions
+    if (gameState.caPanelStatus === 'broken') {
+        appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+        return;
+    }
+    appendTerminalOutput("Attempting to reboot...");
 }
 
 function handleStatCommand(args) {
- const target = args[0]?.toLowerCase();
- const validSectors = ['reactor', 'lab', 'utility', 'hallway']; // Assuming these are the sectors
+    const target = args[0]?.toLowerCase();
+    const validSectors = ['reactor', 'lab', 'utility', 'hallway']; // Assuming these are the sectors
 
- if (!target || target === 'all') {
- showFacilityStatus();
+    if (!target || target === 'all') {
+        showFacilityStatus();
     } else if (target === 'player' || target === '@') {
- showPlayerStatus();
+        showPlayerStatus();
     } else if (validSectors.includes(target)) {
- showSectorStatus(target);
+        showSectorStatus(target);
     } else {
- showRoomStatus(target);
+        showRoomStatus(target);
     }
 }
 
@@ -337,12 +337,12 @@ function showRoomStatus(target) {
 }
 
 function handleUpgradeCommand(args) {
- // TODO: Implement upgrading actions
- if (gameState.caPanelStatus === 'broken') {
- appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
- return;
- }
- appendTerminalOutput("Attempting to upgrade...");
+    // TODO: Implement upgrading actions
+    if (gameState.caPanelStatus === 'broken') {
+        appendTerminalOutput("The control panels in the Control Archives are not working. You cannot issue commands to other rooms.");
+        return;
+    }
+    appendTerminalOutput("Attempting to upgrade...");
 }
 
 function handleFlushCommand(args) {
@@ -360,8 +360,8 @@ function handleFlushCommand(args) {
 }
 
 function handleFixCommand(args) {
- // TODO: Implement fixing actions
- appendTerminalOutput("Attempting to fix...");
+    // TODO: Implement fixing actions
+    appendTerminalOutput("Attempting to fix...");
 }
 
 // Function to handle the 'displaymap' command
@@ -418,7 +418,7 @@ function handleToggleSetting(value, settingKey, settingName) {
 }
 
 function capitalize(string) {
- return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Function to handle the 'clear' command
