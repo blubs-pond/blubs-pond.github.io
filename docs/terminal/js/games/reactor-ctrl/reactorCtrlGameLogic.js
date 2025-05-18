@@ -1,6 +1,5 @@
 import { gameState } from './reactorCtrlGameState.js';
 import { gameSettings } from './reactorCtrlGameSettings.js';
-import { exitGame } from '../../cmd.js'; // Assuming exit handling is in cmd.js
 import { getUserFriendlyLocationName } from './reactorCtrlGameSettings.js'; // Import for stat command
 import { appendTerminalOutput } from '../../ui.js';
 
