@@ -3,7 +3,6 @@ import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reacto
 import { handlePwdCommand, handleCdCommand, handleLsCommand, currentDir} from './dir.js';
 
 const commandHistory = [];
-let currentDir = { path: '/' }; // Initialize current directory
 let currentGame = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,7 +35,7 @@ function updatePrompt() {
 };
 
 function processCommand(command) {
-    appendTerminalOutput(`> ${command}`);
+    appendTerminalOutput(`${currentDir}> ${command}`);
 
     let cmdName;
     let args = [];
