@@ -70,6 +70,7 @@ function processCommand(command) {
         'help': handleCmdHelpCommand,
         'h': handleCmdHelpCommand,
         '?': handleCmdHelpCommand,
+        'exit': handleExitCommand
     };
 
     const handler = commandMap[cmdName];
@@ -108,11 +109,17 @@ function handleCmdHelpCommand() {
         'echo': 'Echoes the provided arguments.',
         'history': 'Shows the command history. Use !<number> to rerun a command.',
         'help': 'Displays this list of commands.',
+        'exit': 'return to home page'
     };
     appendTerminalOutput("Available commands:");
     Object.keys(commandDescriptions).forEach(command => {
         appendTerminalOutput(`- ${command}: ${commandDescriptions[command]}`);
     });
+}
+
+function handleExitCommand() {
+    appendTerminalOutput("Exiting terminal...");
+    window.location.href = '/index.html'; // Open index.html in the current tab
 }
 
 function getDateTime() {
