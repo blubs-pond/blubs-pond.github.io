@@ -9,7 +9,7 @@ function appendTerminalSymbol(message) {
     const terminalSymbol = document.getElementById('terminal-prompt-symbol');
     const p = document.createElement('p');
     p.textContent = message;
-    terminalSymbol.appendChild(p);
+    terminalSymbol.replaceChildren(p);
 }
 
 export { appendTerminalOutput, appendTerminalSymbol };
