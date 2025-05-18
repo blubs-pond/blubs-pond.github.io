@@ -2,7 +2,7 @@ import { gameState } from './reactorCtrlGameState.js';
 import { gameSettings } from './reactorCtrlGameSettings.js';
 import { appendTerminalOutput } from '../../ui.js';
 
-let lastUpdateTime = 0;
+let lastUpdateTime = 0; // ini Lats update game time
 let gameTimeInMinutesReal = 0; // Initialize gameTimeInMinutesReal here
 let currentPhase = "survival"; // Initial phase
 
