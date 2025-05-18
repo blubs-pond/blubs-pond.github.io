@@ -172,7 +172,6 @@ function historyCommand(args) {
 
 export {
     commandHistory,
-    currentDir, // Export currentDir
     currentGame,
     processCommand,
     handleGameReactor,
