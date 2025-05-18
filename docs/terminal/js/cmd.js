@@ -87,7 +87,7 @@ function processCommand(command) {
     const handler = commandMap[cmdName.toLowerCase()];
 
     if (handler && currentGame === null) {
-        handler(args);
+        handler(args[0]);
     } else if (currentGame === 'reactor') {
         if (trimmedCommand.toLowerCase() === 'exit') {
             currentGame = null;

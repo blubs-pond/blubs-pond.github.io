@@ -72,25 +72,35 @@ function handlePwdCommand() {
     appendTerminalOutput(currentDir.path);
 }
 
-function handleCdCommand(dir) {
-    dir = dir.trim().replace(/\\/g, '/'); // Replace backslashes with forward slashes
-    if (dir === '/') {
+function handleCdCommand(args) { // Accept the args array
+    const dir = args[0]; // Get the directory path from the first element
+
+    if (dir === undefined || dir.trim() === '') {
+        // Handle case with no directory argument (e.g., just 'cd')
+        // Maybe navigate to a default directory or show current directory
+        return;
+    }
+
+    const trimmedDir = dir.trim().replace(/\\/g, '/'); // Trim and replace backslashes
+
+    // Now use trimmedDir in the rest of your logic
+    if (trimmedDir === '/') {
         // Handle root directory
         currentDir = rootDirectory;
         appendTerminalOutput(`Changed directory to ${currentDir.path}`);
-    } else if (/^[a-zA-Z]:[\\/]/.test(dir)) { // Use [\\/] to match both / and \\
+    } else if (/^[a-zA-Z]:[\\/]/.test(trimmedDir)) { // Use [\\/] to match both / and \\
         // Handle absolute paths
-        const targetDir = findDirectoryByPath(dir);
+        const targetDir = findDirectoryByPath(trimmedDir);
         if (targetDir) {
             currentDir = targetDir;
             appendTerminalOutput(`Changed directory to ${currentDir.path}`);
         } else {
-            appendTerminalOutput(`cd: No such file or directory: ${dir}`);
+            appendTerminalOutput(`cd: No such file or directory: ${trimmedDir}`);
         }
-    } else if (dir.startsWith('..')) { // Use startsWith for clarity
+    } else if (trimmedDir.startsWith('..')) { // Use startsWith for clarity
         // Handle navigating up
         let targetDir = currentDir;
-        const parts = dir.split(/[\\/]/); // Split by / or \
+        const parts = trimmedDir.split(/[\\/]/); // Split by / or \
         let newPath = targetDir.path;
         for (const part of parts) {
             if (part === '..') {
@@ -107,7 +117,7 @@ function handleCdCommand(dir) {
                     targetDir = nextDir;
                     newPath = targetDir.path;
                 } else {
-                    appendTerminalOutput(`cd: No such file or directory: ${dir}`);
+                    appendTerminalOutput(`cd: No such file or directory: ${trimmedDir}`);
                     return; // Stop processing if a part of the path is invalid
                 }
             }
@@ -117,15 +127,15 @@ function handleCdCommand(dir) {
             currentDir = finalTargetDir;
             appendTerminalOutput(`Changed directory to ${currentDir.path}`);
         } else {
-             appendTerminalOutput(`cd: No such file or directory: ${dir}`);
+             appendTerminalOutput(`cd: No such file or directory: ${trimmedDir}`);
         }
     } else { // Handle navigating to a subdirectory
-        const targetDir = currentDir.subdirectories.find(sub => sub instanceof directory && sub.name === dir);
+        const targetDir = currentDir.subdirectories.find(sub => sub instanceof directory && sub.name === trimmedDir);
         if (targetDir) {
             currentDir = targetDir;
             appendTerminalOutput(`Changed directory to ${currentDir.path}`);
         } else {
-            appendTerminalOutput(`cd: No such file or directory: ${dir}`);
+            appendTerminalOutput(`cd: No such file or directory: ${trimmedDir}`);
         }
     }
 }
