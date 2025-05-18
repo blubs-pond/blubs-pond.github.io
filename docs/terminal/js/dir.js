@@ -90,9 +90,10 @@ function handleCdCommand(args) { // Accept the args array
         return;
     }
 
+    console.log("Value of 'dir' before trimming and replacing:", dir); // Add this log
     const trimmedDir = dir.trim().replace(/\\/g, '/'); // Trim and replace backslashes
     console.log("Checking trimmedDir for absolute path:", trimmedDir); // Add this log
-    
+
     // Now use trimmedDir in the rest of your logic
     if (trimmedDir === '/') {
         // Handle root directory
