@@ -1,4 +1,4 @@
-import { appendTerminalOutput } from './ui.js';
+import { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML } from './ui.js';
 
 class file {
     constructor(name, path, type, content = '') {
@@ -187,54 +187,45 @@ function handleTreeCommand() {
 }
 
 function handleCatCommand(args) {
-    if (!args || args.length === 0) {
-        appendTerminalOutput("cat: No file specified.");
+    const filePath = args[0];
+
+    if (typeof filePath !== 'string' || filePath.trim() === '') {
+        appendTerminalOutput("Usage: cat <filename>");
         return;
     }
 
-    const fileName = args[0];
-    const dirContents = getDirectoryContents(currentDir.path);
+    const resolvedPath = filePath.startsWith('/')
+        ? filePath
+        : `${currentDir.path === '/' ? '' : currentDir.path}/${filePath}`;
 
-    // Try to find the file in the current directory
-    const file = dirContents.find(item =>
-        item.name === fileName && !(item instanceof directory)
-    );
+    const file = fileSystem[resolvedPath];
 
-    if (!file) {
-        appendTerminalOutput(`cat: File not found: ${fileName}`);
+    if (!file || !(file instanceof file.constructor)) {
+        appendTerminalOutput(`cat: No such file: ${filePath}`);
         return;
     }
 
     switch (file.type) {
         case 'text':
-            appendTerminalOutput(`--- ${file.name} ---`);
-            appendTerminalOutput(file.content || "(empty)");
+            appendTerminalOutput(file.content);
             break;
-
-        case 'exe':
-            appendTerminalOutput(`${file.name} is an executable. Run it by typing '${file.content}'`);
+        case 'image':
+        case 'img':
+            appendTerminalHTML(`<img src="${file.content}" alt="${file.name}" style="max-width: 100%; height: auto;">`);
             break;
-
+        case 'audio':
+            appendTerminalHTML(`<audio controls src="${file.content}">Your browser does not support audio playback.</audio>`);
+            break;
         case 'webpage':
         case 'subpage':
-            appendTerminalOutput(`--- ${file.name} [Webpage] ---`);
-            appendTerminalOutput(file.content || "(no content)");
+            appendTerminalHTML(`<iframe src="${file.content}" style="width: 100%; height: 400px;"></iframe>`);
             break;
-
-        case 'audio':
-            appendTerminalOutput(`Playing audio: ${file.name}`);
-            const soundFile = new Audio(`${file.content}`);
-            soundFile.play()
+        case 'exe':
+        case 'switch':
+            appendTerminalOutput(`[Executable] To run this, type: ${file.name.split('.')[0]}`);
             break;
-
-        case 'data':
-            appendTerminalOutput(`--- ${file.name} [Data] ---`);
-            appendTerminalOutput(JSON.stringify(file.content, null, 2));
-            break;
-
         default:
-            appendTerminalOutput(`cat: Unsupported file type: ${file.type}`);
-            break;
+            appendTerminalOutput(`Unsupported file type: ${file.type}`);
     }
 }
 

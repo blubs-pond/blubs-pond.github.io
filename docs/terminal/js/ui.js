@@ -12,4 +12,12 @@ function appendTerminalSymbol(message) {
     terminalSymbol.replaceChildren(p);
 }
 
-export { appendTerminalOutput, appendTerminalSymbol };
+function appendTerminalHTML(html) {
+    const terminalOutput = document.getElementById("terminal-output");
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    terminalOutput.appendChild(container);
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+}
+
+export { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML };
