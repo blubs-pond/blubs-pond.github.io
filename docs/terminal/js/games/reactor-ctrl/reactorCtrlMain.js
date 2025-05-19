@@ -1,22 +1,20 @@
-import { reactorCtrlProcessCommand } from './reactorCtrlCommands.js'; // Corrected import path
-import { gameLoop } from './reactorCtrlGameLogic.js'; // gameLoop is also in gameLogic.js
-import { appendTerminalOutput } from '../../ui.js'; // Make sure appendTerminalOutput is imported
+// main.js
+
+import { reactorCtrlProcessCommand } from './reactorCtrlCommands.js';
+import { appendTerminalOutput } from '../../ui.js';
+
+// gameLoop is now inside reactorCtrlCore.js and used through reactorCtrlProcessCommand
+import { gameLoop } from './reactorCtrlCore.js';  // UPDATED: from unified core file
 
 function handleUserCommand(command) {
-    let cmdName;
-    let args = [];
+    if (!command.trim()) return; // Skip empty input
 
     const parts = command.toLowerCase().split(' ');
-    cmdName = parts[0];
-    args = parts.slice(1);
-
-    if (!command) {
-        // appendTerminalOutput(''); // Or provide a different message for empty input if desired
-        return; // Skip empty input but don't add to output
-    }
+    const cmdName = parts[0];
+    const args = parts.slice(1);
 
     reactorCtrlProcessCommand(cmdName, ...args);
-    
+
     // Clear the input field
     const commandInput = document.getElementById('terminal-command-input');
     if (commandInput) {
@@ -25,13 +23,10 @@ function handleUserCommand(command) {
 }
 
 function startReactorGame() {
-    // Start the game loop
     requestAnimationFrame(gameLoop);
 
-    // Initial message to the user
-    appendTerminalOutput("Reactor Started in 3... 2... 1... Reactor Bolshoy Moshchnosti Kanalny at ##### Site started awaited next instructions.");
-    appendTerminalOutput('Reactor Control System Initiated. Type "help" for commands.'); // Initial prompt
+    appendTerminalOutput("Reactor Started in 3... 2... 1... Reactor Bolshoy Moshchnosti Kanalny at ##### Site started. Awaiting next instructions.");
+    appendTerminalOutput('Reactor Control System Initiated. Type "help" for commands.');
 }
-
 
 export { handleUserCommand, startReactorGame };

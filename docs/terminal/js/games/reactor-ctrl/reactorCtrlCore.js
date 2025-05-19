@@ -1,7 +1,251 @@
-import { gameState } from './reactorCtrlGameState.js';
-import { gameSettings } from './reactorCtrlGameSettings.js';
+// reactorCtrlCore.js
 import { appendTerminalOutput } from '../../ui.js';
 
+// Game State
+const gameState = {
+    currentScene: 'start',
+    gameTime: { hours: 0, minutes: 0 },
+    playerInventory: [],
+    playerLocation: "ControlRoom",
+    playerMoney: 1000,
+    failedDevices: [],
+
+    player: {
+        location: "ControlRoom",
+        inventory: [],
+        stats: {
+            hunger: 0,
+            insomnia: 0,
+            sanity: 100
+        },
+        hungerLevel: 0.0,
+        insomniaLevel: 0.0,
+        caffeineEffectTimer: 0.0,
+        caffeineCrashTimer: 0.0,
+        caffeineOverdosed: false,
+        hidingAbuseCounter: 0.0,
+        isHiding: false,
+        experimentEntryTimer: -1.0,
+        doorBeingHeld: "none",
+    },
+
+    reactorState: {
+        reactor_temp: 50.0,
+        reactor_pressure: 10.0,
+        coolant_level: 100.0,
+        radiation_level: 0.0,
+        reactor_power_output: 100.0,
+        stability: 90
+    },
+
+    tasks: {
+        "repairReactor": {
+            description: "Repair the primary reactor coolant pump.",
+            location: "ReactorRoom",
+            requiredItem: "wrench",
+            isCompleted: false
+        },
+        "restorePower": {
+            description: "Restore auxiliary power to the server room.",
+            location: "ServerRoom",
+            requiredAction: "flip_switch",
+            isCompleted: false
+        }
+    },
+
+    generatorState: {
+        power: 0,
+        fuel: 100
+    },
+
+    monsterState: [],
+    monsters: {
+        "Shadow": { location: null, state: "dormant", isNearPlayer: false }
+    },
+
+    backup_generator_oil: 100.0,
+    pump_speed: 50,
+    temp_increase_rate: 0.1,
+    temp_cool_rate_multiplier: 0.05,
+    temp_meltdown_threshold: 200.0,
+    temp_power_cutout_threshold: 20.0,
+    temp_core_shutdown_overspeed_threshold: 80.0,
+    pump_speed_overspeed_threshold: 80,
+
+    doorState: {
+        door1: { state: 'closed', durability: 100 },
+        door2: { state: 'closed', durability: 100 }
+    },
+
+    oilCans: 2,
+    lubricantKits: 1,
+    rations: 0,
+    coffeeTea: 0,
+    repairToolDurability: 100.0,
+
+    hungerLevel: 0.0,
+    insomniaLevel: 0.0,
+    sanity: 100,
+    caffeineEffectTimer: 0.0,
+    caffeineCrashTimer: 0.0,
+    caffeineOverdosed: false,
+    hidingAbuseCounter: 0.0,
+    isHiding: false,
+    experimentEntryTimer: -1.0,
+    doorBeingHeld: "none",
+
+    cameraState: {
+        "camera1": { isDistorted: false },
+        "camera2": { isDistorted: false }
+    },
+    shadowVisible: false,
+
+    gameFlags: {},
+    recentHallwayMovement: false,
+
+    ventilationStatus: 'working',
+    ventilationBlockageLevel: 0,
+    ventilationBlockedTimer: 0,
+
+    caPanelStatus: 'working',
+    roomPanelStatus: {
+        'RR': 'working',
+        'CP': 'working',
+        'BW': 'working'
+    },
+    rebootAllCaCooldown: 0,
+    rebootRoomCaProgress: {
+        'RR': 0,
+        'CP': 0,
+        'BW': 0
+    },
+    criticalReactorTempIncreaseRate: 0
+};
+
+const gameSettings = {
+    facilityMapString: `
+    ┌─────────────┐ ┌───┐ ┌───────┐ ┌─────────────────────────┐ ┌───────┐ ┌───┐  ┌─────────────┐
+    │             │ │<5>│ │       │ │                         │ │       │ │<6>│  │             │
+    │             │ │   │ │       │ │                         │ │       │ │   │  │             │
+    │             │ │   │ │ <PC>  │ │                         │ │       │ │   │  │             │
+    │             └─┘   │ │       │ │                         │ │       │ │   │  │             │
+    │    <CP>           │ └──┐ ┌──┘ │                         │ │       │ │   └──┘             │
+    │             ┌─┐   │ ┌──┘ └──┐ │                         └─┘       │ │           <BW>     │
+    │             │ │   │ │       │ │          <RR>               <TR>  │ │   ┌──┐             │
+    │             │ │   │ │       │ │                         ┌─┐       │ │   │  │             │
+    │             │ │   │ │       └─┘                         │ │       │ │   │  │             │
+    └─────────────┘ │   │ │ <SF>                              │ │       │ │   │  └─────────────┘
+    ┌─────────────┐ │   │ │       ┌─┐                         │ │       │ │   │                 
+    │             │ │   │ │       │ │                         │ │       │ │   │  ┌─────────────┐
+    │             └─┘   │ │       │ │                         │ │       │ │   │  │             │
+    │   <Vent>          │ └───────┘ └───────────┐ ┌───────────┘ └───────┘ │   │  │             │
+    │             ┌─┐   │                       ├x┤                       │   │  │             │
+    │             │ │   └───────────────────────┘ └───────────────────────┘   └──┘             │
+    └─────────────┘ │<D>                        <C>                        <E>        <CA>     │
+    ┌─────────────┐ │   ┌───────────┐   ┌─────────────────┐   ┌───────────┐   ┌──┐             │
+    │             │ │   │ ┌───────┐ │   │ ┌─────────────┐ │   │ ┌───────┐ │   │  │             │
+    │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+    │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+    │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+    │             │ │   │ │       └─┘   └─┤             ├─┘   └─┘       │ │   │  └─────────────┘
+    │             │ │   │ │          <A>  x             x  <B>          │ │   │                 
+    │             └─┘   │ │ <GR>  ┌─┐   ┌─┤    <CR>     ├─┐   ┌─┐  <SR> │ │   │  ┌─────────────┐
+    │    <LAB>     x    │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+    │             ┌─┐   │ │       │ │   │ │      @      │ │   │ │       │ │   │  │             │
+    │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
+    │             │ │   │ │       │ │<1>│ │             │ │<2>│ │       │ │   └──┘             │
+    │             │ │   │ └───────┘ └───┘ └─────┐ ┌─────┘ └───┘ └───────┘ │          <Elect>   │
+    │             │ │<3>│                       ├x┤                       │   ┌──┐             │
+    │             │ └───┘ ┌─────────────────────┘ └─────────────────────┐ │   │  │             │
+    │             ├───────┤                                             │ │   │  │             │
+    │             x <DCR> x                    <BU>                     │ │   │  │             │
+    │             ├───────┤                                             │ │<4>│  │             │
+    └─────────────┘       └─────────────────────────────────────────────┘ └───┘  └─────────────┘`,
+
+
+    createCamera: (mapMarker, description, location, batteryLife = 100, status = "active") => ({
+        mapMarker, description, location, batteryLife, status, isDistorted: false
+    }),
+
+    createDoor: (location, exit, isOpen = true, durability = 100, isLocked = false) => ({
+        location, exit, isOpen, durability, isLocked
+    }),
+
+    createLocation: (
+        friendlyName, description, mapMarker, exits,
+        securityLevel = 1, hasCreature = false, hazardLevel = 1
+    ) => ({
+        friendlyName, description, mapMarker, exits,
+        securityLevel, hasCreature, hazardLevel
+    }),
+
+    markerToLocationKey: {
+        CP: "CoolantPumpStation",
+        PC: "PowerConverterRoom",
+        SF: "SpentFuelStorage",
+        RR: "ReactorRoom",
+        TR: "TurbineRoom",
+        BW: "WaterTreatmentFacility",
+        CA: "ControlArchives",
+        Elect: "ElectricalSwitchyard",
+        SR: "ServerRoom",
+        CR: "ControlRoom",
+        GR: "GeneratorRoom",
+        LAB: "Laboratory",
+        Vent: "VentilationSystems",
+        DCR: "DecontaminationRoom",
+        BU: "Bunker",
+        A: "HallwayA",
+        B: "HallwayB",
+        C: "HallwayC",
+        D: "HallwayD",
+        E: "HallwayE"
+    },
+
+    locationKeyToMarker: null,
+
+    adjacencyMatrix: {
+        CR: ["SR", "GR", "CA"],
+        SR: ["CR", "Elect"],
+        GR: ["CR", "TR"],
+        TR: ["GR", "RR"],
+        RR: ["TR", "SF"],
+        SF: ["RR", "PC"],
+        PC: ["SF", "CP"],
+        CP: ["PC", "BW"],
+        BW: ["CP"],
+        CA: ["CR", "LAB"],
+        LAB: ["CA", "Vent"],
+        Vent: ["LAB", "DCR"],
+        DCR: ["Vent", "BU"],
+        BU: ["DCR"],
+        A: ["CR", "B"],
+        B: ["A", "C"],
+        C: ["B", "D"],
+        D: ["C", "E"],
+        E: ["D", "BU"]
+    },
+
+    getExitsForLocation: function (locKey) {
+        if (!this.locationKeyToMarker) {
+            this.locationKeyToMarker = Object.fromEntries(
+                Object.entries(this.markerToLocationKey).map(([k, v]) => [v, k])
+            );
+        }
+        const marker = this.locationKeyToMarker[locKey];
+        if (!marker) return {};
+        return Object.fromEntries(
+            (this.adjacencyMatrix[marker] || [])
+                .filter(m => this.markerToLocationKey[m])
+                .map(m => {
+                    const loc = this.markerToLocationKey[m];
+                    return [loc, loc];
+                })
+        );
+    }
+};
+
+// Utility + Game Logic
 let lastUpdateTime = 0;
 let gameTimeInMinutesReal = 0;
 let currentPhase = "survival";
@@ -542,7 +786,10 @@ function handleClear() {
     terminalOutput.innerHTML = '';
 }
 
+// Export everything for command file
 export {
+    gameState,
+    gameSettings,
     gameLoop,
     getPhaseForTime,
     updateGameState,
