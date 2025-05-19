@@ -1,5 +1,6 @@
 import { appendTerminalOutput, appendTerminalSymbol } from './ui.js';
-import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
+import { startReactorGame } from './games/reactor-ctrl/reactorCtrlMain.js';
+import { reactorCtrlProcessCommand } from './games/reactor-ctrl/reactorCtrlCommands.js'; // Import reactorCtrlProcessCommand
 import {
     handlePwdCommand,
     handleCdCommand,
@@ -110,7 +111,8 @@ function processCommand(command) {
             appendTerminalOutput("Exited Reactor Control.");
             appendTerminalOutput("Type 'help' for a list of commands.");
         } else {
-            handleUserCommand(trimmedCommand);
+            // Pass the command to reactorCtrlProcessCommand
+            reactorCtrlProcessCommand(cmdName, ...args);
         }
     } else {
         appendTerminalOutput(`Unknown command: ${cmdName}`);

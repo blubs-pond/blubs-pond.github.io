@@ -1,7 +1,8 @@
 import { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML } from './ui.js';
+import { handleGameReactor } from './cmd.js'; // Import handleGameReactor
 
 class file {
-    constructor(name, path, type, content = '') {
+    constructor(name, path, type, content) {
         this.name = name;
         this.path = path;
         this.type = type;
@@ -33,10 +34,10 @@ directoryContents['/'] = ['C', 'D'];
 const pfDirectory = new directory('Program Files', '/C/Program Files');
 const userDirectory = new directory('Users', '/C/Users');
 const README = new file('README', '/C/README', 'text', 'Welcome to the system.');
-const Blub = new directory('Blub','/C/Users/Blub');
-const Homework = new directory('Homework','/C/Users/Blub/Homework');
-const secret = new file('secret.md','/C/Users/Blub/Homework/secret.md','text','DO NOT OPEN');
-const doNotOpen = new file('DoNotOpen.png','/C/Users/Blub/Homework/DoNotOpen.png','image','js/ref/Shiny_scared_blub.png');
+const Blub = new directory('Blub', '/C/Users/Blub');
+const Homework = new directory('Homework', '/C/Users/Blub/Homework');
+const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN');
+const doNotOpen = new file('DoNotOpen.png', '/C/Users/Blub/Homework/DoNotOpen.png', 'image', 'js/ref/Shiny_scared_blub.png');
 
 fileSystem[pfDirectory.path] = pfDirectory;
 fileSystem[userDirectory.path] = userDirectory;
@@ -49,7 +50,7 @@ fileSystem[doNotOpen.path] = doNotOpen;
 directoryContents['/C'] = ['Program Files', 'Users', 'README'];
 directoryContents['/C/Users'] = ['Blub'];
 directoryContents['/C/Users/Blub'] = ['Homework'];
-directoryContents['/C/Users/Blub/Homework'] = ['secret.md','DoNotOpen.png'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png'];
 
 const gameDirectory = new directory('game', '/C/Program Files/game');
 const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
@@ -146,22 +147,37 @@ function handleLsCommand() {
 }
 
 function handleCdCommand(args) {
-    const targetPath = args[0];
-
-    if (!targetPath || targetPath.trim() === '') {
-        appendTerminalOutput(currentDir.path);
+    if (!args || args.length === 0) {
+        currentDir = rootDirectory;
         return;
     }
 
-    const resolvedPath = resolvePathRelativeToCurrentDir(targetPath.trim());
+    const targetDirName = args[0];
+    let targetDir;
 
-    let targetDir = findDirectoryByPath(resolvedPath);
-    if (targetDir) {
-        currentDir = targetDir;
-        appendTerminalOutput(`Changed directory to ${currentDir.path}`);
+    if (targetDirName === '..') {
+        if (currentDir.path === '/') {
+            return;
+        }
+        const pathParts = currentDir.path.split('/');
+        pathParts.pop();
+        const parentPath = pathParts.join('/') || '/';
+        targetDir = fileSystem[parentPath];
     } else {
-        appendTerminalOutput(`cd: No such file or directory: ${targetPath}`);
+        const targetPath = `${currentDir.path === '/' ? '' : currentDir.path}/${targetDirName}`;
+        targetDir = fileSystem[targetPath];
     }
+
+    if (targetDir && targetDir instanceof directory) {
+        currentDir = targetDir;
+    } else {
+        appendTerminalOutput(`cd: The system cannot find the path specified: ${targetDirName}`);
+    }
+}
+
+function handleTreeCommand() {
+    appendTerminalOutput(currentDir.path + ':');
+    printTree(currentDir.path);
 }
 
 function printTree(dirPath, prefix = '') {
@@ -181,11 +197,6 @@ function printTree(dirPath, prefix = '') {
             printTree(item.path, prefix + (isLast ? '   ' : '│  '));
         }
     });
-}
-
-function handleTreeCommand() {
-    appendTerminalOutput(currentDir.path + ':');
-    printTree(currentDir.path);
 }
 
 function handleCatCommand(args) {
