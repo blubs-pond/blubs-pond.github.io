@@ -364,7 +364,6 @@ export {
     handleToggleSetting,
     capitalize,
     handleGo,
-    handleHelp,
     handleExit,
     handleExitConfirmationResponse,
     handleSettings,
