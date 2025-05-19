@@ -155,6 +155,35 @@ function updateReactorPowerOutput() {
     }
 }
 
+// Function to update the state of the Control Archives panels and related effects
+function updateControlArchives(dt) {
+    const criticalRooms = ['RR', 'CP', 'BW'];
+
+    // Implement chance for critical panels to break
+    criticalRooms.forEach(roomCode => {
+        // Only a chance to break if currently working
+        if (gameState.roomPanelStatus[roomCode] === 'working') {
+            // Simple random chance per second (adjust rate as needed)
+            if (Math.random() < 0.005 * dt) { // 0.5% chance per second
+                gameState.roomPanelStatus[roomCode] = 'broken';
+                appendTerminalOutput(`Control panel in the ${getUserFriendlyLocationName(roomCode)} has failed!`);
+
+                // Recalculate critical temperature increase rate only if this is a critical room
+                if (criticalRooms.includes(roomCode)) {
+                    gameState.criticalReactorTempIncreaseRate = calculateCriticalTempIncreaseRate();
+                }
+            }
+        }
+    });
+
+    // Update reboot cooldown (for 'reboot ca all')
+    if (gameState.rebootAllCaCooldown > 0) {
+        gameState.rebootAllCaCooldown = Math.max(0, gameState.rebootAllCaCooldown - dt);
+    }
+
+    // TODO: Implement reboot progress for individual rooms
+}
+
 // Sets the pump speed within a valid range (0-100)
 function setPumpSpeed(speed) {
     gameState.pump_speed = Math.max(0, Math.min(100, speed));
@@ -180,18 +209,18 @@ function restartCore() {
 function fixReactorComponent(component) {
     const repairToolDurabilityCost = 20;
 
-    if (!gameState.inventory.repairToolDurability || gameState.inventory.repairToolDurability <= 0) {
+    if (!gameState.repairToolDurability || gameState.repairToolDurability <= 0) {
         appendTerminalOutput("You need a working repair tool to fix components.");
         return;
     }
 
-    if (gameState.inventory.repairToolDurability < repairToolDurabilityCost) {
+    if (gameState.repairToolDurability < repairToolDurabilityCost) {
         appendTerminalOutput("Your repair tool doesn't have enough durability to fix this component.");
         return;
     }
 
     appendTerminalOutput(`Attempting to fix the ${component}...`);
-    gameState.inventory.repairToolDurability -= repairToolDurabilityCost;
+    gameState.repairToolDurability -= repairToolDurabilityCost;
     appendTerminalOutput(`Fixed the ${component}. Repair tool durability decreased.`);
 }
 
@@ -341,6 +370,176 @@ function handleHelp(appendTerminalOutput) {
     Object.keys(commandDescriptions).forEach(command => {
         appendTerminalOutput(`- ${command}: ${commandDescriptions[command]}`);
     });
+}
+
+function parseMapString(mapString) {
+    // TODO: Parse the ASCII map string into a usable data structure
+    return {}; // placeholder return
+}
+
+function getUserFriendlyLocationName(locationCode) {
+    if (gameSettings.locations && gameSettings.locations[locationCode]) {
+        return gameSettings.locations[locationCode].friendlyName || locationCode;
+    } else {
+        return locationCode;
+    }
+}
+
+function showFacilityStatus() {
+    appendTerminalOutput("--- Facility Status ---");
+    appendTerminalOutput(`Reactor Temperature: ${gameState.reactorState.reactor_temp}`);
+    appendTerminalOutput(`Reactor Pressure: ${gameState.reactorState.reactor_pressure}`);
+    appendTerminalOutput(`Ventilation Status: ${gameState.ventilationStatus}`);
+}
+
+function showPlayerStatus() {
+    appendTerminalOutput("--- Player Status ---");
+    appendTerminalOutput(`Location: ${getUserFriendlyLocationName(gameState.playerLocation)}`);
+    appendTerminalOutput(`Hunger: ${gameState.playerStats.hunger}`);
+    appendTerminalOutput(`Insomnia: ${gameState.playerStats.insomnia}`);
+    appendTerminalOutput(`Sanity: ${gameState.playerStats.sanity}`);
+    appendTerminalOutput(`Money: ${gameState.playerMoney}`);
+}
+
+function showSectorStatus(target) {
+    appendTerminalOutput(`--- ${capitalize(target)} Sector Status ---`);
+    // Implement sector-specific status outputs
+    appendTerminalOutput("----------------------------");
+}
+
+function showRoomStatus(target) {
+    const room = gameSettings.locations[target];
+    if (room) {
+        appendTerminalOutput(`--- ${room.friendlyName} Status ---`);
+        appendTerminalOutput(room.description);
+        appendTerminalOutput(`Exits: ${Object.keys(room.exits).join(', ')}`);
+    } else {
+        appendTerminalOutput("Invalid room code.");
+    }
+}
+
+function handleToggleSetting(settingName) {
+    if (gameSettings.hasOwnProperty(settingName)) {
+        gameSettings[settingName] = !gameSettings[settingName];
+        appendTerminalOutput(`Toggled setting: ${settingName} to ${gameSettings[settingName]}`);
+    } else {
+        appendTerminalOutput(`Setting ${settingName} not found.`);
+    }
+}
+
+function handleGo(direction) {
+    const currentLocation = gameState.playerLocation;
+    if (gameSettings.locations && gameSettings.locations[currentLocation] && gameSettings.locations[currentLocation].exits) {
+        const exits = gameSettings.locations[currentLocation].exits;
+        if (exits[direction]) {
+            gameState.playerLocation = exits[direction];
+            appendTerminalOutput(`Moved to ${getUserFriendlyLocationName(exits[direction])}`);
+            showRoomStatus(exits[direction]); // Automatically look around after moving
+        } else {
+            appendTerminalOutput(`Cannot go ${direction} from here.`);
+        }
+    } else {
+        appendTerminalOutput("Invalid location or exits not defined.");
+    }
+}
+
+function handleExit() {
+    awaitingExitConfirmation = true;
+    appendTerminalOutput("Are you sure you want to exit? Type 'yes' or 'no'.");
+}
+
+function handleExitConfirmationResponse(response) {
+    if (response.toLowerCase() === 'yes') {
+        appendTerminalOutput("Exiting game...");
+        // Additional exit logic here (e.g., save game)
+        gameState.game_over = true;
+    } else {
+        appendTerminalOutput("Exit cancelled.");
+        awaitingExitConfirmation = false;
+    }
+}
+
+function handleSettings() {
+    appendTerminalOutput("--- Game Settings ---");
+    appendTerminalOutput(`Sound Enabled: ${gameSettings.soundEnabled}`);
+    appendTerminalOutput(`Music Enabled: ${gameSettings.musicEnabled}`);
+}
+
+function handleLook() {
+    showRoomStatus(gameState.playerLocation);
+}
+
+function handleInventory() {
+    appendTerminalOutput("--- Inventory ---");
+    if (gameState.playerInventory.length === 0) {
+        appendTerminalOutput("Inventory is empty.");
+    } else {
+        gameState.playerInventory.forEach(item => appendTerminalOutput(`- ${item}`));
+    }
+    appendTerminalOutput(`Oil Cans: ${gameState.oilCans}`);
+    appendTerminalOutput(`Lubricant Kits: ${gameState.lubricantKits}`);
+    appendTerminalOutput(`Rations: ${gameState.rations}`);
+    appendTerminalOutput(`Coffee/Tea: ${gameState.coffeeTea}`);
+    appendTerminalOutput(`Repair Tool Durability: ${gameState.repairToolDurability}`);
+}
+
+function handleExamine(objectName) {
+    // TODO: Examine an object
+    appendTerminalOutput(`Examining ${objectName} (not yet implemented)`);
+}
+
+function handleReboot(component) {
+    // TODO: Reboot a system component
+    appendTerminalOutput(`Rebooting ${component} (not yet implemented)`);
+}
+
+function handleStat(category) {
+    if (category === 'player') {
+        showPlayerStatus();
+    } else if (category === 'facility') {
+        showFacilityStatus();
+    } else {
+        appendTerminalOutput(`Invalid category: ${category}`);
+    }
+}
+
+function handleUpgrade(component) {
+    // TODO: Upgrade a component
+    appendTerminalOutput(`Upgrading ${component} (not yet implemented)`);
+}
+
+function handleFlush(systemName) {
+    if (systemName === 'ventilation') {
+        flushVentilation();
+    } else {
+        appendTerminalOutput(`Cannot flush ${systemName}.`);
+    }
+}
+
+function handleDisplayMap() {
+    // TODO: Display game map
+    appendTerminalOutput("Displaying map (not yet implemented)");
+}
+
+function handleCam(cameraNumber) {
+    rebootCamera(cameraNumber);
+}
+
+function handleStart() {
+    appendTerminalOutput("Game start (not yet implemented)");
+}
+
+function handlePeak() {
+    appendTerminalOutput("Peak status (not yet implemented)");
+}
+
+function handleAbout() {
+    appendTerminalOutput("About info (not yet implemented)");
+}
+
+function handleClear() {
+    const terminalOutput = document.getElementById('terminalOutput');
+    terminalOutput.innerHTML = '';
 }
 
 export {
