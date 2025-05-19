@@ -39,6 +39,28 @@ const facilityMapString = `
 |             +-------+                                             | |<4>|  |             |
 +-------------+       +---------------------------------------------+ +---+  +-------------+`;
 
+const adjacentcyMatrix = {
+  "CP":    ["PC"],
+  "PC":    ["CP", "SF"],
+  "SF":    ["PC", "RR"],
+  "RR":    ["SF", "TR"],
+  "TR":    ["RR", "BW"],
+  "BW":    ["TR", "CA"],
+  "CA":    ["BW", "Elect", "E"],
+  "Elect": ["CA", "SR"],
+  "SR":    ["Elect", "CR", "B"],
+  "CR":    ["SR", "GR", "A", "B"],
+  "GR":    ["CR", "LAB", "A"],
+  "LAB":   ["GR", "DCR", "Vent"],
+  "Vent":  ["LAB"],
+  "DCR":   ["LAB", "D"],
+  "D":     ["DCR", "C"],
+  "C":     ["D", "E"],
+  "E":     ["C", "CA"],
+  "A":     ["CR", "GR"],
+  "B":     ["CR", "SR"]
+};
+
 const gameSettings = {
     soundEnabled: true,
     musicEnabled: true,
@@ -468,5 +490,5 @@ const gameSettings = {
 
 // Make gameSettings globally accessible (or import where needed)
 export {
-  facilityMapString, gameSettings
+  facilityMapString, gameSettings, adjacentcyMatrix
 };
