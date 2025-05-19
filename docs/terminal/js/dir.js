@@ -36,6 +36,7 @@ const README = new file('README', '/C/README', 'text', 'Welcome to the system.')
 const Blub = new directory('Blub','/C/Users/Blub');
 const Homework = new directory('Homework','/C/Users/Blub/Homework');
 const secret = new file('secret.md','/C/Users/Blub/Homework/secret.md','text','DO NOT OPEN');
+const doNotOpen = new file('DoNotOpen.png','/C/Users/Blub/Homework/DoNotOpen.png','image','ref/Shiny_scared_blub.png');
 
 fileSystem[pfDirectory.path] = pfDirectory;
 fileSystem[userDirectory.path] = userDirectory;
@@ -43,11 +44,12 @@ fileSystem[Blub.path] = Blub;
 fileSystem[Homework.path] = Homework;
 fileSystem[README.path] = README;
 fileSystem[secret.path] = secret;
+fileSystem[doNotOpen.path] = doNotOpen;
 
 directoryContents['/C'] = ['Program Files', 'Users', 'README'];
 directoryContents['/C/Users'] = ['Blub'];
 directoryContents['/C/Users/Blub'] = ['Homework'];
-directoryContents['/C/Users/Blub/Homework'] = ['secret.md'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md','DoNotOpen.png'];
 
 const gameDirectory = new directory('game', '/C/Program Files/game');
 const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
