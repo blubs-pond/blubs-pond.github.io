@@ -33,12 +33,21 @@ directoryContents['/'] = ['C', 'D'];
 const pfDirectory = new directory('Program Files', '/C/Program Files');
 const userDirectory = new directory('Users', '/C/Users');
 const README = new file('README', '/C/README', 'text', 'Welcome to the system.');
+const Blub = new directory('Blub','/C/Users/Blub');
+const Homework = new directory('Homework','/C/Users/Blub/Homework');
+const secret = new file('secret.md','/C/Users/Blub/Homework/secret.md','text','DO NOT OPEN');
 
 fileSystem[pfDirectory.path] = pfDirectory;
 fileSystem[userDirectory.path] = userDirectory;
+fileSystem[Blub.path] = Blub;
+fileSystem[Homework.path] = Homework;
 fileSystem[README.path] = README;
+fileSystem[secret.path] = secret;
 
 directoryContents['/C'] = ['Program Files', 'Users', 'README'];
+directoryContents['/C/Users'] = ['Blub'];
+directoryContents['/C/Users/Blub'] = ['Homework'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md'];
 
 const gameDirectory = new directory('game', '/C/Program Files/game');
 const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
