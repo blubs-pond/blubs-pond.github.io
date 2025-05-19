@@ -13,7 +13,7 @@ function appendTerminalSymbol(message) {
 }
 
 function appendTerminalHTML(html) {
-    const terminalOutput = document.getElementById("terminal-output");
+    const terminalOutput = document.getElementById("terminalOutput");
     const container = document.createElement("div");
     container.innerHTML = html;
     terminalOutput.appendChild(container);
