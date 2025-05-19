@@ -52,7 +52,15 @@ directoryContents['/C/Program Files'] = ['game'];
 directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
 directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
-const readme = new file('README', '/C/README', 'text', 'Welcome to the Blubs-Pond Terminal.');
+const awaAudio = new file('awa.wav','/D/Audio/awa.wav','audio','../../untitled.wav');
+const audioDirectory = new directory('Audio','/D/Audio');
+
+fileSystem[awaAudio.path] = awaAudio;
+fileSystem[audioDirectory.path] = audioDirectory;
+
+directoryContents['/D'] = ['Audio']
+directoryContents['/D/Audio'] = ['awa.wav']
+
 const exeFile = new file('reactor.exe', '/C/Program Files/reactor.exe', 'exe', 'reactor');
 const audioLog = new file('log1.ogg', '/C/logs/log1.ogg', 'audio', 'boot_audio');
 const configFile = new file('config.json', '/C/data/config.json', 'data', { power: "ON", temp: 83 });
@@ -206,6 +214,8 @@ function handleCatCommand(args) {
 
         case 'audio':
             appendTerminalOutput(`Playing audio: ${file.name}`);
+            const soundFile = new Audio(`${file.content}`);
+            soundFile.play()
             break;
 
         case 'data':

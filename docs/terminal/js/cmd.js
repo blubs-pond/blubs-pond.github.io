@@ -88,7 +88,7 @@ function processCommand(command) {
         'clear': clearTerminal,
         'cls': clearTerminal,
         'echo': echoCommand,
-        'cat': catCommand,
+        'cat': handleCatCommand,
         'history': historyCommand,
         '!': historyCommand,
         'help': handleCmdHelpCommand,
