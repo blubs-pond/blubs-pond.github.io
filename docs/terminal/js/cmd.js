@@ -1,6 +1,18 @@
 import { appendTerminalOutput, appendTerminalSymbol } from './ui.js';
 import { startReactorGame, handleUserCommand } from './games/reactor-ctrl/reactorCtrlMain.js';
-import { handlePwdCommand, handleCdCommand, handleLsCommand, currentDir} from './dir.js';
+import {
+    handlePwdCommand,
+    handleCdCommand,
+    handleLsCommand,
+    handleCatCommand,
+    handleTreeCommand,
+    printTree,
+    openCommand,
+    playCommand,
+    runCommand,
+    currentDir,
+    fileSystem
+} from './dir.js';
 
 const commandHistory = [];
 let currentGame = null;
@@ -39,11 +51,9 @@ function updatePrompt() {
 function processCommand(command) {
     appendTerminalOutput(`${currentDir.path}> ${command}`);
 
-    let cmdName;
-    let args = [];
-
     const trimmedCommand = command.trim();
 
+    // Handle history shortcut (!number)
     if (trimmedCommand.startsWith('!')) {
         const historyIndex = parseInt(trimmedCommand.substring(1), 10) - 1;
         if (!isNaN(historyIndex) && historyIndex >= 0 && historyIndex < commandHistory.length) {
@@ -55,13 +65,15 @@ function processCommand(command) {
             appendTerminalOutput("Invalid history index.");
             return;
         }
-    } else {
-        const parts = trimmedCommand.split(' ');
-        cmdName = parts[0];
-        appendTerminalOutput(`cmdName = ${cmdName}`);
-        args = parts.slice(1);
-        appendTerminalOutput(`args = ${args}`);
     }
+
+    // ✅ Smart argument parsing that supports quoted strings
+    const parts = trimmedCommand.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    const cmdName = parts[0]?.toLowerCase();
+    const args = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
+
+    appendTerminalOutput(`cmdName = ${cmdName}`);
+    appendTerminalOutput(`args = ${args}`);
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
@@ -70,6 +82,7 @@ function processCommand(command) {
         'date': getDateTime,
         'time': getDateTime,
         'ls': handleLsCommand,
+        'tree': handleTreeCommand,
         'cd': handleCdCommand,
         'pwd': handlePwdCommand,
         'clear': clearTerminal,
@@ -81,13 +94,16 @@ function processCommand(command) {
         'help': handleCmdHelpCommand,
         'h': handleCmdHelpCommand,
         '?': handleCmdHelpCommand,
+        'run': runCommand,
+        'play': playCommand,
+        'open': openCommand,
         'exit': handleExitCommand
     };
 
-    const handler = commandMap[cmdName.toLowerCase()];
+    const handler = commandMap[cmdName];
 
     if (handler && currentGame === null) {
-        handler(args[0]);
+        handler(args);
     } else if (currentGame === 'reactor') {
         if (trimmedCommand.toLowerCase() === 'exit') {
             currentGame = null;
@@ -100,7 +116,8 @@ function processCommand(command) {
         appendTerminalOutput(`Unknown command: ${cmdName}`);
         appendTerminalOutput("Type 'help' for a list of commands.");
     }
-    updatePrompt(); // Update prompt after command execution
+
+    updatePrompt();
 }
 
 function handleGameReactor(args) {

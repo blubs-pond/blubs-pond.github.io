@@ -1,8 +1,7 @@
 import { appendTerminalOutput } from './ui.js';
 
-// === File and Directory Classes ===
-class File {
-    constructor(name, path, type, content) {
+class file {
+    constructor(name, path, type, content = '') {
         this.name = name;
         this.path = path;
         this.type = type;
@@ -10,119 +9,134 @@ class File {
     }
 }
 
-class Directory {
+class directory {
     constructor(name, path) {
         this.name = name;
         this.path = path;
     }
 }
 
-// === File System Initialization ===
 const fileSystem = {};
+const directoryContents = {};
 
-const rootDirectory = new Directory('/', '/');
-const sysDirectory = new Directory('C', 'C');
-const dataDirectory = new Directory('D', 'D');
+// Create base directories and files
+const rootDirectory = new directory('/', '/');
+const sysDirectory = new directory('C', '/C');
+const dataDirectory = new directory('D', '/D');
 
 fileSystem[rootDirectory.path] = rootDirectory;
 fileSystem[sysDirectory.path] = sysDirectory;
 fileSystem[dataDirectory.path] = dataDirectory;
 
-const pfDirectory = new Directory('Program Files', 'C/Program Files');
+directoryContents['/'] = ['C', 'D'];
+
+const pfDirectory = new directory('Program Files', '/C/Program Files');
+const userDirectory = new directory('Users', '/C/Users');
+const README = new file('README', '/C/README', 'text', 'Welcome to the system.');
+
 fileSystem[pfDirectory.path] = pfDirectory;
-
-const userDirectory = new Directory('Users', 'C/Users');
 fileSystem[userDirectory.path] = userDirectory;
-
-const README = new File('README', 'C/README', 'text', '');
 fileSystem[README.path] = README;
 
-const gameDirectory = new Directory('game', 'C/Program Files/game');
+directoryContents['/C'] = ['Program Files', 'Users', 'README'];
+
+const gameDirectory = new directory('game', '/C/Program Files/game');
+const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
+const reactorExecutable = new file('reactor.exe', '/C/Program Files/game/reactor-ctrl/reactor.exe', 'exe', 'reactor');
+
 fileSystem[gameDirectory.path] = gameDirectory;
-
-const reactorDirectory = new Directory('reactor-ctrl', 'C/Program Files/game/reactor-ctrl');
 fileSystem[reactorDirectory.path] = reactorDirectory;
-
-const reactorExecutable = new File('reactor.exe', 'C/Program Files/game/reactor-ctrl/reactorCtrl.html', 'exe', 'reactor');
 fileSystem[reactorExecutable.path] = reactorExecutable;
 
-// === Directory Relationships ===
-const directoryContents = {
-    '/': ['C', 'D'],
-    'C': ['Program Files', 'Users', 'README'],
-    'C/Program Files': ['game'],
-    'C/Program Files/game': ['reactor-ctrl'],
-    'C/Program Files/game/reactor-ctrl': ['reactor.exe']
-};
+directoryContents['/C/Program Files'] = ['game'];
+directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
+directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
-// === Current Directory State ===
+const readme = new file('README', '/C/README', 'text', 'Welcome to the Blubs-Pond Terminal.');
+const exeFile = new file('reactor.exe', '/C/Program Files/reactor.exe', 'exe', 'reactor');
+const audioLog = new file('log1.ogg', '/C/logs/log1.ogg', 'audio', 'boot_audio');
+const configFile = new file('config.json', '/C/data/config.json', 'data', { power: "ON", temp: 83 });
+
 let currentDir = rootDirectory;
 
-// === Helper Functions ===
+// --- Helpers ---
 
-// Normalize paths and get a Directory object from fileSystem
-function findDirectoryByPath(path) {
-    const normalizedPath = path.replace(/\\/g, '/').replace(/\/+/g, '/');
-    const cleanPath = normalizedPath.endsWith('/') && normalizedPath.length > 1
-        ? normalizedPath.slice(0, -1)
-        : normalizedPath;
-    const dir = fileSystem[cleanPath];
-    return dir instanceof Directory ? dir : null;
+function normalizePath(path) {
+    return path.replace(/\\/g, '/').replace(/\/+/g, '/').replace(/\/$/, '') || '/';
 }
 
-// Get contents of a directory for `ls`
+function findDirectoryByPath(path) {
+    return fileSystem[normalizePath(path)];
+}
+
 function getDirectoryContents(dirPath) {
     const contents = directoryContents[dirPath] || [];
     const items = [];
 
-    for (const itemName of contents) {
-        const itemPath = dirPath === '/' ? `/${itemName}` : `${dirPath}/${itemName}`;
+    for (const name of contents) {
+        const itemPath = dirPath === '/' ? `/${name}` : `${dirPath}/${name}`;
         const item = fileSystem[itemPath];
+
         if (item) {
             items.push(item);
+        } else {
+            appendTerminalOutput(`ls: Warning - Missing reference for ${itemPath}`);
         }
     }
 
     return items;
 }
 
-// === Terminal Command Handlers ===
+function resolvePathRelativeToCurrentDir(inputPath) {
+    const isAbsolute = inputPath.startsWith('/');
+    const parts = normalizePath(inputPath).split('/');
+    const baseParts = isAbsolute ? [] : currentDir.path.split('/').filter(Boolean);
 
-// Handle `cd` command
+    for (const part of parts) {
+        if (part === '' || part === '.') continue;
+        if (part === '..') {
+            baseParts.pop(); // Go up one level
+        } else {
+            baseParts.push(part);
+        }
+    }
+
+    return '/' + baseParts.join('/');
+}
+
+
+// --- Command Handlers (Read-Only) ---
+
+function handlePwdCommand() {
+    appendTerminalOutput(currentDir.path);
+}
+
+function handleLsCommand() {
+    const contents = getDirectoryContents(currentDir.path);
+
+    if (contents.length === 0) {
+        appendTerminalOutput("Directory is empty.");
+        return;
+    }
+
+    appendTerminalOutput(`Contents of ${currentDir.path}:`);
+    for (const item of contents) {
+        const type = item instanceof directory ? "directory" : "file";
+        appendTerminalOutput(`- ${item.name} (${type})`);
+    }
+}
+
 function handleCdCommand(args) {
     const targetPath = args[0];
 
-    if (!targetPath) {
+    if (!targetPath || targetPath.trim() === '') {
         appendTerminalOutput(currentDir.path);
         return;
     }
 
-    const trimmedPath = targetPath.trim();
+    const resolvedPath = resolvePathRelativeToCurrentDir(targetPath.trim());
 
-    // Handle ".."
-    if (trimmedPath === '..') {
-        if (currentDir.path === '/') {
-            appendTerminalOutput(currentDir.path);
-            return;
-        }
-        const parentPath = currentDir.path.substring(0, currentDir.path.lastIndexOf('/')) || '/';
-        const parentDir = findDirectoryByPath(parentPath);
-        if (parentDir) {
-            currentDir = parentDir;
-            appendTerminalOutput(`Changed directory to ${currentDir.path}`);
-        } else {
-            appendTerminalOutput(`cd: Error navigating up from ${currentDir.path}`);
-        }
-        return;
-    }
-
-    // Relative or absolute path
-    const newPath = trimmedPath.startsWith('/') || /^[a-zA-Z]:?\/.*$/.test(trimmedPath)
-        ? trimmedPath
-        : `${currentDir.path === '/' ? '' : currentDir.path}/${trimmedPath}`;
-
-    const targetDir = findDirectoryByPath(newPath);
-
+    let targetDir = findDirectoryByPath(resolvedPath);
     if (targetDir) {
         currentDir = targetDir;
         appendTerminalOutput(`Changed directory to ${currentDir.path}`);
@@ -131,112 +145,149 @@ function handleCdCommand(args) {
     }
 }
 
-// Handle `ls` command
-function handleLsCommand() {
-    const contents = getDirectoryContents(currentDir.path);
+function printTree(dirPath, prefix = '') {
+    const contents = getDirectoryContents(dirPath);
     if (contents.length === 0) {
-        appendTerminalOutput("Directory is empty.");
-        return;
-    }
-    appendTerminalOutput("Contents of " + currentDir.path + ":");
-    for (const item of contents) {
-        const type = item instanceof Directory ? 'Directory' : 'File';
-        appendTerminalOutput(`- ${item.name} (${type})`);
-    }
-}
-
-// `dir` is an alias for `ls`
-function handleDirCommand() {
-    handleLsCommand();
-}
-
-// Handle `pwd` command
-function handlePwdCommand() {
-    appendTerminalOutput(currentDir.path);
-}
-
-// Handle `mkdir <name>` command
-function handleMkdirCommand(args) {
-    const dirName = args[0];
-    if (!dirName) {
-        appendTerminalOutput("mkdir: missing directory name.");
+        appendTerminalOutput(prefix + '(empty)');
         return;
     }
 
-    const newPath = currentDir.path === '/' ? `/${dirName}` : `${currentDir.path}/${dirName}`;
+    contents.forEach((item, index) => {
+        const isLast = index === contents.length - 1;
+        const connector = isLast ? '└─ ' : '├─ ';
 
-    if (fileSystem[newPath]) {
-        appendTerminalOutput(`mkdir: '${dirName}' already exists.`);
-        return;
-    }
+        appendTerminalOutput(prefix + connector + item.name + (item instanceof directory ? '/' : ''));
 
-    const newDir = new Directory(dirName, newPath);
-    fileSystem[newPath] = newDir;
-
-    if (!directoryContents[currentDir.path]) {
-        directoryContents[currentDir.path] = [];
-    }
-    directoryContents[currentDir.path].push(dirName);
-
-    appendTerminalOutput(`Directory '${dirName}' created.`);
+        if (item instanceof directory) {
+            printTree(item.path, prefix + (isLast ? '   ' : '│  '));
+        }
+    });
 }
 
-// Handle `touch <name>` command
-function handleTouchCommand(args) {
-    const fileName = args[0];
-    if (!fileName) {
-        appendTerminalOutput("touch: missing file name.");
-        return;
-    }
-
-    const newPath = currentDir.path === '/' ? `/${fileName}` : `${currentDir.path}/${fileName}`;
-
-    if (fileSystem[newPath]) {
-        appendTerminalOutput(`touch: '${fileName}' already exists.`);
-        return;
-    }
-
-    const newFile = new File(fileName, newPath, 'text', ''); // Default to empty text file
-    fileSystem[newPath] = newFile;
-
-    if (!directoryContents[currentDir.path]) {
-        directoryContents[currentDir.path] = [];
-    }
-    directoryContents[currentDir.path].push(fileName);
-
-    appendTerminalOutput(`File '${fileName}' created.`);
+function handleTreeCommand() {
+    appendTerminalOutput(currentDir.path + ':');
+    printTree(currentDir.path);
 }
 
-// Handle `cat <filename>` command
 function handleCatCommand(args) {
+    if (!args || args.length === 0) {
+        appendTerminalOutput("cat: No file specified.");
+        return;
+    }
+
     const fileName = args[0];
-    if (!fileName) {
-        appendTerminalOutput("cat: missing file name.");
+    const dirContents = getDirectoryContents(currentDir.path);
+
+    // Try to find the file in the current directory
+    const file = dirContents.find(item =>
+        item.name === fileName && !(item instanceof directory)
+    );
+
+    if (!file) {
+        appendTerminalOutput(`cat: File not found: ${fileName}`);
         return;
     }
 
-    const filePath = currentDir.path === '/' ? `/${fileName}` : `${currentDir.path}/${fileName}`;
-    const file = fileSystem[filePath];
+    switch (file.type) {
+        case 'text':
+            appendTerminalOutput(`--- ${file.name} ---`);
+            appendTerminalOutput(file.content || "(empty)");
+            break;
 
-    if (!file || !(file instanceof File)) {
-        appendTerminalOutput(`cat: No such file '${fileName}'`);
-        return;
+        case 'exe':
+            appendTerminalOutput(`${file.name} is an executable. Run it by typing '${file.content}'`);
+            break;
+
+        case 'webpage':
+        case 'subpage':
+            appendTerminalOutput(`--- ${file.name} [Webpage] ---`);
+            appendTerminalOutput(file.content || "(no content)");
+            break;
+
+        case 'audio':
+            appendTerminalOutput(`Playing audio: ${file.name}`);
+            break;
+
+        case 'data':
+            appendTerminalOutput(`--- ${file.name} [Data] ---`);
+            appendTerminalOutput(JSON.stringify(file.content, null, 2));
+            break;
+
+        default:
+            appendTerminalOutput(`cat: Unsupported file type: ${file.type}`);
+            break;
     }
-
-    appendTerminalOutput(`Contents of ${file.name}:`);
-    appendTerminalOutput(file.content || "[Empty]");
 }
 
+// --- New Command Handlers ---
 
-// === Exports ===
+function runCommand(args) {
+    if (!args?.[0]) {
+        appendTerminalOutput("run: No program specified.");
+        return;
+    }
+    const name = args[0];
+    const file = getDirectoryContents(currentDir.path)
+        .find(item => item.name === name && item.type === 'exe');
+    if (!file) {
+        appendTerminalOutput(`run: Executable not found: ${name}`);
+        return;
+    }
+    // file.content holds the command to launch, e.g. "reactor"
+    appendTerminalOutput(`Launching ${file.name}...`);
+    // if you have a game-launcher handler:
+    if (file.content === 'reactor') {
+        handleGameReactor();
+    } else {
+        appendTerminalOutput(`run: No handler for ${file.content}`);
+    }
+}
+
+function playCommand(args) {
+    if (!args?.[0]) {
+        appendTerminalOutput("play: No audio file specified.");
+        return;
+    }
+    const name = args[0];
+    const file = getDirectoryContents(currentDir.path)
+        .find(item => item.name === name && item.type === 'audio');
+    if (!file) {
+        appendTerminalOutput(`play: Audio file not found: ${name}`);
+        return;
+    }
+    appendTerminalOutput(`Playing audio: ${file.name}`);
+    
+    // (hook in your actual audio-playback code here)
+}
+
+function openCommand(args) {
+    if (!args?.[0]) {
+        appendTerminalOutput("open: No webpage specified.");
+        return;
+    }
+    const name = args[0];
+    const file = getDirectoryContents(currentDir.path)
+        .find(item => item.name === name && ['webpage','subpage'].includes(item.type));
+    if (!file) {
+        appendTerminalOutput(`open: Page not found: ${name}`);
+        return;
+    }
+    appendTerminalOutput(`Opening ${file.name}…`);
+    appendTerminalOutput(file.content || "(no content)");
+}
+
+// --- Exported Functions ---
+
 export {
+    handlePwdCommand,
     handleCdCommand,
     handleLsCommand,
-    handlePwdCommand,
-    handleDirCommand,
-    handleMkdirCommand,
-    handleTouchCommand,
     handleCatCommand,
+    handleTreeCommand,
+    printTree,
+    openCommand,
+    playCommand,
+    runCommand,
     currentDir,
     fileSystem
 };
