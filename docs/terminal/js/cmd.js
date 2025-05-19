@@ -72,8 +72,8 @@ function processCommand(command) {
     const cmdName = parts[0]?.toLowerCase();
     const args = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
 
-    appendTerminalOutput(`cmdName = ${cmdName}`);
-    appendTerminalOutput(`args = ${args}`);
+    // appendTerminalOutput(`cmdName = ${cmdName}`);
+    // appendTerminalOutput(`args = ${args}`);
 
     const commandMap = {
         'reactor-ctrl': handleGameReactor,
