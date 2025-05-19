@@ -36,7 +36,7 @@ const README = new file('README', '/C/README', 'text', 'Welcome to the system.')
 const Blub = new directory('Blub','/C/Users/Blub');
 const Homework = new directory('Homework','/C/Users/Blub/Homework');
 const secret = new file('secret.md','/C/Users/Blub/Homework/secret.md','text','DO NOT OPEN');
-const doNotOpen = new file('DoNotOpen.png','/C/Users/Blub/Homework/DoNotOpen.png','image','ref/Shiny_scared_blub.png');
+const doNotOpen = new file('DoNotOpen.png','/C/Users/Blub/Homework/DoNotOpen.png','image','js/ref/Shiny_scared_blub.png');
 
 fileSystem[pfDirectory.path] = pfDirectory;
 fileSystem[userDirectory.path] = userDirectory;
