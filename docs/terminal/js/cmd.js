@@ -69,9 +69,9 @@ function processCommand(command) {
     }
 
     // ✅ Smart argument parsing that supports quoted strings
-    const parts = trimmedCommand.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    const parts = trimmedCommand.match(/(?:[^\\s\"]+|\"[^\"]*\")+/g) || [];
     const cmdName = parts[0]?.toLowerCase();
-    const args = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
+    const args = parts.slice(1).map(arg => arg.replace(/^\"|\"$/g, ''));
 
     // appendTerminalOutput(`cmdName = ${cmdName}`);
     // appendTerminalOutput(`args = ${args}`);
@@ -111,8 +111,8 @@ function processCommand(command) {
             appendTerminalOutput("Exited Reactor Control.");
             appendTerminalOutput("Type 'help' for a list of commands.");
         } else {
-            // Pass the command to reactorCtrlProcessCommand
-            reactorCtrlProcessCommand(cmdName, ...args);
+            // Pass the command to reactorCtrlMain.js for game-specific handling
+            handleUserCommand(trimmedCommand);
         }
     } else {
         appendTerminalOutput(`Unknown command: ${cmdName}`);

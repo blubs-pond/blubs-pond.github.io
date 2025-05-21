@@ -1,64 +1,89 @@
-// reactorCtrlCommands.js
 import { appendTerminalOutput } from '../../ui.js';
-import * as core from './reactorCtrlCore.js';
+import { gameState} from './reactorCtrlGameState.js'; // Import gameState and gameSettings
+import {
+    handleGo,
+    handleLook,
+    handleInventory,
+    handleExamine,
+    handleHelp,
+    fixReactorComponent,
+    handleReboot,
+    handleStat,
+    handleUpgrade,
+    handleFlush,
+    handlePeak,
+    handleCam,
+    handleAbout,
+    handleDisplayMap,
+    handleExit,
+    handleExitConfirmationResponse,
+    handleSettings,
+    setPumpSpeed,
+    restartCore,
+    checkHideMonster,
+    checkLookAtShadow,
+    rebootCamera,
+    showFacilityStatus,
+    getUserFriendlyLocationName,
+    showPlayerStatus,
+    showSectorStatus,
+    showRoomStatus,
+    capitalize,
+    flushVentilation,
+    gameLoop,
+    handleToggleSetting
+} from './reactorCtrlGameLogic.js'; // Import handlers from game logic
+import {
+    createCamera,
+    createDoor,
+    createLocation,
+    markerToLocationKey,
+    locationKeyToMarker,
+    adjacencyMatrix,
+    locations
+  } from './reactorCtrlGameSettings.js';
 
-let awaitingExitConfirmation = false;
+async function reactorCtrlProcessCommand(commandString) {
+    // Parse the command string
+    const trimmedCommand = commandString.trim();
+    const parts = trimmedCommand.match(/(?:[^\\s"]|"[^"]*")+/g) || [];
+    const cmdName = parts[0]?.toLowerCase();
+    const args = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
 
-async function reactorCtrlProcessCommand(cmdName, ...args) {
+    // Define the command map
     const commandMap = {
-        'start': () => core.handleStart(core.gameLoop, appendTerminalOutput),
-        'reactor-ctrl': () => core.handleStart(core.gameLoop, appendTerminalOutput),
-        'r-ctrl': () => core.handleStart(core.gameLoop, appendTerminalOutput),
+        'go': () => handleGo(args[0]), // Assuming handleGo takes direction as argument
+        'g': () => handleGo(args[0]),
+        'look': () => handleLook(), // Assuming handleLook takes no arguments
+        'l': () => handleLook(),
+        'inventory': () => handleInventory(), // Assuming handleInventory takes no arguments
+        'inv': () => handleInventory(),
+        'examine': () => handleExamine(args[0]), // Assuming handleExamine takes object name as argument
+        'exam': () => handleExamine(args[0]),
+        'help': () => handleHelp(appendTerminalOutput), // Assuming handleHelp takes appendTerminalOutput
+        'h': () => handleHelp(appendTerminalOutput),
+        'fix': () => fixReactorComponent(args[0]), // Assuming fixReactorComponent takes component name
+        'reboot': () => handleReboot(args[0]), // Assuming handleReboot takes component name
+        'stat': () => handleStat(args[0]), // Assuming handleStat takes category
+        'upgrade': () => handleUpgrade(args[0]), // Assuming handleUpgrade takes component name
+        'flush': () => handleFlush(args[0]), // Assuming handleFlush takes system name
+        'peak': () => handlePeak(), // Assuming handlePeak takes no arguments
+        'cam': () => handleCam(args[0]), // Assuming handleCam takes camera number
+        'about': () => handleAbout(), // Assuming handleAbout takes no arguments
+        'map': () => handleDisplayMap(), // Assuming handleDisplayMap takes no arguments
+        'settings': () => handleSettings(args[0]), // Assuming handleSettings takes setting name
+        'pump': () => setPumpSpeed(args[0]), // Assuming setPumpSpeed takes speed
+        'restart': () => restartCore(), // Assuming restartCore takes no arguments
+        'hide': () => checkHideMonster(), // Assuming checkHideMonster takes no arguments
+        'shadow': () => checkLookAtShadow(args[0]), // Assuming checkLookAtShadow takes location
+        'camera': () => rebootCamera(args[0]), // Assuming rebootCamera takes camera number
 
-        'go': () => core.handleGo(args, core.gameState, core.gameSettings, appendTerminalOutput),
-        'g': () => core.handleGo(args, core.gameState, core.gameSettings, appendTerminalOutput),
-
-        'look': () => core.handleLook(args, appendTerminalOutput),
-        'l': () => core.handleLook(args, appendTerminalOutput),
-
-        'inventory': () => core.handleInventory(appendTerminalOutput),
-        'inv': () => core.handleInventory(appendTerminalOutput),
-
-        'examine': () => core.handleExamine(args, appendTerminalOutput),
-        'exam': () => core.handleExamine(args, appendTerminalOutput),
-
-        'help': () => core.handleHelp(appendTerminalOutput),
-        'h': () => core.handleHelp(appendTerminalOutput),
-
-        'fix': () => core.fixReactorComponent(args, appendTerminalOutput, core.gameState),
-        'reboot': () => core.handleReboot(appendTerminalOutput),
-        'stat': () => core.handleStat(
-            appendTerminalOutput,
-            core.gameState,
-            core.showFacilityStatus,
-            core.getUserFriendlyLocationName,
-            core.showPlayerStatus,
-            core.showSectorStatus,
-            core.showRoomStatus,
-            core.capitalize,
-            core.gameSettings
-        ),
-
-        'upgrade': () => core.handleUpgrade(appendTerminalOutput),
-        'flush': () => core.handleFlush(appendTerminalOutput),
-        'peak': () => core.handlePeak(appendTerminalOutput),
-        'cam': () => core.handleCam(appendTerminalOutput),
-        'about': () => core.handleAbout(appendTerminalOutput),
-        'map': () => core.handleDisplayMap(appendTerminalOutput),
-
-        'exit': () => core.handleExit(appendTerminalOutput, awaitingExitConfirmation),
-        'settings': () => core.handleSettings(args, appendTerminalOutput, core.gameState, core.handleToggleSetting),
-
-        'pump': () => core.setPumpSpeed(args[0], appendTerminalOutput, core.gameState),
-        'restart': () => core.restartCore(appendTerminalOutput, core.gameState),
-
-        'hide': () => core.checkHideMonster(appendTerminalOutput, core.gameState),
-        'shadow': () => core.checkLookAtShadow(args[0], appendTerminalOutput, core.gameState, core.gameSettings),
-        'camera': () => core.rebootCamera(args[0], appendTerminalOutput, core.gameState),
+        // Add other command mappings as needed
     };
 
-    if (awaitingExitConfirmation) {
-        core.handleExitConfirmationResponse(cmdName);
+    // Handle exit confirmation separately
+    if (gameState.awaitingExitConfirmation) {
+        handleExitConfirmationResponse(commandString);
         return;
     }
 
@@ -67,7 +92,7 @@ async function reactorCtrlProcessCommand(cmdName, ...args) {
     if (handler) {
         handler();
     } else {
-        appendTerminalOutput(`Unknown command: ${cmdName}`);
+        appendTerminalOutput(`Unknown game command: ${cmdName}`);
     }
 }
 

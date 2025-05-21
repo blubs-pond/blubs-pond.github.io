@@ -1,6 +1,10 @@
 let gameState = {
     currentScene: 'start', // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
+    lastUpdateTime: 0, // Time of the last game update timestamp
+    gameTimeInMinutesReal: 0, // Accumulates real time passed in minutes
+    currentPhase: "survival", // Current game phase (survival, fixing, rest_payment)
+    awaitingExitConfirmation: false, // Flag to track if the game is awaiting exit confirmation
     // playerInventory: [], // Moved to player object
     // playerLocation: "ControlRoom", // Moved to player object
     playerMoney: 1000, // Starting money

@@ -1,0 +1,35 @@
+- [ ] rock paper scissors
+  - Implement game logic for determining the winner.
+  - Create UI elements to display player and computer choices.
+  - Integrate game state to track wins, losses, and ties.
+  - Handle player input via the terminal interface.
+  - Display results and offer to play again.
+- [ ] Battle ship
+  - Design the game board and ship placement logic.
+  - Implement turn-based gameplay and shot validation.
+  - Create UI to display the player's board and the opponent's board (with hits and misses).
+  - Integrate game state to track ship locations, hits, and sinks.
+  - Handle player input for placing ships and taking shots.
+  - Display game progress and determine the winner.
+- [ ] 20Q
+  - Develop a knowledge base or decision tree for possible answers.
+  - Implement the question-asking and answer-processing logic.
+  - Create UI to display the questions and the player's yes/no/sometimes/unknown responses.
+  - Integrate game state to track the remaining possibilities.
+  - Handle player input for answering questions.
+  - Display the guessed answer and handle win/loss conditions.
+- [ ] Sudoku
+  - Generate Sudoku puzzles with varying difficulty levels.
+  - Implement game logic for validating player input and checking for completion.
+  - Create UI to display the Sudoku grid.
+  - Integrate game state to store the current grid and the original puzzle.
+  - Handle player input for filling in numbers.
+  - Provide feedback on incorrect entries and indicate game completion.
+- [ ] NetHack
+  - This is a complex game. Consider starting with a simplified version or focusing on core mechanics.
+  - Design the game world, character movement, and combat system.
+  - Implement item interaction, inventory management, and character progression.
+  - Create UI to display the game map, player status, and messages.
+  - Integrate game state to track all game elements and their properties.
+  - Handle player input for movement, actions, and commands.
+  - Implement saving and loading game progress.

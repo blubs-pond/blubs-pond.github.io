@@ -94,10 +94,6 @@ const gameState = {
     experimentEntryTimer: -1.0,
     doorBeingHeld: "none",
 
-    cameraState: {
-        "camera1": { isDistorted: false },
-        "camera2": { isDistorted: false }
-    },
     shadowVisible: false,
 
     gameFlags: {},
@@ -242,7 +238,46 @@ const gameSettings = {
                     return [loc, loc];
                 })
         );
-    }
+    },
+
+    locationDescriptors : [
+        ["ControlRoom", "Control Room", "CR", 3, false, 2],
+        ["ReactorRoom", "Reactor Room", "RR", 5, true, 5],
+        ["TurbineRoom", "Turbine Room", "TR", 4, false, 3],
+        ["GeneratorRoom", "Generator Room", "GR", 3, false, 2],
+        ["ServerRoom", "Server Room", "SR", 2, false, 2],
+        ["CoolantPumpStation", "Coolant Pump Station", "CP", 2, false, 3],
+        ["PowerConverterRoom", "Power Converter Room", "PC", 2, false, 2],
+        ["SpentFuelStorage", "Spent Fuel Storage", "SF", 4, false, 4],
+        ["WaterTreatmentFacility", "Water Treatment Facility", "BW", 3, false, 2],
+        ["ControlArchives", "Control Archives", "CA", 3, false, 1],
+        ["ElectricalSwitchyard", "Electrical Switchyard", "Elect", 2, false, 1],
+        ["Laboratory", "Laboratory", "LAB", 4, false, 3],
+        ["VentilationSystems", "Ventilation Systems", "Vent", 4, false, 2],
+        ["DecontaminationRoom", "Decontamination Room", "DCR", 3, false, 2],
+        ["Bunker", "Bunker", "BU", 5, false, 4],
+        ["HallwayA", "Hallway A", "A", 1, false, 1],
+        ["HallwayB", "Hallway B", "B", 1, false, 1],
+        ["HallwayC", "Hallway C", "C", 1, false, 1],
+        ["HallwayD", "Hallway D", "D", 1, false, 1],
+        ["HallwayE", "Hallway E", "E", 1, false, 1]
+    ],
+
+      locations : Object.fromEntries(
+        locationDescriptors.map(([key, name, marker, secLvl, creature, hazard]) => [
+          key,
+          createLocation(
+            name,
+            `Description for ${name}.`,
+            `<${marker}>`,
+            getExitsForLocation(key),
+            secLvl,
+            creature,
+            hazard
+          )
+        ])
+      )
+
 };
 
 // Utility + Game Logic
