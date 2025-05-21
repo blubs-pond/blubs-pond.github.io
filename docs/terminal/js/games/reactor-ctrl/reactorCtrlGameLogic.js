@@ -540,7 +540,10 @@ function handlePeak() {
 }
 
 function handleAbout() {
-    appendTerminalOutput("About info (not yet implemented)");
+    appendTerminalOutput("--- About Reactor-CTRL ---");
+    appendTerminalOutput("Created by ClockWorksProduction Studio");
+    appendTerminalOutput("Created for Blub Blub Fish");
+    appendTerminalOutput("--------------------------");
 }
 
 function handleClear() {
