@@ -31,18 +31,33 @@ fileSystem[dataDirectory.path] = dataDirectory;
 
 directoryContents['/'] = ['C', 'D'];
 
+//Program file
 const pfDirectory = new directory('Program Files', '/C/Program Files');
+
+fileSystem[pfDirectory.path] = pfDirectory;
+
+const gameDirectory = new directory('game', '/C/Program Files/game');
+const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
+const reactorExecutable = new file('reactor.exe', '/C/Program Files/game/reactor-ctrl/reactor.exe', 'exe', 'reactor');
+
+fileSystem[gameDirectory.path] = gameDirectory;
+fileSystem[reactorDirectory.path] = reactorDirectory;
+fileSystem[reactorExecutable.path] = reactorExecutable;
+
+
+
+
+
+
+
+
+
+//Users
 const userDirectory = new directory('Users', '/C/Users');
-const README = new file('README', '/C/README', 'text',  `
------- Blubs Pond Terminal ------
 
---- About Blubs Pond Terminal ---
-Started on 9 May 2025
+fileSystem[userDirectory.path] = userDirectory;
 
-Created by ClockWorksProduction Studio
-Created for twitch.tv/blubbyblubfish
----------------------------------
-`);
+// Blubs
 const Blub = new directory('Blub', '/C/Users/Blub');
 const Homework = new directory('Homework', '/C/Users/Blub/Homework');
 const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN 𓆏');
@@ -60,44 +75,112 @@ Years   Status
 2025    Not Started
 `);
 
-fileSystem[pfDirectory.path] = pfDirectory;
-fileSystem[userDirectory.path] = userDirectory;
 fileSystem[Blub.path] = Blub;
 fileSystem[Homework.path] = Homework;
-fileSystem[README.path] = README;
 fileSystem[secret.path] = secret;
 fileSystem[doNotOpen.path] = doNotOpen;
 fileSystem[TODO.path] = TODO;
 
+
+// CWPStudio file
+const CWPStudio = new directory('CWPStudio', '/C/Users/CWPStudio');
+
+fileSystem[CWPStudio.path] = CWPStudio;
+
+
+// ClassyDistroyer file
+const ClassyDistroyer = new directory('ClassyDistroyer', '/C/Users/ClassyDistroyer');
+
+fileSystem[ClassyDistroyer.path] = ClassyDistroyer;
+
+
+// Minty file
+const Minty = new directory('Minty', '/C/Users/Minty');
+
+fileSystem[Minty.path] = Minty;
+
+
+// Rune file
+const Rune = new directory('Rune', '/C/Users/Rune');
+
+fileSystem[Rune.path] = Rune;
+
+
+// Philo file
+const Philo = new directory('Philo', '/C/Users/Philo');
+
+fileSystem[Philo.path] = Philo;
+
+
+
+
+
+
+
+
+
+// C/README
+const README = new file('README', '/C/README', 'text',  `
+------------ Blubs Pond Terminal -------------
+
+--------- About Blubs Pond Terminal ----------
+Started on 9 May 2025
+
+Created for twitch.tv/blubbyblubfish
+Created by CWP Studio & blubbyblubfish Mods
+
+=============================================
+
+--- Contributors of Blubs Pond & Terminal ---
+
+------------- Main Contributors -------------
+Commission Art      - Blubby Blub Fish
+Code & Moderating   - ClassyDistroyer
+Code & CLI + Game   - CWP Studio
+(1st) Fan Art       - Minty
+
+---------- Suggestion Contributors ----------
+"awa" button        - Rune
+Homework folder     - ClassyDistroyer
+bob the frog        - Blubby Blub Fish
+Blubs' TODO list    - Philo
+Terminal            - CWP Studio
+---------------------------------------------
+`);
+
+fileSystem[README.path] = README;
+
+//Root C
 directoryContents['/C'] = ['Program Files', 'Users', 'README'];
-directoryContents['/C/Users'] = ['Blub'];
-directoryContents['/C/Users/Blub'] = ['Homework'];
-directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TODO'];
 
-const gameDirectory = new directory('game', '/C/Program Files/game');
-const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
-const reactorExecutable = new file('reactor.exe', '/C/Program Files/game/reactor-ctrl/reactor.exe', 'exe', 'reactor');
-
-fileSystem[gameDirectory.path] = gameDirectory;
-fileSystem[reactorDirectory.path] = reactorDirectory;
-fileSystem[reactorExecutable.path] = reactorExecutable;
-
+// C/Program Files
 directoryContents['/C/Program Files'] = ['game'];
+
+// C/Program Files/game
 directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
 directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
-const awaAudio = new file('awa.wav','/D/Audio/awa.wav','audio','../../untitled.wav');
-const audioDirectory = new directory('Audio','/D/Audio');
+// C/Users
+directoryContents['/C/Users'] = ['Blub','CWPStudio'];
 
-fileSystem[awaAudio.path] = awaAudio;
+// C/Users/Blubs
+directoryContents['/C/Users/Blub'] = ['Homework'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TODO'];
+
+// C/Users/CWPStudio
+// TBA
+
+
+// D/ Audio
+const audioDirectory = new directory('Audio','/D/Audio');
+const awaAudio = new file('awa.wav','/D/Audio/awa.wav','audio','../../untitled.wav');
+
+// D/Audio
 fileSystem[audioDirectory.path] = audioDirectory;
+fileSystem[awaAudio.path] = awaAudio;
 
 directoryContents['/D'] = ['Audio']
 directoryContents['/D/Audio'] = ['awa.wav']
-
-const exeFile = new file('reactor.exe', '/C/Program Files/reactor.exe', 'exe', 'reactor');
-const audioLog = new file('log1.ogg', '/C/logs/log1.ogg', 'audio', 'boot_audio');
-const configFile = new file('config.json', '/C/data/config.json', 'data', { power: "ON", temp: 83 });
 
 let currentDir = rootDirectory;
 
