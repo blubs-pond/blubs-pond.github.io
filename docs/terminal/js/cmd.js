@@ -1,5 +1,4 @@
 import { appendTerminalOutput, appendTerminalSymbol } from './ui.js';
-import { startReactorGame } from './games/reactor-ctrl/reactorCtrlMain.js';
 import { reactorCtrlProcessCommand } from './games/reactor-ctrl/reactorCtrlCommands.js'; // Import reactorCtrlProcessCommand
 import {
     handlePwdCommand,
@@ -69,9 +68,10 @@ function processCommand(command) {
     }
 
     // ✅ Smart argument parsing that supports quoted strings
-    const parts = trimmedCommand.match(/(?:[^\\s\"]+|\"[^\"]*\")+/g) || [];
+    const parts = trimmedCommand.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
     const cmdName = parts[0]?.toLowerCase();
-    const args = parts.slice(1).map(arg => arg.replace(/^\"|\"$/g, ''));
+    const args = parts.slice(1).map(arg => arg.replace(/^"|"$/g, ''));
+
 
     // appendTerminalOutput(`cmdName = ${cmdName}`);
     // appendTerminalOutput(`args = ${args}`);

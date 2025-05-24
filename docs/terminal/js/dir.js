@@ -33,11 +33,32 @@ directoryContents['/'] = ['C', 'D'];
 
 const pfDirectory = new directory('Program Files', '/C/Program Files');
 const userDirectory = new directory('Users', '/C/Users');
-const README = new file('README', '/C/README', 'text', 'Welcome to the system.');
+const README = new file('README', '/C/README', 'text',  `
+------ Blubs Pond Terminal ------
+
+--- About Blubs Pond Terminal ---
+Started on 9 May 2025
+
+Created by ClockWorksProduction Studio
+Created for twitch.tv/blubbyblubfish
+---------------------------------
+`);
 const Blub = new directory('Blub', '/C/Users/Blub');
 const Homework = new directory('Homework', '/C/Users/Blub/Homework');
-const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN');
+const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN 𓆏');
 const doNotOpen = new file('DoNotOpen.png', '/C/Users/Blub/Homework/DoNotOpen.png', 'image', 'js/ref/Shiny_scared_blub.png');
+const TODO = new file('TODO','/C/Users/Blub/Homework/TODO','text',`
+--- TODO ---
+Yearly Shower
+
+Years   Status
+2020    Done
+2021    Done
+2022    Done
+2023    Pending
+2024    Pending
+2025    Not Started
+`);
 
 fileSystem[pfDirectory.path] = pfDirectory;
 fileSystem[userDirectory.path] = userDirectory;
@@ -46,11 +67,12 @@ fileSystem[Homework.path] = Homework;
 fileSystem[README.path] = README;
 fileSystem[secret.path] = secret;
 fileSystem[doNotOpen.path] = doNotOpen;
+fileSystem[TODO.path] = TODO;
 
 directoryContents['/C'] = ['Program Files', 'Users', 'README'];
 directoryContents['/C/Users'] = ['Blub'];
 directoryContents['/C/Users/Blub'] = ['Homework'];
-directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TODO'];
 
 const gameDirectory = new directory('game', '/C/Program Files/game');
 const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
