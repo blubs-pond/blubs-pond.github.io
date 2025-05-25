@@ -121,4 +121,11 @@ function updateUI() {
     // TODO: Add more UI updates here as gameState evolves
 }
 
-export { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML, escapeRegExp, appendOutput, displayMap, updateUI };
+let frogClick = 0;
+
+function frog() {
+    frogClick++;
+    appendTerminalOutput(`frog clicked ${frogClick} times`);
+}
+
+export { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML, escapeRegExp, appendOutput, displayMap, updateUI, frog };

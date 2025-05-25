@@ -1,4 +1,4 @@
-import { appendTerminalOutput, appendTerminalSymbol } from './ui.js';
+import { appendTerminalOutput, appendTerminalSymbol, frog } from './ui.js';
 import { reactorCtrlProcessCommand } from './games/reactor-ctrl/reactorCtrlCommands.js'; // Import reactorCtrlProcessCommand
 import {
     handlePwdCommand,
@@ -16,12 +16,12 @@ import {
 
 const commandHistory = [];
 let currentGame = null;
-let frogClick = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired');
     const terminalInput = document.getElementById('terminal-command-input');
     const terminalOutput = document.getElementById('terminalOutput');
+    const frogButton = document.getElementById('frog-button'); // Assuming the button ID is 'frog-button'
 
     terminalInput.focus();
 
@@ -41,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     appendTerminalOutput("Welcome to the Blubs-Pond Terminal!");
     appendTerminalOutput("Type 'help' for a list of commands.");
     updatePrompt(); // Display initial prompt
+
+    if (frogButton) {
+        frogButton.addEventListener('click', frog);
+    }
 });
 
 function updatePrompt() {
@@ -191,11 +195,6 @@ function historyCommand(args) {
     commandHistory.forEach((cmd, index) => {
         appendTerminalOutput(`${index + 1}: ${cmd}`);
     });
-}
-
-function frog() {
-    frogClick++;
-    appendTerminalOutput(`frog clicked ${frogClick} time.`);
 }
 
 export {
