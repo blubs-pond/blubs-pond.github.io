@@ -31,26 +31,10 @@ fileSystem[dataDirectory.path] = dataDirectory;
 
 directoryContents['/'] = ['C', 'D'];
 
+//Program file
 const pfDirectory = new directory('Program Files', '/C/Program Files');
-const userDirectory = new directory('Users', '/C/Users');
-const README = new file('README', '/C/README', 'text', 'Welcome to the system.');
-const Blub = new directory('Blub', '/C/Users/Blub');
-const Homework = new directory('Homework', '/C/Users/Blub/Homework');
-const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN');
-const doNotOpen = new file('DoNotOpen.png', '/C/Users/Blub/Homework/DoNotOpen.png', 'image', 'js/ref/Shiny_scared_blub.png');
 
 fileSystem[pfDirectory.path] = pfDirectory;
-fileSystem[userDirectory.path] = userDirectory;
-fileSystem[Blub.path] = Blub;
-fileSystem[Homework.path] = Homework;
-fileSystem[README.path] = README;
-fileSystem[secret.path] = secret;
-fileSystem[doNotOpen.path] = doNotOpen;
-
-directoryContents['/C'] = ['Program Files', 'Users', 'README'];
-directoryContents['/C/Users'] = ['Blub'];
-directoryContents['/C/Users/Blub'] = ['Homework'];
-directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png'];
 
 const gameDirectory = new directory('game', '/C/Program Files/game');
 const reactorDirectory = new directory('reactor-ctrl', '/C/Program Files/game/reactor-ctrl');
@@ -60,22 +44,152 @@ fileSystem[gameDirectory.path] = gameDirectory;
 fileSystem[reactorDirectory.path] = reactorDirectory;
 fileSystem[reactorExecutable.path] = reactorExecutable;
 
+
+
+
+
+
+
+
+
+//Users
+const userDirectory = new directory('Users', '/C/Users');
+
+fileSystem[userDirectory.path] = userDirectory;
+
+// Blubs
+const Blub = new directory('Blub', '/C/Users/Blub');
+const Homework = new directory('Homework', '/C/Users/Blub/Homework');
+const secret = new file('secret.md', '/C/Users/Blub/Homework/secret.md', 'text', 'DO NOT OPEN 𓆏');
+const doNotOpen = new file('DoNotOpen.png', '/C/Users/Blub/Homework/DoNotOpen.png', 'image', 'js/ref/Shiny_scared_blub.png');
+const TODO = new file('TODO','/C/Users/Blub/Homework/TODO','text',`
+--- TODO ---
+Yearly Shower
+
+Years   Status
+2020    Done
+2021    Done
+2022    Done
+2023    Pending
+2024    Pending
+2025    Not Started
+`);
+
+fileSystem[Blub.path] = Blub;
+fileSystem[Homework.path] = Homework;
+fileSystem[secret.path] = secret;
+fileSystem[doNotOpen.path] = doNotOpen;
+fileSystem[TODO.path] = TODO;
+
+
+// CWPStudio file
+const CWPStudio = new directory('CWPStudio', '/C/Users/CWPStudio');
+
+fileSystem[CWPStudio.path] = CWPStudio;
+
+
+// ClassyDestroyer file
+const ClassyDestroyer = new directory('ClassyDestroyer', '/C/Users/ClassyDestroyer');
+
+fileSystem[ClassyDestroyer.path] = ClassyDestroyer;
+
+const Pictures = new directory('Pictures', '/C/Users/ClassyDestroyer/Pictures');
+const MnM = new file('MnM.jpg', '/C/Users/ClassyDestroyer/Pictures/MnM.jpg', 'image', 'js/ref/MnM.jpg');
+
+fileSystem[Pictures.path] = Pictures;
+fileSystem[MnM.path] = MnM;
+
+// Minty file
+const Minty = new directory('Minty', '/C/Users/Minty');
+
+fileSystem[Minty.path] = Minty;
+
+
+// Rune file
+const Rune = new directory('Rune', '/C/Users/Rune');
+
+fileSystem[Rune.path] = Rune;
+
+
+// Philo file
+const Philo = new directory('Philo', '/C/Users/Philo');
+
+fileSystem[Philo.path] = Philo;
+
+
+
+
+
+
+
+
+
+// C/README
+const README = new file('README', '/C/README', 'text',  `
+------------ Blubs Pond Terminal -------------
+
+--------- About Blubs Pond Terminal ----------
+Started on 9 May 2025
+
+Created for twitch.tv/blubbyblubfish
+Created by CWP Studio & blubbyblubfish Mods
+
+=============================================
+
+--- Contributors of Blubs Pond & Terminal ---
+
+------------- Main Contributors -------------
+Commission Art      - Blubby Blub Fish
+Code & Moderating   - ClassyDestroyer
+Code & CLI + Game   - CWP Studio
+(1st) Fan Art       - Minty
+
+---------- Suggestion Contributors ----------
+"awa" button        - Rune
+Homework folder     - ClassyDestroyer
+bob the frog        - Blubby Blub Fish
+Blubs' TODO list    - Philo
+Terminal            - CWP Studio
+---------------------------------------------
+`);
+
+fileSystem[README.path] = README;
+
+//Root C
+directoryContents['/C'] = ['Program Files', 'Users', 'README'];
+
+// C/Program Files
 directoryContents['/C/Program Files'] = ['game'];
+
+// C/Program Files/game
 directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
 directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
-const awaAudio = new file('awa.wav','/D/Audio/awa.wav','audio','../../untitled.wav');
-const audioDirectory = new directory('Audio','/D/Audio');
+// C/Users
+directoryContents['/C/Users'] = ['Blub','CWPStudio','ClassyDestroyer'];
 
-fileSystem[awaAudio.path] = awaAudio;
+// C/Users/Blubs
+directoryContents['/C/Users/Blub'] = ['Homework'];
+directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TODO'];
+
+// C/Users/CWPStudio
+// TBA
+
+// C/Users/ClassyDestroyer
+directoryContents['/C/Users/ClassyDestroyer'] = ['Pictures'];
+directoryContents['/C/Users/ClassyDestroyer/Pictures'] = ['MnM.jpg'];
+
+
+// D/ Audio
+const audioDirectory = new directory('Audio','/D/Audio');
+const awaAudio = new file('awa.wav','/D/Audio/awa.wav','audio','../../untitled.wav');
+
+// D/Audio
 fileSystem[audioDirectory.path] = audioDirectory;
+fileSystem[awaAudio.path] = awaAudio;
 
 directoryContents['/D'] = ['Audio']
 directoryContents['/D/Audio'] = ['awa.wav']
-
-const exeFile = new file('reactor.exe', '/C/Program Files/reactor.exe', 'exe', 'reactor');
-const audioLog = new file('log1.ogg', '/C/logs/log1.ogg', 'audio', 'boot_audio');
-const configFile = new file('config.json', '/C/data/config.json', 'data', { power: "ON", temp: 83 });
 
 let currentDir = rootDirectory;
 
