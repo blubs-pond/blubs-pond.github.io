@@ -88,13 +88,13 @@ const CWPStudio = new directory('CWPStudio', '/C/Users/CWPStudio');
 fileSystem[CWPStudio.path] = CWPStudio;
 
 
-// ClassyDistroyer file
-const ClassyDistroyer = new directory('ClassyDistroyer', '/C/Users/ClassyDistroyer');
+// ClassyDestroyer file
+const ClassyDestroyer = new directory('ClassyDestroyer', '/C/Users/ClassyDestroyer');
 
-fileSystem[ClassyDistroyer.path] = ClassyDistroyer;
+fileSystem[ClassyDestroyer.path] = ClassyDestroyer;
 
-const Pictures = new directory('Pictures', '/C/Users/ClassyDistroyer/Pictures');
-const MnM = new file('MnM.jpg', '/C/Users/ClassyDistroyer/Pictures/MnM.jpg', 'image', 'js/ref/MnM.jpg');
+const Pictures = new directory('Pictures', '/C/Users/ClassyDestroyer/Pictures');
+const MnM = new file('MnM.jpg', '/C/Users/ClassyDestroyer/Pictures/MnM.jpg', 'image', 'js/ref/MnM.jpg');
 
 fileSystem[Pictures.path] = Pictures;
 fileSystem[MnM.path] = MnM;
@@ -140,13 +140,13 @@ Created by CWP Studio & blubbyblubfish Mods
 
 ------------- Main Contributors -------------
 Commission Art      - Blubby Blub Fish
-Code & Moderating   - ClassyDistroyer
+Code & Moderating   - ClassyDestroyer
 Code & CLI + Game   - CWP Studio
 (1st) Fan Art       - Minty
 
 ---------- Suggestion Contributors ----------
 "awa" button        - Rune
-Homework folder     - ClassyDistroyer
+Homework folder     - ClassyDestroyer
 bob the frog        - Blubby Blub Fish
 Blubs' TODO list    - Philo
 Terminal            - CWP Studio
@@ -166,7 +166,7 @@ directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
 directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
 // C/Users
-directoryContents['/C/Users'] = ['Blub','CWPStudio','ClassyDistroyer'];
+directoryContents['/C/Users'] = ['Blub','CWPStudio','ClassyDestroyer'];
 
 // C/Users/Blubs
 directoryContents['/C/Users/Blub'] = ['Homework'];
@@ -175,9 +175,9 @@ directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TOD
 // C/Users/CWPStudio
 // TBA
 
-// C/Users/ClassyDistroyer
-directoryContents['/C/Users/ClassyDistroyer'] = ['Pictures'];
-directoryContents['/C/Users/ClassyDistroyer/Pictures'] = ['MnM.jpg'];
+// C/Users/ClassyDestroyer
+directoryContents['/C/Users/ClassyDestroyer'] = ['Pictures'];
+directoryContents['/C/Users/ClassyDestroyer/Pictures'] = ['MnM.jpg'];
 
 
 // D/ Audio
