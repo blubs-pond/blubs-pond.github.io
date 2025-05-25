@@ -93,6 +93,11 @@ const ClassyDistroyer = new directory('ClassyDistroyer', '/C/Users/ClassyDistroy
 
 fileSystem[ClassyDistroyer.path] = ClassyDistroyer;
 
+const Pictures = new directory('Pictures', '/C/Users/ClassyDistroyer/Pictures');
+const MnM = new file('MnM.jpg', '/C/Users/ClassyDistroyer/Pictures/MnM.jpg', 'image', 'js/ref/MnM.jpg');
+
+fileSystem[Pictures.path] = Pictures;
+fileSystem[MnM.path] = MnM;
 
 // Minty file
 const Minty = new directory('Minty', '/C/Users/Minty');
@@ -161,7 +166,7 @@ directoryContents['/C/Program Files/game'] = ['reactor-ctrl'];
 directoryContents['/C/Program Files/game/reactor-ctrl'] = ['reactor.exe'];
 
 // C/Users
-directoryContents['/C/Users'] = ['Blub','CWPStudio'];
+directoryContents['/C/Users'] = ['Blub','CWPStudio','ClassyDistroyer'];
 
 // C/Users/Blubs
 directoryContents['/C/Users/Blub'] = ['Homework'];
@@ -169,6 +174,10 @@ directoryContents['/C/Users/Blub/Homework'] = ['secret.md', 'DoNotOpen.png','TOD
 
 // C/Users/CWPStudio
 // TBA
+
+// C/Users/ClassyDistroyer
+directoryContents['/C/Users/ClassyDistroyer'] = ['Pictures'];
+directoryContents['/C/Users/ClassyDistroyer/Pictures'] = ['MnM.jpg'];
 
 
 // D/ Audio

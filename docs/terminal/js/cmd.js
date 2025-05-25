@@ -16,6 +16,7 @@ import {
 
 const commandHistory = [];
 let currentGame = null;
+let frogClick = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired');
@@ -192,6 +193,11 @@ function historyCommand(args) {
     });
 }
 
+function frog() {
+    frogClick++;
+    appendTerminalOutput(`frog clicked ${frogClick} time.`);
+}
+
 export {
     commandHistory,
     currentGame,
@@ -202,5 +208,6 @@ export {
     clearTerminal,
     echoCommand,
     catCommand,
-    historyCommand
+    historyCommand,
+    frog
 };
