@@ -16,6 +16,9 @@ import {
 
 const commandHistory = [];
 let currentGame = null;
+let isDebug = false; // Variable to track debug mode state
+
+const debugToggleElement = document.body; // Or document.getElementById('pseudo-terminal');
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired');
@@ -103,6 +106,7 @@ function processCommand(command) {
         'run': runCommand,
         'play': playCommand,
         'open': openCommand,
+        'debug': debug,
         'exit': handleExitCommand
     };
 
@@ -125,6 +129,59 @@ function processCommand(command) {
     }
 
     updatePrompt();
+}
+
+function debug() {
+    // Parse arguments for debug view mode (-V, -H, -A)
+    const args = Array.from(arguments); // Get arguments passed to the function
+    const argument = args[0]; // The first argument
+
+    // Toggle the isDebug state
+    isDebug = !isDebug;
+
+    // Toggle the debug-active class for CSS styling
+    debugToggleElement.classList.toggle('debug-active');
+
+    if (isDebug) {
+        // If debug mode is turning ON
+        console.log('Debug mode ON.');
+
+        if (argument === '-V') {
+            debugToggleElement.dataset.debugView = 'visible';
+            console.log('Debug view: Visible UI only');
+        } else if (argument === '-H') {
+            debugToggleElement.dataset.debugView = 'hidden';
+            console.log('Debug view: Hidden UI only');
+        } else if (argument === '-A') {
+            debugToggleElement.dataset.debugView = 'all';
+            console.log('Debug view: All UI');
+        } else {
+            // Default to -A if no valid argument provided
+            debugToggleElement.dataset.debugView = 'all';
+            console.log('Debug view: All UI (default)');
+        }
+
+        // Notify the current game (if any) that debug mode is active
+        if (currentGame !== null) {
+             console.log("Notifying game '" + currentGame + "' that debug mode is ON.");
+            // Future: Call a game-specific function, e.g., handleGameDebug(true, debugToggleElement.dataset.debugView);
+        }
+
+    } else {
+        // If debug mode is turning OFF
+        console.log('Debug mode OFF.');
+        // Remove the debug view data attribute
+        delete debugToggleElement.dataset.debugView;
+
+        // Notify the current game (if any) that debug mode is inactive
+        if (currentGame !== null) {
+             console.log("Notifying game '" + currentGame + "' that debug mode is OFF.");
+            // Future: Call a game-specific function, e.g., handleGameDebug(false);
+        }
+    }
+
+    // You might want to update the terminal prompt or provide other feedback
+    // updatePrompt(); // If you have a function to update the prompt
 }
 
 function handleGameReactor(args) {

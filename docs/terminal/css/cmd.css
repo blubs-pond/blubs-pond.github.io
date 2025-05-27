@@ -24,6 +24,7 @@ body {
 
 /* Debug UI Overlay */
 #debug-overlay {
+    display: none;
     position: fixed;
     top: 10px;
     right: 10px;
@@ -32,6 +33,62 @@ body {
     padding: 5px;
     z-index: 1001; /* higher than pseudo-terminal */
     font-size: 0.8em;
+}
+
+/* Show debug overlay when debug is active */
+.debug-active #debug-overlay {
+    display: block;
+}
+
+/* Outline and position for debugged containers */
+.debug-active [data-debug-view] #pseudo-terminal,
+.debug-active [data-debug-view] #game-area-container,
+.debug-active [data-debug-view] #map-area,
+.debug-active [data-debug-view] #user-ui,
+.debug-active [data-debug-view] #terminalOutput,
+.debug-active [data-debug-view] #terminal-input-container {
+    /* Initially hide outlines and labels */
+    outline: none;
+    position: relative; /* Needed for absolute positioning of ::before */
+}
+
+/* Display ID as text for debugged containers */
+.debug-active #pseudo-terminal::before, .debug-active #game-area-container::before, .debug-active #map-area::before, .debug-active #user-ui::before, .debug-active #terminalOutput::before, .debug-active #terminal-input-container::before {
+ content: attr(id);
+ position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px;
+    z-index: 1002; /* Ensure label is on top */
+    display: none; /* Initially hide labels */
+}
+
+/* Show outlines and labels when data-debug-view="all" */
+.debug-active[data-debug-view="all"] #pseudo-terminal,
+.debug-active[data-debug-view="all"] #game-area-container,
+.debug-active[data-debug-view="all"] #map-area,
+.debug-active[data-debug-view="all"] #user-ui,
+.debug-active[data-debug-view="all"] #terminalOutput,
+.debug-active[data-debug-view="all"] #terminal-input-container {
+    outline: 1px dashed red;
+}
+
+.debug-active[data-debug-view="all"] #pseudo-terminal::before, .debug-active[data-debug-view="all"] #game-area-container::before, .debug-active[data-debug-view="all"] #map-area::before, .debug-active[data-debug-view="all"] #user-ui::before, .debug-active[data-debug-view="all"] #terminalOutput::before, .debug-active[data-debug-view="all"] #terminal-input-container::before {
+    display: block;
+}
+
+/* Show outlines and labels for visible elements when data-debug-view="visible" */
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#pseudo-terminal,
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#game-area-container,
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#map-area,
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#user-ui,
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#terminalOutput,
+.debug-active[data-debug-view="visible"] *:not([style*="display: none"]):not([style*="visibility: hidden"])#terminal-input-container {
+    outline: 1px dashed red;
+    /* ::before will be handled by the general rule with display: block */
 }
 
 /* Terminal Output Area */
@@ -146,7 +203,7 @@ button#frog-button {
 
 
 /* === PC/Wide-Screen ONLY Style */
-@media (min-width: 769px) or (orientation: landscape) {
+@media (min-width: 769px) {
     /* Widescreen: Arrange elements horizontally */
     #pseudo-terminal {
          flex-direction: column; /* Still a column for main sections */
