@@ -1,5 +1,5 @@
 import { appendTerminalOutput } from '../../ui.js';
-import { gameState} from './reactorCtrlGameState.js'; // Import gameState and gameSettings
+import { gameState} from './reactorCtrlGameState.js'; // Import gameState
 import {
     handleGo,
     handleLook,

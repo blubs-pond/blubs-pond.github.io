@@ -1,5 +1,5 @@
 import { appendTerminalOutput, appendTerminalSymbol, frog } from './ui.js';
-import { reactorCtrlProcessCommand } from './games/reactor-ctrl/reactorCtrlCommands.js'; // Import reactorCtrlProcessCommand
+import { handleUserCommand, startReactorGame } from './games/reactor-ctrl/reactorCtrlMain.js'; // Import reactorCtrlProcessCommand
 import {
     handlePwdCommand,
     handleCdCommand,

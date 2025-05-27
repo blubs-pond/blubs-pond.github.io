@@ -3,8 +3,8 @@
 import { reactorCtrlProcessCommand } from './reactorCtrlCommands.js';
 import { appendTerminalOutput } from '../../ui.js';
 
-// gameLoop is now inside reactorCtrlCore.js and used through reactorCtrlProcessCommand
-import { gameLoop } from './reactorCtrlCore.js';  // UPDATED: from unified core file
+// gameLoop is now inside reactorCtrlGameLogic.js
+import { gameLoop } from './reactorCtrlGameLogic.js';
 
 function handleUserCommand(command) {
     if (!command.trim()) return; // Skip empty input

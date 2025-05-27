@@ -48,6 +48,7 @@ let gameState = {
     //     sanity: 100 // 0-100, 0 is critical
     // },
 
+    machines: {}, // Added machines object
     tasks: {
         "repairReactor": {
             description: "Repair the primary reactor coolant pump.",

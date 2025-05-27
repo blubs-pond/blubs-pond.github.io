@@ -29,7 +29,7 @@ const facilityMapString = `
 │             │ │   │ │          <A>  x             x  <B>          │ │   │                 
 │             └─┘   │ │ <GR>  ┌─┐   ┌─┤    <CR>     ├─┐   ┌─┐  <SR> │ │   │  ┌─────────────┐
 │    <LAB>     x    │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
-│             ┌─┐   │ │       │ │   │ │      @      │ │   │ │       │ │   │  │             │
+│             ┌─┐   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
 │             │ │   │ │       │ │   │ │             │ │   │ │       │ │   │  │             │
 │             │ │   │ │       │ │<1>│ │             │ │<2>│ │       │ │   └──┘             │
 │             │ │   │ └───────┘ └───┘ └─────┐ ┌─────┘ └───┘ └───────┘ │          <Elect>   │
@@ -51,11 +51,9 @@ const createDoor = (location, exit, isOpen = true, durability = 100, isLocked = 
   location, exit, isOpen, durability, isLocked
 });
 
-const createLocation = (
-  friendlyName, description, mapMarker, exits,
-  securityLevel = 1, hasCreature = false, hazardLevel = 1
-) => ({
-  friendlyName, description, mapMarker, exits,
+const createLocation = (friendlyName, description, mapMarker, exits, line, column, securityLevel = 1, hasCreature = false, hazardLevel = 1
+) => ({ // Added line and column to returned object
+  friendlyName, description, mapMarker, exits, line, column,
   securityLevel, hasCreature, hazardLevel
 });
 
@@ -120,36 +118,38 @@ const getExitsForLocation = locKey =>
 
 // === Locations ===
 const locationDescriptors = [
-  ["ControlRoom", "Control Room", "CR", 3, false, 2],
-  ["ReactorRoom", "Reactor Room", "RR", 5, true, 5],
-  ["TurbineRoom", "Turbine Room", "TR", 4, false, 3],
-  ["GeneratorRoom", "Generator Room", "GR", 3, false, 2],
-  ["ServerRoom", "Server Room", "SR", 2, false, 2],
-  ["CoolantPumpStation", "Coolant Pump Station", "CP", 2, false, 3],
-  ["PowerConverterRoom", "Power Converter Room", "PC", 2, false, 2],
-  ["SpentFuelStorage", "Spent Fuel Storage", "SF", 4, false, 4],
-  ["WaterTreatmentFacility", "Water Treatment Facility", "BW", 3, false, 2],
-  ["ControlArchives", "Control Archives", "CA", 3, false, 1],
-  ["ElectricalSwitchyard", "Electrical Switchyard", "Elect", 2, false, 1],
-  ["Laboratory", "Laboratory", "LAB", 4, false, 3],
-  ["VentilationSystems", "Ventilation Systems", "Vent", 4, false, 2],
-  ["DecontaminationRoom", "Decontamination Room", "DCR", 3, false, 2],
-  ["Bunker", "Bunker", "BU", 5, false, 4],
-  ["HallwayA", "Hallway A", "A", 1, false, 1],
-  ["HallwayB", "Hallway B", "B", 1, false, 1],
-  ["HallwayC", "Hallway C", "C", 1, false, 1],
-  ["HallwayD", "Hallway D", "D", 1, false, 1],
-  ["HallwayE", "Hallway E", "E", 1, false, 1]
+  ["ControlRoom", "Control Room", "CR", 27, 45, 3, false, 2], // Added line and column
+  ["ReactorRoom", "Reactor Room", "RR", 5, true, 5, 7, 45],
+  ["TurbineRoom", "Turbine Room", "TR", 4, false, 3, 7, 65],
+  ["GeneratorRoom", "Generator Room", "GR", 3, false, 2, 26, 15],
+  ["ServerRoom", "Server Room", "SR", 2, false, 2, 26, 75],
+  ["CoolantPumpStation", "Coolant Pump Station", "CP", 2, false, 3, 5, 4],
+  ["PowerConverterRoom", "Power Converter Room", "PC", 2, false, 2, 3, 40],
+  ["SpentFuelStorage", "Spent Fuel Storage", "SF", 4, false, 4, 10, 40],
+  ["WaterTreatmentFacility", "Water Treatment Facility", "BW", 3, false, 2, 6, 90],
+  ["ControlArchives", "Control Archives", "CA", 3, false, 1, 17, 95],
+  ["ElectricalSwitchyard", "Electrical Switchyard", "Elect", 2, false, 1, 30, 90],
+  ["Laboratory", "Laboratory", "LAB", 4, false, 3, 26, 4],
+  ["VentilationSystems", "Ventilation Systems", "Vent", 4, false, 2, 15, 4],
+  ["DecontaminationRoom", "Decontamination Room", "DCR", 3, false, 2, 34, 15],
+  ["Bunker", "Bunker", "BU", 5, false, 4, 35, 45],
+  ["HallwayA", "Hallway A", "A", 1, false, 1, 26, 35],
+  ["HallwayB", "Hallway B", "B", 1, false, 1, 26, 55],
+  ["HallwayC", "Hallway C", "C", 1, false, 1, 17, 45],
+  ["HallwayD", "Hallway D", "D", 1, false, 1, 17, 15],
+  ["HallwayE", "Hallway E", "E", 1, false, 1, 17, 75]
 ];
 
 const locations = Object.fromEntries(
-  locationDescriptors.map(([key, name, marker, secLvl, creature, hazard]) => [
+  locationDescriptors.map(([key, name, marker, line, column, secLvl, creature, hazard]) => [ // Destructure line and column
     key,
     createLocation(
       name,
       `Description for ${name}.`,
       `<${marker}>`,
       getExitsForLocation(key),
+      line,
+      column,
       secLvl,
       creature,
       hazard
@@ -157,13 +157,26 @@ const locations = Object.fromEntries(
   ])
 );
 
+// === Game Settings ===
+const oil_consumption_rate = 0.1;
+const oil_leak_multiplier = 1.0;
+const shadowLookSanityDrain = 5;
+const soundEnabled = true;
+const musicEnabled = true;
+
 // === Exported Game Settings ===
 export {
+  facilityMapString,
   createCamera,
   createDoor,
   createLocation,
   markerToLocationKey,
   locationKeyToMarker,
   adjacencyMatrix,
-  locations
+  locations,
+  oil_consumption_rate,
+  oil_leak_multiplier,
+  shadowLookSanityDrain,
+  soundEnabled,
+  musicEnabled
 };

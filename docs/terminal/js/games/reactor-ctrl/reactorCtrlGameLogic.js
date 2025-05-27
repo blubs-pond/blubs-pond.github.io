@@ -1,22 +1,39 @@
 import { gameState } from './reactorCtrlGameState.js';
-import {   createCamera,
-  createDoor,
-  createLocation,
-  markerToLocationKey,
-  locationKeyToMarker,
-  adjacencyMatrix,
-  locations } from './reactorCtrlGameSettings.js';
-import { appendTerminalOutput } from '../../ui.js';
+import {
+    facilityMapString,
+    createCamera,
+    createDoor,
+    createLocation,
+    markerToLocationKey,
+    locationKeyToMarker,
+    adjacencyMatrix,
+    locations,
+    oil_consumption_rate,
+    oil_leak_multiplier,
+    shadowLookSanityDrain,
+    soundEnabled,
+    musicEnabled 
+} from './reactorCtrlGameSettings.js'; // Corrected path
+import { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML, escapeRegExp, appendOutput, displayMap, updateUI, frog, updateGameUI } from '../../ui.js'; // Import displayMap from ui.js
 
+let settings = {};
 let lastUpdateTime = 0;
 let gameTimeInMinutesReal = 0;
 let currentPhase = "survival";
 let awaitingExitConfirmation = false;
 
+function initializeSettings() {
+    settings.soundEnabled = soundEnabled;
+    settings.musicEnabled = musicEnabled;
+    updateGameUI('reactor-ctrl'); // Show game UI elements
+}
+
 function gameLoop(timestamp) {
     if (!lastUpdateTime) lastUpdateTime = timestamp;
     const dt = (timestamp - lastUpdateTime) / 1000;
     lastUpdateTime = timestamp;
+ displayGameStatus();
+    displayMap(gameState, { locations, facilityMapString });
 
     updateGameState(dt);
     updateGame();
@@ -25,6 +42,12 @@ function gameLoop(timestamp) {
     updateControlArchives(dt);
     updateVentilation(dt);
     updateGeneratorOil(dt);
+
+    // TODO: Handle player input here or through an event listener
+    // For now, the game loop just updates the state over time.
+    // Player commands will be processed via handleUserCommand in main.js
+    // which calls reactorCtrlProcessCommand.
+
 
     if (!gameState.game_over) {
         requestAnimationFrame(gameLoop);
@@ -60,6 +83,18 @@ function handlePhaseTransition(phase) {
     // TODO: Trigger phase-specific setup like monster spawns, system changes, etc.
 }
 
+// Displays key game status information to the terminal
+function displayGameStatus() {
+    const statBar = document.getElementById('stat-bar');
+    if (statBar) {
+        statBar.style.display = 'block'; // Make the stat bar visible
+        statBar.innerHTML = `
+            Location: ${getUserFriendlyLocationName(gameState.player.location)} |
+            Reactor Temp: ${gameState.reactorState.reactor_temp.toFixed(1)}°C |
+            Ventilation: ${gameState.ventilationStatus}
+        `;
+    }
+}
 // Updates reactor temperature based on system state and cooling effects
 function updateReactorTemp(dt) {
     if (!gameState.core_active) {
@@ -139,9 +174,9 @@ function flushVentilation() {
 // Updates the backup generator oil consumption if reactor is off
 function updateGeneratorOil(dt) {
     if (!gameState.core_active && gameState.generator_status !== 'broken') {
-        const consumptionRate = (gameSettings.oil_consumption_rate || 0.1) *
-            (gameSettings.oil_leak_multiplier || 1.0) *
-            (gameState.generator_lubricant_cycles || 1);
+        const consumptionRate = (oil_consumption_rate || 0.1) *
+            (oil_leak_multiplier || 1.0) *
+            (gameState.generator_lubricant_cycles || 1)
         gameState.backup_generator_oil -= consumptionRate * dt;
         gameState.backup_generator_oil = Math.max(0, gameState.backup_generator_oil);
 
@@ -271,7 +306,7 @@ function checkLookAtShadow(locationViewed) {
     const shadow = gameState.monsters["Shadow"];
     if (shadow && shadow.state !== "dormant" && shadow.location === locationViewed) {
         gameState.shadowVisible = true;
-        gameState.sanity = Math.max(0, gameState.sanity - gameSettings.shadowLookSanityDrain);
+        gameState.sanity = Math.max(0, gameState.sanity - shadowLookSanityDrain);
         appendTerminalOutput("You see the Shadow! Your sanity is draining!");
     } else {
         gameState.shadowVisible = false;
@@ -292,6 +327,20 @@ function rebootCamera(cameraNumber) {
 // Main game loop for periodic updates (monster movements, sanity checks, etc.)
 function updateGame() {
     handleMonsterMovement();
+
+    // Update Survival Stats based on time and phase
+    const hungerIncreaseRate = gameState.currentPhase === 'survival' ? 0.05 : 0.02; // Adjust rates as needed
+    const insomniaIncreaseRate = gameState.currentPhase === 'survival' ? 0.07 : 0.03; // Adjust rates as needed
+    const sanityDecreaseRate = gameState.currentPhase === 'survival' ? 0.04 : 0.01; // Adjust rates as needed
+
+    gameState.player.stats.hunger = Math.min(100, gameState.player.stats.hunger + hungerIncreaseRate);
+    gameState.player.stats.insomnia = Math.min(100, gameState.player.stats.insomnia + insomniaIncreaseRate);
+    gameState.player.stats.sanity = Math.max(0, gameState.player.stats.sanity - sanityDecreaseRate);
+
+    // Apply sanity effects based on current level (this can be expanded)
+    if (gameState.player.stats.sanity <= 25) {
+        appendTerminalOutput("You feel your grip on reality slipping...");
+    }
     checkSanityEffects();
     checkWinLoseConditions();
 }
@@ -308,9 +357,7 @@ function handleMonsterMovement() {
 
 // Checks sanity effects (e.g., when sanity is low, the player is warned)
 function checkSanityEffects() {
-    if (gameState.sanity <= 25) {
-        appendTerminalOutput("You feel your grip on reality slipping...");
-    }
+    // This function can be used for more complex sanity effects later if needed.
 }
 
 // Checks if the win/lose conditions are met
@@ -384,8 +431,8 @@ function parseMapString(mapString) {
 }
 
 function getUserFriendlyLocationName(locationCode) {
-    if (gameSettings.locations && gameSettings.locations[locationCode]) {
-        return gameSettings.locations[locationCode].friendlyName || locationCode;
+    if (locations && locations[locationCode]) {
+        return locations[locationCode].friendlyName || locationCode;
     } else {
         return locationCode;
     }
@@ -393,17 +440,18 @@ function getUserFriendlyLocationName(locationCode) {
 
 function showFacilityStatus() {
     appendTerminalOutput("--- Facility Status ---");
-    appendTerminalOutput(`Reactor Temperature: ${gameState.reactorState.reactor_temp}`);
-    appendTerminalOutput(`Reactor Pressure: ${gameState.reactorState.reactor_pressure}`);
+    appendTerminalOutput(`Reactor Temperature: ${gameState.reactorState.reactor_temp.toFixed(1)}°C`);
+    appendTerminalOutput(`Reactor Pressure: ${gameState.reactorState.reactor_pressure.toFixed(1)}`);
     appendTerminalOutput(`Ventilation Status: ${gameState.ventilationStatus}`);
+    appendTerminalOutput(`Ventilation Blockage: ${gameState.ventilationBlockageLevel.toFixed(1)}%`);
 }
 
 function showPlayerStatus() {
     appendTerminalOutput("--- Player Status ---");
     appendTerminalOutput(`Location: ${getUserFriendlyLocationName(gameState.playerLocation)}`);
-    appendTerminalOutput(`Hunger: ${gameState.playerStats.hunger}`);
-    appendTerminalOutput(`Insomnia: ${gameState.playerStats.insomnia}`);
-    appendTerminalOutput(`Sanity: ${gameState.playerStats.sanity}`);
+    appendTerminalOutput(`Hunger: ${gameState.player.stats.hunger.toFixed(1)}%`);
+    appendTerminalOutput(`Insomnia: ${gameState.player.stats.insomnia.toFixed(1)}%`);
+    appendTerminalOutput(`Sanity: ${gameState.player.stats.sanity.toFixed(1)}%`);
     appendTerminalOutput(`Money: ${gameState.playerMoney}`);
 }
 
@@ -414,7 +462,7 @@ function showSectorStatus(target) {
 }
 
 function showRoomStatus(target) {
-    const room = gameSettings.locations[target];
+    const room = locations[target];
     if (room) {
         appendTerminalOutput(`--- ${room.friendlyName} Status ---`);
         appendTerminalOutput(room.description);
@@ -425,22 +473,23 @@ function showRoomStatus(target) {
 }
 
 function handleToggleSetting(settingName) {
-    if (gameSettings.hasOwnProperty(settingName)) {
-        gameSettings[settingName] = !gameSettings[settingName];
-        appendTerminalOutput(`Toggled setting: ${settingName} to ${gameSettings[settingName]}`);
+    if (settings.hasOwnProperty(settingName)) {
+        settings[settingName] = !settings[settingName]
+        appendTerminalOutput(`Toggled setting: ${settingName} to ${settings[settingName]}`)
     } else {
         appendTerminalOutput(`Setting ${settingName} not found.`);
     }
 }
 
 function handleGo(direction) {
-    const currentLocation = gameState.playerLocation;
-    if (gameSettings.locations && gameSettings.locations[currentLocation] && gameSettings.locations[currentLocation].exits) {
-        const exits = gameSettings.locations[currentLocation].exits;
+    const currentLocation = gameState.player.location;
+    if (locations && locations[currentLocation] && locations[currentLocation].exits) {
+        const exits = locations[currentLocation].exits;
         if (exits[direction]) {
-            gameState.playerLocation = exits[direction];
-            appendTerminalOutput(`Moved to ${getUserFriendlyLocationName(exits[direction])}`);
+            gameState.player.location = exits[direction];
+            appendTerminalOutput(`\nYou moved to ${getUserFriendlyLocationName(exits[direction])}\n`);
             showRoomStatus(exits[direction]); // Automatically look around after moving
+            displayMap(gameState, { locations, facilityMapString }); // Update map after moving
         } else {
             appendTerminalOutput(`Cannot go ${direction} from here.`);
         }
@@ -467,20 +516,25 @@ function handleExitConfirmationResponse(response) {
 
 function handleSettings() {
     appendTerminalOutput("--- Game Settings ---");
-    appendTerminalOutput(`Sound Enabled: ${gameSettings.soundEnabled}`);
-    appendTerminalOutput(`Music Enabled: ${gameSettings.musicEnabled}`);
+    appendTerminalOutput(`Sound Enabled: ${settings.soundEnabled}`);
+    appendTerminalOutput(`Music Enabled: ${settings.musicEnabled}`);
 }
 
 function handleLook() {
-    showRoomStatus(gameState.playerLocation);
+    const currentLocationKey = gameState.player.location;
+    if (locations[currentLocationKey]) {
+        showRoomStatus(currentLocationKey);
+    } else {
+        appendTerminalOutput("You are in an unknown location.");
+    }
 }
 
 function handleInventory() {
     appendTerminalOutput("--- Inventory ---");
     if (gameState.playerInventory.length === 0) {
-        appendTerminalOutput("Inventory is empty.");
+        appendTerminalOutput("Your personal inventory is empty.");
     } else {
-        gameState.playerInventory.forEach(item => appendTerminalOutput(`- ${item}`));
+        gameState.player.inventory.forEach(item => appendTerminalOutput(`- ${item}`));
     }
     appendTerminalOutput(`Oil Cans: ${gameState.oilCans}`);
     appendTerminalOutput(`Lubricant Kits: ${gameState.lubricantKits}`);
@@ -523,10 +577,9 @@ function handleFlush(systemName) {
 }
 
 function handleDisplayMap() {
-    // TODO: Display game map
-    appendTerminalOutput("Displaying map (not yet implemented)");
+    displayMap(gameState, { locations, facilityMapString });
 }
-
+console.log("displayMap(gameState, { locations, facilityMapString });")
 function handleCam(cameraNumber) {
     rebootCamera(cameraNumber);
 }
@@ -554,6 +607,7 @@ function handleClear() {
 export {
     gameLoop,
     getPhaseForTime,
+    displayGameStatus,
     updateGameState,
     updateGame,
     updateReactorTemp,

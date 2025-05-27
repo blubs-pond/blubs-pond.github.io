@@ -25,7 +25,7 @@ function escapeRegExp(string) {
 }
 
 function appendOutput(text) {
-    const outputArea = document.getElementById('output-area');
+    const outputArea = document.getElementById('terminalOutput');
     if (!outputArea) {
         console.error("Output area not found!");
         return;
@@ -34,7 +34,7 @@ function appendOutput(text) {
     outputArea.scrollTop = outputArea.scrollHeight;
 }
 
-function displayMap(state = 'default') {
+function displayMap(gameState, gameSettings, state = 'default') {
     const mapArea = document.getElementById('map-area');
     if (!mapArea) {
         console.error("Map area not found!");
@@ -42,19 +42,19 @@ function displayMap(state = 'default') {
         return;
     }
 
-    if (typeof reactorCtrlGameState === 'undefined' || typeof reactorCtrlGameSetting === 'undefined') {
+    if (typeof gameState === 'undefined' || typeof gameSettings.locations === 'undefined' || typeof gameSettings.facilityMapString === 'undefined') { // Added check for facilityMapString
         console.error("gameState or gameSettings not defined!");
         appendOutput("Error: Game data not loaded.");
         return;
-    }
+    }    
 
-    if (typeof reactorCtrlGameSetting.facilityMap !== 'string') {
+    if (typeof gameSettings.facilityMapString !== 'string') {
         console.error("Invalid map data format.");
         appendOutput("Error: Invalid map data.");
         return;
     }
 
-    const mapLines = reactorCtrlGameSetting.facilityMap.split('\n');
+    const mapLines = gameSettings.facilityMapString.split('\n');
     const finalMapLines = mapLines.map(line => line.split(''));
 
     const placeMarker = ({ line, column }, marker) => {
@@ -68,8 +68,8 @@ function displayMap(state = 'default') {
     };
 
     // --- Player marker ---
-    const playerLocationKey = reactorCtrlGameState.currentLocation || reactorCtrlGameState.playerLocation;
-    const player = reactorCtrlGameSetting.locations?.[playerLocationKey];
+    const playerLocationKey = gameState.currentLocation || gameState.player.location;
+    const player = gameSettings.locations?.[playerLocationKey];
     const playerLine = parseInt(player?.line, 10);
     const playerColumn = parseInt(player?.column, 10);
     if (!isNaN(playerLine) && !isNaN(playerColumn)) {
@@ -80,29 +80,40 @@ function displayMap(state = 'default') {
 
     // --- State-dependent markers ---
     if (['failed', 'show'].includes(state)) {
-        for (const id in reactorCtrlGameSetting.failedDevices) {
-            placeMarker(reactorCtrlGameSetting.failedDevices[id], 'X');
+        for (const id in gameState.failedDevices) {
+            placeMarker(gameState.failedDevices[id], 'X');
         }
     }
 
     if (state === 'players' || state === 'show') {
-        for (const name in reactorCtrlGameState.monsters) {
-            const pos = reactorCtrlGameState.monsters[name]?.mapPosition;
-            if (pos) placeMarker(pos, name[0].toUpperCase());
+        for (const name in gameState.monsters) {
+            const pos = gameState.monsters[name]?.mapPosition;
+            if (pos) placeMarker({ line: pos[0], column: pos[1] }, name[0].toUpperCase()); // Changed to use gameState.monsters and correct coordinate passing
         }
     }
-
+    
     if (state === 'show') {
-        for (const id in reactorCtrlGameSetting.tasks) {
-            placeMarker(reactorCtrlGameSetting.tasks[id], '$');
+        for (const id in gameState.tasks) {
+            placeMarker(gameState.tasks[id], '$');
         }
-        for (const id in reactorCtrlGameSetting.machines) {
-            placeMarker(reactorCtrlGameSetting.machines[id], '%');
+        for (const id in gameState.machines) { // Changed to use gameState.machines
+            placeMarker(gameState.machines[id], '%');
         }
     }
 
     const finalMap = finalMapLines.map(line => line.join('')).join('\n');
+    console.log("Final map:", finalMap);
     mapArea.textContent = finalMap;
+}
+
+function updateGameUI(gameId) {
+    const mapArea = document.getElementById('map-area');
+    const statBar = document.getElementById('stat-bar'); // Assuming stat-bar is the id for the status bar
+
+    const displayStyle = (gameId === 'reactor-ctrl') ? 'block' : 'none';
+
+    if (mapArea) mapArea.style.display = displayStyle;
+    if (statBar) statBar.style.display = displayStyle;
 }
 
 function updateUI() {
@@ -128,4 +139,4 @@ function frog() {
     appendTerminalOutput(`frog clicked ${frogClick} times`);
 }
 
-export { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML, escapeRegExp, appendOutput, displayMap, updateUI, frog };
+export { appendTerminalOutput, appendTerminalSymbol, appendTerminalHTML, escapeRegExp, appendOutput, displayMap, updateUI, frog, updateGameUI };
