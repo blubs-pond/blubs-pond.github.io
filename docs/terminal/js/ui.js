@@ -35,7 +35,7 @@ function appendOutput(text) {
 }
 
 function displayMap(gameState, gameSettings, state = 'default') {
-    console.log("displayMap gameSettings:", gameSettings);
+    // console.log("displayMap gameSettings:", gameSettings);
     const mapArea = document.getElementById('map-area');
     if (!mapArea) {
         console.error("Map area not found!");

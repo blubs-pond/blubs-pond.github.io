@@ -22,11 +22,8 @@
 #map-area {
     color: #00ff00;
     font-size: 0.8em; /* Smaller font for the map */
-    margin-bottom: 15px;
     text-shadow: 0 0 3px #00ff00;
-    white-space: pre; /* Preserve whitespace for map characters */
-    overflow-x: auto; /* Add horizontal scroll if map is too wide */
-    border-bottom: 1px dashed #00ff00; /* Separator line */
+    border: 1px solid green;
     padding-bottom: 10px;
     /* Allow map area to grow and enable vertical scrolling */
     flex-grow: 1;

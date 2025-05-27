@@ -10,8 +10,11 @@
         <div id="pseudo-terminal">
             <!-- Game-specific UI elements will go here, initially hidden -->            
             <button id="frog-button" style="background-color: rgba(0, 0, 0, 0.9); color: #00ff00; font-family: 'Courier New', Courier, monospace;"><p>Blubs Pond Terminal 𓆏</p></button>
-            <div id="stat-bar" class="game-ui" style="display: none;"></div>
-            <div id="map-area" class="game-ui" style="display: none; white-space: pre;"></div>
+            <div id="stat-bar" class="game-ui" style="display: block;">stat-bar</div>            
+            <div id="game-area-container">
+                <div id="map-area" class="game-ui" style="display: block; white-space: pre;">map-area</div>
+                <div id="user-ui" class="game-ui" style="display: block;">user-ui</div> <!-- Placeholder for User UI -->
+            </div>
 
             <div id="terminalOutput">
                 <!-- All text output will appear here -->
@@ -25,6 +28,23 @@
         <script src="js/ui.js" type="module"></script> <!-- General UI functions -->
         <script src="js/cmd.js" type="module"></script> <!-- Pseudo terminal logic -->
         <!-- Game-specific scripts will be loaded by cmd.js as needed -->
+        
+        <div id="debug-overlay">
+            <p id="screen-width"></p>
+            <p id="screen-height"></p>
+        </div>
 
+        <script>
+            const screenWidthElement = document.getElementById('screen-width');
+            const screenHeightElement = document.getElementById('screen-height');
+
+            function updateScreenDimensions() {
+                screenWidthElement.textContent = `Width: ${window.innerWidth}px`;
+                screenHeightElement.textContent = `Height: ${window.innerHeight}px`;
+            }
+
+            updateScreenDimensions(); // Initial update
+            window.addEventListener('resize', updateScreenDimensions);
+        </script>
     </body>
 </html>

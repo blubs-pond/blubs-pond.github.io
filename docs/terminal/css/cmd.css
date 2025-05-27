@@ -1,4 +1,15 @@
-/* Pseudo Terminal Styling */
+/* === Common Styles === */
+
+/* Basic body styling for the terminal */
+body {
+    margin: 0; /* Remove default body margin */
+    background-color: #000;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden; /* Prevent overall page scroll */
+}
+
+/* Pseudo Terminal Container */
 #pseudo-terminal {
     display: flex;
     position: fixed; /* Position it relative to the viewport */
@@ -6,64 +17,60 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black background */
-    color: #00ff00; /* Green text */
-    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
     z-index: 1000; /* Ensure it's on top of other content */
     padding: 10px;
     box-sizing: border-box; /* Include padding in width and height */
-    flex-direction: column; /* Arrange children vertically */
 }
 
+/* Debug UI Overlay */
+#debug-overlay {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    color: #00ff00;
+    padding: 5px;
+    z-index: 1001; /* higher than pseudo-terminal */
+    font-size: 0.8em;
+}
+
+/* Terminal Output Area */
 #terminalOutput {
-    flex-grow: 1; /* Allow output area to take up available space */
-    overflow-y: auto; /* Enable scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
     white-space: pre-wrap; /* Preserve whitespace and wrap text */
     word-break: break-all; /* Break long words */
     margin-bottom: 10px; /* Space between output and input */
-    /* Optional: Add a subtle border or indicator for the output area */
-    border-bottom: 1px dashed #00ff00;
+    border-bottom: 1px dashed #00ff00; /* Optional: Add a subtle border */
     padding-bottom: 10px;
 }
 
+/* Terminal Input Container */
 #terminal-input-container {
     display: flex; /* Arrange prompt and input horizontally */
     align-items: center; /* Vertically align items */
-    flex-shrink: 0; /* Prevent input container from shrinking */
+    flex-shrink: 0; /* Prevent input container from shrinking vertically */
 }
 
+/* Terminal Prompt Symbol */
 #terminal-prompt {
     margin-right: 5px; /* Space between prompt and input */
     color: #00ff00; /* Green prompt */
 }
 
+/* Terminal Command Input */
 #terminal-command-input {
-    flex-grow: 1; /* Allow input to take up available space */
+    flex-grow: 1; /* Allow input to take up available horizontal space */
     background-color: transparent; /* Transparent background */
     color: #00ff00; /* Green text */
     font-family: 'Courier New', Courier, monospace; /* Monospaced font */
     border: none; /* No border */
     outline: none; /* Remove outline on focus */
-    font-size: 1em;
+    font-size: 1em; /* Standard font size for input */
     caret-color: #00ff00; /* Green cursor */
     padding: 0; /* Remove default padding */
 }
 
-#map-area {
-    /* Add a border to see the area it occupies */
-    border: 1px solid green;
-
-    /* Prevent it from being shrunk by flex-grow in other elements */
-    flex-shrink: 0;
-    
-    /* Add some margin for spacing */
-    margin-bottom: 10px;
-    white-space: pre;
-    overflow-y: auto;
-    overflow-y: visible;
-}
-
-/* Add a blinking cursor effect (optional) */
+/* Blinking cursor animation */
 #terminal-command-input {
     animation: blink-caret 1s step-end infinite;
 }
@@ -71,4 +78,104 @@
 @keyframes blink-caret {
     from, to { border-right-color: transparent }
     50% { border-right-color: #00ff00; }
+}
+
+/* Assuming #frog-button is the header button */
+button#frog-button {
+    flex-shrink: 0; /* Prevent from shrinking vertically */
+}
+
+/* Stat Bar */
+#stat-bar {
+    flex-shrink: 0; /* Prevent from shrinking vertically */
+}
+
+/* Game Area Container (holds map and user UI) */
+#game-area-container {
+     margin-bottom: 10px; /* Space between game area and terminal output */
+}
+
+/* Map Area */
+#map-area {
+    flex-grow: 1; /* Allow map to take up available horizontal space */
+    flex-basis: 0; /* Allow map to shrink below its content size */
+    min-width: 0; /* Allow flex item to shrink below content size */
+    margin-right: 10px; /* Space between map and user UI */
+    overflow-x: auto; /* Enable horizontal scrolling if map content exceeds container size */
+    overflow-y: auto; /* Enable vertical scrolling if map content exceeds container size */
+}
+
+/* User UI Area */
+#user-ui {
+    flex-shrink: 0; /* Prevent user UI from shrinking vertically */
+    flex-grow: 1; /* Allow user UI to take up available horizontal space */
+    flex-basis: 0; /* Allow user UI to shrink below its content size */
+}
+
+
+/* === Mobile ONLY Style === */
+@media (max-width: 768px) or (orientation: portrait) {
+    /* Mobile: Stack elements vertically */
+    #pseudo-terminal {
+        flex-direction: column;
+    }
+
+    #game-area-container {
+        display: flex;
+        flex-direction: column; /* Stack map and user UI vertically */
+        flex-grow: 1; /* Allow game area to grow vertically on mobile */
+    }
+
+    #map-area {
+        /* Mobile specific map styles */
+        font-size: 0.9em; /* Adjust font size for mobile */
+        margin-right: 0; /* Remove right margin on mobile */
+        margin-bottom: 10px; /* Add bottom margin below map on mobile */
+    }
+
+    #user-ui {
+        /* Mobile specific user UI styles */
+        margin-top: 10px; /* Add top margin above user UI on mobile */
+    }
+
+    #terminalOutput {
+        /* Mobile specific terminal output styles */
+        flex-grow: 1; /* Allow output to grow vertically on mobile */
+    }
+}
+
+
+/* === PC/Wide-Screen ONLY Style */
+@media (min-width: 769px) or (orientation: landscape) {
+    /* Widescreen: Arrange elements horizontally */
+    #pseudo-terminal {
+         flex-direction: column; /* Still a column for main sections */
+    }
+
+    #game-area-container {
+        display: flex;
+        flex-direction: row; /* Arrange map and user UI horizontally */
+        flex-grow: 1; /* Allow game area to grow vertically on widescreen */
+    }
+
+    #map-area {
+        /* Widescreen specific map styles */
+        width: 60%; /* Map takes 60% width */
+        flex-grow: 0; /* Don't let it grow beyond 60% */
+        font-size: 1.4vw; /* Scale font size with viewport width */
+         margin-right: 10px; /* Space between map and user UI */
+         margin-bottom: 0; /* Remove bottom margin on widescreen */
+    }
+
+    #user-ui {
+        /* Widescreen specific user UI styles */
+        width: 40%; /* User UI takes 40% width */
+        flex-grow: 0; /* Don't let it grow beyond 40% */
+        margin-top: 0; /* Remove top margin on widescreen */
+    }
+
+    #terminalOutput {
+        /* Widescreen specific terminal output styles */
+        flex-grow: 1; /* Allow output to grow vertically on widescreen */
+    }
 }
