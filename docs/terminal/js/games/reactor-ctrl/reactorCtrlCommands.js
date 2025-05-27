@@ -1,5 +1,5 @@
-import { appendTerminalOutput } from '../../ui.js';
-import { gameState} from './reactorCtrlGameState.js'; // Import gameState
+import { appendTerminalOutput, displayMap } from '../../ui.js';
+import { gameState } from './reactorCtrlGameState.js'; // Import gameState
 import {
     handleGo,
     handleLook,
@@ -28,7 +28,8 @@ import {
     showPlayerStatus,
     showSectorStatus,
     showRoomStatus,
-    capitalize,
+    capitalize, // This seems unused here, maybe remove?
+
     flushVentilation,
     gameLoop,
     handleToggleSetting
@@ -39,8 +40,10 @@ import {
     createLocation,
     markerToLocationKey,
     locationKeyToMarker,
-    adjacencyMatrix,
-    locations
+    adjacencyMatrix, // This seems unused here, maybe remove?
+
+    locations,
+    facilityMapString
   } from './reactorCtrlGameSettings.js';
 
 async function reactorCtrlProcessCommand(commandString) {
@@ -85,6 +88,18 @@ async function reactorCtrlProcessCommand(commandString) {
     if (gameState.awaitingExitConfirmation) {
         handleExitConfirmationResponse(commandString);
         return;
+    }
+
+    // Handle 'start' command specifically to initialize the game
+    if (cmdName === 'start' || cmdName === 's') {
+        appendTerminalOutput("Launching Reactor Control...");
+        gameState.currentScene = 'game';
+        gameState.lastUpdateTime = Date.now(); // Initialize last update time
+        appendTerminalOutput("Reactor Started in 3... 2... 1... Reactor Bolshoy Moshchnosti Kanalny at #### Site started. Awaiting next instructions."); // Example flavor text
+        appendTerminalOutput("Reactor Control System Initiated. Type 'help' for commands.");
+        gameLoop(); // Start the game loop
+        displayMap(gameState, { locations, facilityMapString: gameSettings.facilityMapString }); // Display initial map
+        return; // Exit the function after handling the start command
     }
 
     const handler = commandMap[cmdName];

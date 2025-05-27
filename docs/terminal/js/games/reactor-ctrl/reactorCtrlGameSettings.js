@@ -166,6 +166,7 @@ const musicEnabled = true;
 
 // === Exported Game Settings ===
 export {
+  locations,
   facilityMapString,
   createCamera,
   createDoor,
@@ -173,7 +174,8 @@ export {
   markerToLocationKey,
   locationKeyToMarker,
   adjacencyMatrix,
-  locations,
+  getExitsForLocation,
+  locationDescriptors,
   oil_consumption_rate,
   oil_leak_multiplier,
   shadowLookSanityDrain,

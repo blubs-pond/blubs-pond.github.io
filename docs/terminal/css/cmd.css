@@ -49,6 +49,20 @@
     padding: 0; /* Remove default padding */
 }
 
+#map-area {
+    /* Add a border to see the area it occupies */
+    border: 1px solid green;
+
+    /* Prevent it from being shrunk by flex-grow in other elements */
+    flex-shrink: 0;
+    
+    /* Add some margin for spacing */
+    margin-bottom: 10px;
+    white-space: pre;
+    overflow-y: auto;
+    overflow-y: visible;
+}
+
 /* Add a blinking cursor effect (optional) */
 #terminal-command-input {
     animation: blink-caret 1s step-end infinite;

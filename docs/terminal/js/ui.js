@@ -35,12 +35,14 @@ function appendOutput(text) {
 }
 
 function displayMap(gameState, gameSettings, state = 'default') {
+    console.log("displayMap gameSettings:", gameSettings);
     const mapArea = document.getElementById('map-area');
     if (!mapArea) {
         console.error("Map area not found!");
         appendOutput("Error: Map display area not found.");
         return;
     }
+ mapArea.style.display = 'block';
 
     if (typeof gameState === 'undefined' || typeof gameSettings.locations === 'undefined' || typeof gameSettings.facilityMapString === 'undefined') { // Added check for facilityMapString
         console.error("gameState or gameSettings not defined!");
@@ -81,39 +83,43 @@ function displayMap(gameState, gameSettings, state = 'default') {
     // --- State-dependent markers ---
     if (['failed', 'show'].includes(state)) {
         for (const id in gameState.failedDevices) {
+            console.log("Placing failed device marker:", id);
             placeMarker(gameState.failedDevices[id], 'X');
         }
     }
 
     if (state === 'players' || state === 'show') {
         for (const name in gameState.monsters) {
+            console.log("Checking monster for map display:", name);
             const pos = gameState.monsters[name]?.mapPosition;
             if (pos) placeMarker({ line: pos[0], column: pos[1] }, name[0].toUpperCase()); // Changed to use gameState.monsters and correct coordinate passing
         }
     }
-    
+
     if (state === 'show') {
         for (const id in gameState.tasks) {
+            console.log("Placing task marker:", id);
             placeMarker(gameState.tasks[id], '$');
         }
         for (const id in gameState.machines) { // Changed to use gameState.machines
+            console.log("Placing machine marker:", id);
             placeMarker(gameState.machines[id], '%');
         }
     }
 
     const finalMap = finalMapLines.map(line => line.join('')).join('\n');
-    console.log("Final map:", finalMap);
+    // console.log("Final map:", finalMap);
     mapArea.textContent = finalMap;
 }
 
 function updateGameUI(gameId) {
-    const mapArea = document.getElementById('map-area');
     const statBar = document.getElementById('stat-bar'); // Assuming stat-bar is the id for the status bar
+    const mapArea = document.getElementById('map-area');
 
     const displayStyle = (gameId === 'reactor-ctrl') ? 'block' : 'none';
 
-    if (mapArea) mapArea.style.display = displayStyle;
     if (statBar) statBar.style.display = displayStyle;
+    if (mapArea) mapArea.style.display = displayStyle;
 }
 
 function updateUI() {

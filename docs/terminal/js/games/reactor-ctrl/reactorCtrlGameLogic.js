@@ -30,9 +30,9 @@ function initializeSettings() {
 
 function gameLoop(timestamp) {
     if (!lastUpdateTime) lastUpdateTime = timestamp;
-    const dt = (timestamp - lastUpdateTime) / 1000;
+    let dt = (timestamp - lastUpdateTime) / 1000;
     lastUpdateTime = timestamp;
- displayGameStatus();
+    displayGameStatus();
     displayMap(gameState, { locations, facilityMapString });
 
     updateGameState(dt);

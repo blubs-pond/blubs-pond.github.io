@@ -133,7 +133,7 @@ function handleGameReactor(args) {
     } else {
         currentGame = 'reactor';
         appendTerminalOutput("Launching Reactor Control...");
-        startReactorGame();
+        startReactorGame(appendTerminalOutput);
     }
 }
 
