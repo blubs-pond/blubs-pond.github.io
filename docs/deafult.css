@@ -43,3 +43,29 @@ body {
     width: 100%;
     height: 100%;
 }
+
+/* Responsive adjustments for smaller screens */
+@media only screen and (max-width: 600px) {
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-link {
+        font-size: 14px; /* Adjust font size for smaller screens */
+    }
+
+    /* Adjust header font size for smaller screens */
+    .w3-jumbo,
+    .w3-xxlarge,
+    header .w3-display-left span[style*="xx-large"] {
+        font-size: large !important; /* Adjust font size as needed */
+    }
+
+    #twitch-embed {
+        height: 300px; /* Adjust height for smaller screens */
+    }
+
+}

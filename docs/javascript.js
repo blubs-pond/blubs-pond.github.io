@@ -70,4 +70,3 @@ function awa() {
         console.error('awa failed:', error);
       });
 }
-}
