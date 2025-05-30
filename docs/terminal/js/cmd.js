@@ -1,24 +1,12 @@
 import { appendTerminalOutput, appendTerminalSymbol, frog } from './ui.js';
-import { handleUserCommand, startReactorGame } from './games/reactor-ctrl/reactorCtrlMain.js'; // Import reactorCtrlProcessCommand
-import {
-    handlePwdCommand,
-    handleCdCommand,
-    handleLsCommand,
-    handleCatCommand,
-    handleTreeCommand,
-    printTree,
-    openCommand,
-    playCommand,
-    runCommand,
-    currentDir,
-    fileSystem
-} from './dir.js';
+import { handlePwdCommand, handleCdCommand, handleLsCommand, handleCatCommand, handleTreeCommand, printTree, openCommand, playCommand, runCommand, currentDir, fileSystem } from './dir.js';
+import * as r_ctrl from './games/reactor-ctrl/reactor-ctrl-module.js'; // Import reactor-ctrl module
 import { runTests } from './tests.js'; // Import runTests
 
 const commandHistory = [];
 let currentGame = null;
 let isDebug = false; // Variable to track debug mode state
-let isDevMode = false;
+let isDevMode = false; // Variable to track developer mode state
 
 const debugToggleElement = document.body; // Or document.getElementById('pseudo-terminal');
 
@@ -96,7 +84,7 @@ function processCommand(command) {
         'tree': handleTreeCommand,
         'cd': handleCdCommand,
         'pwd': handlePwdCommand,
-        'clear': clearTerminal,
+ 'clear': clearTerminal,
         'cls': clearTerminal,
         'echo': echoCommand,
         'cat': handleCatCommand,
@@ -108,8 +96,8 @@ function processCommand(command) {
         'run': runCommand,
         'play': playCommand,
         'open': openCommand,
- 'dev': handleDevCommand,
- 'debug': handleDebugCommand,
+ 'dev': handleDevCommand, // Developer mode toggle
+ 'debug': handleDebugCommand, // Debug mode toggle (requires dev mode)
         'exit': handleExitCommand
     };
 
@@ -124,7 +112,7 @@ function processCommand(command) {
             appendTerminalOutput("Type 'help' for a list of commands.");
         } else {
             // Pass the command to reactorCtrlMain.js for game-specific handling
-            handleUserCommand(trimmedCommand);
+            r_ctrl.handleUserCommand(trimmedCommand);
         }
     } else {
         appendTerminalOutput(`Unknown command: ${cmdName}`);
@@ -205,7 +193,7 @@ function handleGameReactor(args) {
     } else {
         currentGame = 'reactor';
         appendTerminalOutput("Launching Reactor Control...");
-        startReactorGame(appendTerminalOutput);
+        r_ctrl.startReactorGame(appendTerminalOutput);
     }
 }
 
@@ -285,11 +273,24 @@ export {
     currentGame,
     processCommand,
     handleGameReactor,
+    handleCdCommand,
+    handlePwdCommand,
+    handleLsCommand,
+    handleCatCommand,
+    handleTreeCommand,
+    handleDebugCommand,
+    handleDevCommand,
+    handleExitCommand,
     handleCmdHelpCommand,
     getDateTime,
     clearTerminal,
     echoCommand,
     catCommand,
     historyCommand,
-    frog
+    frog,
+    openCommand,
+    playCommand,
+    runCommand,
+    currentDir,
+    fileSystem
 };
