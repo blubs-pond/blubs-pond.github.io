@@ -1,4 +1,4 @@
-import { appendTerminalOutput } from '../ui.js';
+import { appendTerminalOutput } from './ui.js';
 
 function runTests() {
     appendTerminalOutput("Running basic tests...");
