@@ -13,10 +13,12 @@ import {
     currentDir,
     fileSystem
 } from './dir.js';
+import { runTests } from './tests.js'; // Import runTests
 
 const commandHistory = [];
 let currentGame = null;
 let isDebug = false; // Variable to track debug mode state
+let isDevMode = false;
 
 const debugToggleElement = document.body; // Or document.getElementById('pseudo-terminal');
 
@@ -106,7 +108,8 @@ function processCommand(command) {
         'run': runCommand,
         'play': playCommand,
         'open': openCommand,
-        'debug': debug,
+ 'dev': handleDevCommand,
+ 'debug': handleDebugCommand,
         'exit': handleExitCommand
     };
 
@@ -131,9 +134,16 @@ function processCommand(command) {
     updatePrompt();
 }
 
-function debug() {
-    // Parse arguments for debug view mode (-V, -H, -A)
-    const args = Array.from(arguments); // Get arguments passed to the function
+function handleDebugCommand(args) {
+    if (isDevMode) {
+        // If in developer mode, call the original debug logic
+        toggleDebugMode(args);
+    } else {
+        appendTerminalOutput("Developer mode is not active. Type 'dev' to activate.");
+    }
+}
+
+function toggleDebugMode(args) {
     const argument = args[0]; // The first argument
 
     // Toggle the isDebug state
@@ -145,6 +155,7 @@ function debug() {
     if (isDebug) {
         // If debug mode is turning ON
         console.log('Debug mode ON.');
+        appendTerminalOutput('Debug mode ON.');
 
         if (argument === '-V') {
             debugToggleElement.dataset.debugView = 'visible';
@@ -155,11 +166,14 @@ function debug() {
         } else if (argument === '-A') {
             debugToggleElement.dataset.debugView = 'all';
             console.log('Debug view: All UI');
+            appendTerminalOutput('Debug view: All UI');
         } else {
             // Default to -A if no valid argument provided
             debugToggleElement.dataset.debugView = 'all';
             console.log('Debug view: All UI (default)');
+            appendTerminalOutput('Debug view: All UI (default)');
         }
+
 
         // Notify the current game (if any) that debug mode is active
         if (currentGame !== null) {
@@ -170,6 +184,7 @@ function debug() {
     } else {
         // If debug mode is turning OFF
         console.log('Debug mode OFF.');
+        appendTerminalOutput('Debug mode OFF.');
         // Remove the debug view data attribute
         delete debugToggleElement.dataset.debugView;
 
@@ -254,6 +269,17 @@ function historyCommand(args) {
     });
 }
 
+// Empty function for the dev command for now
+function handleDevCommand() {
+    isDevMode = !isDevMode;
+    if (isDevMode) {
+        appendTerminalOutput("Developer mode ON.");
+        runTests(); // Run tests when developer mode is activated
+    } else {
+        appendTerminalOutput("Developer mode OFF.");
+    }
+
+}
 export {
     commandHistory,
     currentGame,
