@@ -1,5 +1,5 @@
 let gameState = {
-    currentScene: 'start', // Start at a 'start' scene
+    currentScene: "start", // Start at a 'start' scene
     gameTime: { hours: 0, minutes: 0 },
     lastUpdateTime: 0, // Time of the last game update timestamp
     gameTimeInMinutesReal: 0, // Accumulates real time passed in minutes
@@ -14,7 +14,8 @@ let gameState = {
     player: {
         location: "CR", // Player's current location key
         inventory: [], // Array of item strings
-        stats: { // Player stats (moved from playerStats)
+        stats: {
+            // Player stats (moved from playerStats)
             hunger: 0, // 0-100, 100 is starving
             insomnia: 0, // 0-100, 100 is critical insomnia
             sanity: 100 // 0-100, 0 is critical
@@ -28,9 +29,8 @@ let gameState = {
         hidingAbuseCounter: 0.0, // Moved from playerStats
         isHiding: false, // Moved from playerStats
         experimentEntryTimer: -1.0, // Moved from playerStats
-        doorBeingHeld: "none", // Moved from playerStats
+        doorBeingHeld: "none" // Moved from playerStats
     },
-
 
     // Reactor-related variables
     reactorState: {
@@ -50,13 +50,13 @@ let gameState = {
 
     machines: {}, // Added machines object
     tasks: {
-        "repairReactor": {
+        repairReactor: {
             description: "Repair the primary reactor coolant pump.",
             location: "ReactorRoom",
             requiredItem: "wrench",
             isCompleted: false
         },
-        "restorePower": {
+        restorePower: {
             description: "Restore auxiliary power to the server room.",
             location: "ServerRoom",
             requiredAction: "flip_switch",
@@ -72,78 +72,77 @@ let gameState = {
 
     // Monster state
     monsters: {
-    "Template": {
-        location: null,
-        state: "dormant",
-        isNearPlayer: false,
-        isHostile: true,
-        canNoClip: false,
-        hp: 100,
-        target: null,
-        goal: [],
-        path: []
-    },
+        Template: {
+            location: null,
+            state: "dormant",
+            isNearPlayer: false,
+            isHostile: true,
+            canNoClip: false,
+            hp: 100,
+            target: null,
+            goal: [],
+            path: []
+        },
 
-    "Shadow": {
-        location: null,
-        state: "dormant",
-        isNearPlayer: false,
-        isHostile: true,
-        canNoClip: true,
-        hp: 100,
-        target: null,
-        goal: [],
-        path: []
-    },
+        Shadow: {
+            location: null,
+            state: "dormant",
+            isNearPlayer: false,
+            isHostile: true,
+            canNoClip: true,
+            hp: 100,
+            target: null,
+            goal: [],
+            path: []
+        },
 
-    "Hide": {
-        location: "BR",
-        state: "active",
-        isNearPlayer: false,
-        isHostile: false,
-        canNoClip: false,
-        hp: -1,
-        target: "BR",
-        goal: [],
-        path: []
-    },
+        Hide: {
+            location: "BR",
+            state: "active",
+            isNearPlayer: false,
+            isHostile: false,
+            canNoClip: false,
+            hp: -1,
+            target: "BR",
+            goal: [],
+            path: []
+        },
 
-    "Experiment": {
-        location: "LAB",
-        state: "dormant",
-        isNearPlayer: false,
-        isHostile: false,
-        canNoClip: false,
-        hp: 10000,
-        target: null,
-        goal: [],
-        path: []
-    },
+        Experiment: {
+            location: "LAB",
+            state: "dormant",
+            isNearPlayer: false,
+            isHostile: false,
+            canNoClip: false,
+            hp: 10000,
+            target: null,
+            goal: [],
+            path: []
+        },
 
-    "Abomination": {
-        location: null,
-        state: "active",
-        isNearPlayer: false,
-        isHostile: true,
-        canNoClip: false,
-        hp: 100,
-        target: null,
-        goal: [],
-        path: []
-    },
+        Abomination: {
+            location: null,
+            state: "active",
+            isNearPlayer: false,
+            isHostile: true,
+            canNoClip: false,
+            hp: 100,
+            target: null,
+            goal: [],
+            path: []
+        },
 
-    "Loss": {
-        location: null,
-        state: "active",
-        isNearPlayer: false,
-        isHostile: false,
-        canNoClip: true,
-        hp: 100,
-        target: null,
-        goal: [],
-        path: []
-    }
-
+        Loss: {
+            location: null,
+            state: "active",
+            isNearPlayer: false,
+            isHostile: false,
+            canNoClip: true,
+            hp: 100,
+            target: null,
+            goal: [],
+            path: []
+        }
     },
 
     // Reactor-related parameters for temperature and pump management
@@ -158,8 +157,8 @@ let gameState = {
 
     // Door states
     doorState: {
-        door1: { state: 'closed', durability: 100 },
-        door2: { state: 'closed', durability: 100 }
+        door1: { state: "closed", durability: 100 },
+        door2: { state: "closed", durability: 100 }
     },
 
     // Inventory items
@@ -181,11 +180,10 @@ let gameState = {
     // experimentEntryTimer: -1.0, // -1.0 if not in room
     // doorBeingHeld: "none", // Tracks which door is being held ('door1', 'door2', or 'none')
 
-
     // Camera system
     cameraState: {
-        "camera1": { isDistorted: false },
-        "camera2": { isDistorted: false }
+        camera1: { isDistorted: false },
+        camera2: { isDistorted: false }
     },
     shadowVisible: false, // Track if the Shadow is currently visible on a camera
 
@@ -194,25 +192,26 @@ let gameState = {
     recentHallwayMovement: false, // Track if there's been recent monster movement in hallways
 
     // Ventilation System
-    ventilationStatus: 'working', // 'working' or 'blocked'
+    ventilationStatus: "working", // 'working' or 'blocked'
     ventilationBlockageLevel: 0, // 0-100, 100 is fully blocked
     ventilationBlockedTimer: 0, // Tracks how long ventilation has been blocked
 
     // Control Archives and Panel Status
-    caPanelStatus: 'working', // 'working' or 'broken'
-    roomPanelStatus: { // Status for panels in specific rooms controlled by CA
-        'RR': 'working',
-        'CP': 'working',
-        'BW': 'working'
+    caPanelStatus: "working", // 'working' or 'broken'
+    roomPanelStatus: {
+        // Status for panels in specific rooms controlled by CA
+        RR: "working",
+        CP: "working",
+        BW: "working"
     },
     rebootAllCaCooldown: 0, // Cooldown timer for 'reboot ca all' command
-    rebootRoomCaProgress: { // Progress for individual room CA reboots
-        'RR': 0,
-        'CP': 0,
-        'BW': 0
+    rebootRoomCaProgress: {
+        // Progress for individual room CA reboots
+        RR: 0,
+        CP: 0,
+        BW: 0
     },
     criticalReactorTempIncreaseRate: 0 // Increased temperature rate when critical panels are broken
 };
-
 
 export { gameState };

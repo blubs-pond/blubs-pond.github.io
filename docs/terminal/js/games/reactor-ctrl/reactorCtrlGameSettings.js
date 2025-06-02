@@ -1,4 +1,4 @@
-import { handleInventory, parseMapString } from './reactorCtrlGameLogic.js';
+import { handleInventory, parseMapString } from "./reactorCtrlGameLogic.js";
 
 // Facility map as a template string
 const facilityMapString = `
@@ -44,25 +44,77 @@ const facilityMapString = `
 
 // === Helper Functions ===
 const createCamera = (mapMarker, description, location, batteryLife = 100, status = "active") => ({
-  mapMarker, description, location, batteryLife, status, isDistorted: false
+  mapMarker,
+  description,
+  location,
+  batteryLife,
+  status,
+  isDistorted: false
 });
 
 const createDoor = (location, exit, isOpen = true, durability = 100, isLocked = false) => ({
-  location, exit, isOpen, durability, isLocked
+  location,
+  exit,
+  isOpen,
+  durability,
+  isLocked
 });
 
-const createLocation = (friendlyName, description, mapMarker, exits, line, column, securityLevel = 1, hasCreature = false, hazardLevel = 1
-) => ({ // Added line and column to returned object
-  friendlyName, description, mapMarker, exits, line, column,
-  securityLevel, hasCreature, hazardLevel
+const createLocation = (
+  friendlyName,
+  description,
+  mapMarker,
+  exits,
+  line,
+  column,
+  securityLevel = 1,
+  hasCreature = false,
+  hazardLevel = 1
+) => ({
+  // Added line and column to returned object
+  friendlyName,
+  description,
+  mapMarker,
+  exits,
+  line,
+  column,
+  securityLevel,
+  hasCreature,
+  hazardLevel
 });
 
-const createPlayer = (hp = 500, ap = 5, currentLocation = "CR", inventory = [], held_r = null, held_l = null, stats = { hunger: 0, insomnia: 0, sanity: 100 }) => ({
-  hp, ap, currentLocation, inventory, held_r, held_l, stats
+const createPlayer = (
+  hp = 500,
+  ap = 5,
+  currentLocation = "CR",
+  inventory = [],
+  held_r = null,
+  held_l = null,
+  stats = { hunger: 0, insomnia: 0, sanity: 100 }
+) => ({
+  hp,
+  ap,
+  currentLocation,
+  inventory,
+  held_r,
+  held_l,
+  stats
 });
 
-const createItem = (max_durability = 1000, durability = 1000, is2handed = false, description = "", dph = 1, modifier = []) => ({
-  max_durability, durability, is2handed, description, dph, modifier
+const createItem = (
+  max_durability = 1000,
+  durability = 1000,
+  is2handed = false,
+  description = "",
+  dph = 1,
+  modifier = []
+) => ({
+  max_durability,
+  durability,
+  is2handed,
+  description,
+  dph,
+  modifier
 });
 
 const createMonster = {
@@ -76,10 +128,10 @@ const createMonster = {
   target: null,
   goal: [],
   path: []
-}
+};
 
 // === Facility Map ===
-const facilityMap = parseMapString(facilityMapString)
+const facilityMap = parseMapString(facilityMapString);
 
 // === Reverse Mapping Utilities ===
 const markerToLocationKey = {
@@ -105,9 +157,7 @@ const markerToLocationKey = {
   E: "HallwayE"
 };
 
-const locationKeyToMarker = Object.fromEntries(
-  Object.entries(markerToLocationKey).map(([k, v]) => [v, k])
-);
+const locationKeyToMarker = Object.fromEntries(Object.entries(markerToLocationKey).map(([k, v]) => [v, k]));
 
 // === Adjacency Matrix ===
 const adjacencyMatrix = {
@@ -133,11 +183,11 @@ const adjacencyMatrix = {
 };
 
 // === Generate Exits for a Location ===
-const getExitsForLocation = locKey =>
+const getExitsForLocation = (locKey) =>
   Object.fromEntries(
     (adjacencyMatrix[locationKeyToMarker[locKey]] ?? [])
-      .filter(marker => markerToLocationKey[marker])
-      .map(marker => [markerToLocationKey[marker], markerToLocationKey[marker]])
+      .filter((marker) => markerToLocationKey[marker])
+      .map((marker) => [markerToLocationKey[marker], markerToLocationKey[marker]])
   );
 
 // === Locations ===
@@ -165,7 +215,8 @@ const locationDescriptors = [
 ];
 
 const locations = Object.fromEntries(
-  locationDescriptors.map(([key, name, marker, line, column, secLvl, creature, hazard]) => [ // Destructure line and column
+  locationDescriptors.map(([key, name, marker, line, column, secLvl, creature, hazard]) => [
+    // Destructure line and column
     key,
     createLocation(
       name,
