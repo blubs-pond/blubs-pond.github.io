@@ -1,6 +1,6 @@
 import { appendTerminalOutput, appendTerminalSymbol, frog } from './ui.js';
 import { handlePwdCommand, handleCdCommand, handleLsCommand, handleCatCommand, handleTreeCommand, printTree, openCommand, playCommand, runCommand, currentDir, fileSystem } from './dir.js';
-import * as r_ctrl from './games/reactor-ctrl/reactor-ctrl-module.js'; // Import reactor-ctrl module
+import * as r_ctrl from '../../r-ctrl/r-ctrl1.0/reactor-ctrl-module.js'; // Import reactor-ctrl module
 // import { runTests } from './tests.js'; // Import runTests
 
 const commandHistory = [];
