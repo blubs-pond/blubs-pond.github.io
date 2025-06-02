@@ -1,7 +1,7 @@
 import { appendTerminalOutput, appendTerminalSymbol, frog } from './ui.js';
 import { handlePwdCommand, handleCdCommand, handleLsCommand, handleCatCommand, handleTreeCommand, printTree, openCommand, playCommand, runCommand, currentDir, fileSystem } from './dir.js';
 import * as r_ctrl from './games/reactor-ctrl/reactor-ctrl-module.js'; // Import reactor-ctrl module
-import { runTests } from './tests.js'; // Import runTests
+// import { runTests } from './tests.js'; // Import runTests
 
 const commandHistory = [];
 let currentGame = null;
@@ -84,7 +84,7 @@ function processCommand(command) {
         'tree': handleTreeCommand,
         'cd': handleCdCommand,
         'pwd': handlePwdCommand,
- 'clear': clearTerminal,
+        'clear': clearTerminal,
         'cls': clearTerminal,
         'echo': echoCommand,
         'cat': handleCatCommand,
@@ -96,8 +96,8 @@ function processCommand(command) {
         'run': runCommand,
         'play': playCommand,
         'open': openCommand,
- 'dev': handleDevCommand, // Developer mode toggle
- 'debug': handleDebugCommand, // Debug mode toggle (requires dev mode)
+        'dev': handleDevCommand, // Developer mode toggle
+        'debug': handleDebugCommand, // Debug mode toggle (requires dev mode)
         'exit': handleExitCommand
     };
 
@@ -262,7 +262,7 @@ function handleDevCommand() {
     isDevMode = !isDevMode;
     if (isDevMode) {
         appendTerminalOutput("Developer mode ON.");
-        runTests(); // Run tests when developer mode is activated
+        // runTests(); // Run tests when developer mode is activated
     } else {
         appendTerminalOutput("Developer mode OFF.");
     }

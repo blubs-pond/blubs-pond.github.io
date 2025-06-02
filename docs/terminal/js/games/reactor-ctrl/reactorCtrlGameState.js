@@ -12,7 +12,7 @@ let gameState = {
 
     // Player object to hold player-specific state
     player: {
-        location: "ControlRoom", // Player's current location key
+        location: "CR", // Player's current location key
         inventory: [], // Array of item strings
         stats: { // Player stats (moved from playerStats)
             hunger: 0, // 0-100, 100 is starving
@@ -71,9 +71,79 @@ let gameState = {
     },
 
     // Monster state
-    monsterState: [],
     monsters: {
-        "Shadow": { location: null, state: "dormant", isNearPlayer: false } // Initial state for Shadow
+    "Template": {
+        location: null,
+        state: "dormant",
+        isNearPlayer: false,
+        isHostile: true,
+        canNoClip: false,
+        hp: 100,
+        target: null,
+        goal: [],
+        path: []
+    },
+
+    "Shadow": {
+        location: null,
+        state: "dormant",
+        isNearPlayer: false,
+        isHostile: true,
+        canNoClip: true,
+        hp: 100,
+        target: null,
+        goal: [],
+        path: []
+    },
+
+    "Hide": {
+        location: "BR",
+        state: "active",
+        isNearPlayer: false,
+        isHostile: false,
+        canNoClip: false,
+        hp: -1,
+        target: "BR",
+        goal: [],
+        path: []
+    },
+
+    "Experiment": {
+        location: "LAB",
+        state: "dormant",
+        isNearPlayer: false,
+        isHostile: false,
+        canNoClip: false,
+        hp: 10000,
+        target: null,
+        goal: [],
+        path: []
+    },
+
+    "Abomination": {
+        location: null,
+        state: "active",
+        isNearPlayer: false,
+        isHostile: true,
+        canNoClip: false,
+        hp: 100,
+        target: null,
+        goal: [],
+        path: []
+    },
+
+    "Loss": {
+        location: null,
+        state: "active",
+        isNearPlayer: false,
+        isHostile: false,
+        canNoClip: true,
+        hp: 100,
+        target: null,
+        goal: [],
+        path: []
+    }
+
     },
 
     // Reactor-related parameters for temperature and pump management
