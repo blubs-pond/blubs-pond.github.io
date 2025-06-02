@@ -4,12 +4,12 @@ This file outlines the tasks that need to be completed to rebuild and enhance th
 
 ## Core Structure
 
-*   Define initial game state in `gameState.js`.
-*   Define game settings and configurations in `gameSettings.js`.
-*   Implement core game loop and update functions in `gameLogic.js` (e.g., update time, handle phase transitions, update reactor temp, update ventilation, update generator oil, update control archives).
-*   Implement command logic in `commands.js` (e.g., go, look, stat, fix, reboot, flush, cam, settings, about, exit, peak, start).
-*   Implement UI update functions in `ui.js` (e.g., display map, update status displays).
-*   Integrate game logic and command processing in `main.js`.
+*   [x] Define initial game state in `gameState.js`.
+*   [x] Define game settings and configurations in `gameSettings.js`.
+*   [x] Implement core game loop and update functions in `gameLogic.js` (e.g., update time, handle phase transitions, update reactor temp, update ventilation, update generator oil, update control archives).
+*   [x] Implement command logic in `commands.js` (e.g., go, look, stat, fix, reboot, flush, cam, settings, about, exit, peak, start).
+*   [ ] Implement UI update functions in `ui.js` (e.g., display map, update status displays).
+*   [x] Integrate game logic and command processing in `main.js`.
 
 ## Game Features and Logic
 

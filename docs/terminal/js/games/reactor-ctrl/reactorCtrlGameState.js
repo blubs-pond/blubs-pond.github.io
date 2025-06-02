@@ -1,62 +1,118 @@
+/**
+ * @typedef {Object} GameState - Represents the overall state of the game.
+ * @property {string} currentScene - The current scene of the game.
+ * @property {Object} gameTime - The current game time.
+ * @property {number} gameTime.hours - The hour of the day (0-23).
+ * @property {number} gameTime.minutes - The minute of the hour (0-59).
+ * @property {number} lastUpdateTime - The timestamp of the last game update.
+ * @property {number} gameTimeInMinutesReal - Accumulated real time passed in minutes.
+ * @property {string} currentPhase - The current game phase (survival, fixing, rest_payment).
+ * @property {boolean} awaitingExitConfirmation - Flag to track if the game is awaiting exit confirmation.
+ * @property {number} playerMoney - The player's current money.
+ * @property {Array<string>} failedDevices - Array of device IDs that have failed.
+ * @property {Object} player - Object holding player-specific state.
+ * @property {string} player.location - Player's current location key.
+ * @property {Array<string>} player.inventory - Array of item strings.
+ * @property {Object} player.stats - Player stats.
+ * @property {number} player.stats.hunger - Hunger level (0-100).
+ * @property {number} player.stats.insomnia - Insomnia level (0-100).
+ * @property {number} player.stats.sanity - Sanity level (0-100).
+ * @property {number} player.hungerLevel - Player's hunger level.
+ * @property {number} player.insomniaLevel - Player's insomnia level.
+ * @property {number} player.caffeineEffectTimer - Timer for caffeine effect.
+ * @property {number} player.caffeineCrashTimer - Timer for caffeine crash.
+ * @property {boolean} player.caffeineOverdosed - Flag indicating caffeine overdose.
+ * @property {number} player.hidingAbuseCounter - Counter for hiding abuse.
+ * @property {boolean} player.isHiding - Flag indicating if the player is hiding.
+ * @property {number} player.experimentEntryTimer - Timer for experiment entry.
+ * @property {string} player.doorBeingHeld - Tracks which door is being held ('door1', 'door2', or 'none').
+ * @property {Object} reactorState - Reactor-related variables.
+ * @property {number} reactorState.reactor_temp - Temperature of the reactor.
+ * @property {number} reactorState.reactor_pressure - Pressure of the reactor.
+ * @property {number} reactorState.coolant_level - Coolant level of the reactor.
+ * @property {number} reactorState.radiation_level - Radiation level of the reactor.
+ * @property {number} reactorState.reactor_power_output - Power output of the reactor.
+ * @property {number} reactorState.stability - Stability of the reactor (percentage).
+ * @property {Object} machines - Object containing machine states.
+ * @property {Object} tasks - Object containing task descriptions and completion status.
+ * @property {Object} generatorState - Generator-related states.
+ * @property {number} generatorState.power - Power level of the generator.
+ * @property {number} generatorState.fuel - Fuel level of the generator.
+ * @property {Object} monsters - Object containing monster states.
+ * @property {number} backup_generator_oil - Backup generator oil level.
+ * @property {number} pump_speed - Pump speed (0-100).
+ * @property {number} temp_increase_rate - Base rate temperature increases.
+ * @property {number} temp_cool_rate_multiplier - How much pump speed affects cooling.
+ * @property {number} temp_meltdown_threshold - Temperature for meltdown.
+ * @property {number} temp_power_cutout_threshold - Temperature for power cutout.
+ * @property {number} temp_core_shutdown_overspeed_threshold - Temp above which high speed is safe.
+ * @property {number} pump_speed_overspeed_threshold - Pump speed causing shutdown at low temp.
+ * @property {Object} doorState - Door states.
+ * @property {number} oilCans - Number of oil cans in inventory.
+ * @property {number} lubricantKits - Number of lubricant kits in inventory.
+ * @property {number} rations - Number of rations in inventory.
+ * @property {number} coffeeTea - Number of coffee/tea items in inventory.
+ * @property {number} repairToolDurability - Durability of the repair tool.
+ * @property {Object} cameraState - Camera system states.
+ * @property {boolean} shadowVisible - Track if the Shadow is currently visible on a camera.
+ * @property {Object} gameFlags - Object to store boolean flags.
+ * @property {boolean} recentHallwayMovement - Track if there's been recent monster movement in hallways.
+ * @property {string} ventilationStatus - Ventilation system status ('working' or 'blocked').
+ * @property {number} ventilationBlockageLevel - Ventilation blockage level (0-100).
+ * @property {number} ventilationBlockedTimer - Tracks how long ventilation has been blocked.
+ * @property {string} caPanelStatus - Control Archives panel status ('working' or 'broken').
+ * @property {Object} roomPanelStatus - Status for panels in specific rooms controlled by CA.
+ * @property {number} rebootAllCaCooldown - Cooldown timer for 'reboot ca all' command.
+ * @property {Object} rebootRoomCaProgress - Progress for individual room CA reboots.
+ * @property {number} criticalReactorTempIncreaseRate - Increased temperature rate when critical panels are broken.
+ */
 let gameState = {
-    currentScene: "start", // Start at a 'start' scene
+    currentScene: 'start',
     gameTime: { hours: 0, minutes: 0 },
-    lastUpdateTime: 0, // Time of the last game update timestamp
-    gameTimeInMinutesReal: 0, // Accumulates real time passed in minutes
-    currentPhase: "survival", // Current game phase (survival, fixing, rest_payment)
-    awaitingExitConfirmation: false, // Flag to track if the game is awaiting exit confirmation
-    // playerInventory: [], // Moved to player object
-    // playerLocation: "ControlRoom", // Moved to player object
-    playerMoney: 1000, // Starting money
-    failedDevices: [], // Array of device IDs that have failed
+    lastUpdateTime: 0,
+    gameTimeInMinutesReal: 0,
+    currentPhase: "survival",
+    awaitingExitConfirmation: false,
+    playerMoney: 1000,
+    failedDevices: [],
 
-    // Player object to hold player-specific state
     player: {
-        location: "CR", // Player's current location key
-        inventory: [], // Array of item strings
+        location: "CR",
+        inventory: [],
         stats: {
-            // Player stats (moved from playerStats)
-            hunger: 0, // 0-100, 100 is starving
-            insomnia: 0, // 0-100, 100 is critical insomnia
-            sanity: 100 // 0-100, 0 is critical
+            hunger: 0,
+            insomnia: 0,
+            sanity: 100
         },
-        // Add other player-specific properties here as needed
-        hungerLevel: 0.0, // Moved from playerStats
-        insomniaLevel: 0.0, // Moved from playerStats
-        caffeineEffectTimer: 0.0, // Moved from playerStats
-        caffeineCrashTimer: 0.0, // Moved from playerStats
-        caffeineOverdosed: false, // Moved from playerStats
-        hidingAbuseCounter: 0.0, // Moved from playerStats
-        isHiding: false, // Moved from playerStats
-        experimentEntryTimer: -1.0, // Moved from playerStats
-        doorBeingHeld: "none" // Moved from playerStats
+        hungerLevel: 0.0,
+        insomniaLevel: 0.0,
+        caffeineEffectTimer: 0.0,
+        caffeineCrashTimer: 0.0,
+        caffeineOverdosed: false,
+        hidingAbuseCounter: 0.0,
+        isHiding: false,
+        experimentEntryTimer: -1.0,
+        doorBeingHeld: "none",
     },
 
-    // Reactor-related variables
     reactorState: {
-        reactor_temp: 50.0, // Temperature
-        reactor_pressure: 10.0, // Pressure
-        coolant_level: 100.0, // Coolant level
-        radiation_level: 0.0, // Radiation level
-        reactor_power_output: 100.0, // Power Output
-        stability: 90 // Percentage
+        reactor_temp: 50.0,
+        reactor_pressure: 10.0,
+        coolant_level: 100.0,
+        radiation_level: 0.0,
+        reactor_power_output: 100.0,
+        stability: 90
     },
 
-    // playerStats: { // Removed as stats are now in the player object
-    //     hunger: 0, // 0-100, 100 is starving
-    //     insomnia: 0, // 0-100, 100 is critical insomnia
-    //     sanity: 100 // 0-100, 0 is critical
-    // },
-
-    machines: {}, // Added machines object
+    machines: {},
     tasks: {
-        repairReactor: {
+        "repairReactor": {
             description: "Repair the primary reactor coolant pump.",
             location: "ReactorRoom",
             requiredItem: "wrench",
             isCompleted: false
         },
-        restorePower: {
+        "restorePower": {
             description: "Restore auxiliary power to the server room.",
             location: "ServerRoom",
             requiredAction: "flip_switch",
@@ -64,15 +120,13 @@ let gameState = {
         }
     },
 
-    // Generator and pump-related states
     generatorState: {
         power: 0,
         fuel: 100
     },
 
-    // Monster state
     monsters: {
-        Template: {
+        "Template": {
             location: null,
             state: "dormant",
             isNearPlayer: false,
@@ -84,7 +138,7 @@ let gameState = {
             path: []
         },
 
-        Shadow: {
+        "Shadow": {
             location: null,
             state: "dormant",
             isNearPlayer: false,
@@ -96,7 +150,7 @@ let gameState = {
             path: []
         },
 
-        Hide: {
+        "Hide": {
             location: "BR",
             state: "active",
             isNearPlayer: false,
@@ -108,7 +162,7 @@ let gameState = {
             path: []
         },
 
-        Experiment: {
+        "Experiment": {
             location: "LAB",
             state: "dormant",
             isNearPlayer: false,
@@ -120,7 +174,7 @@ let gameState = {
             path: []
         },
 
-        Abomination: {
+        "Abomination": {
             location: null,
             state: "active",
             isNearPlayer: false,
@@ -132,7 +186,7 @@ let gameState = {
             path: []
         },
 
-        Loss: {
+        "Loss": {
             location: null,
             state: "active",
             isNearPlayer: false,
@@ -143,75 +197,55 @@ let gameState = {
             goal: [],
             path: []
         }
+
     },
 
-    // Reactor-related parameters for temperature and pump management
-    backup_generator_oil: 100.0, // Backup generator oil level
-    pump_speed: 50, // Pump speed (0-100)
-    temp_increase_rate: 0.1, // Base rate temperature increases
-    temp_cool_rate_multiplier: 0.05, // How much pump speed affects cooling
-    temp_meltdown_threshold: 200.0, // Temperature for meltdown
-    temp_power_cutout_threshold: 20.0, // Temperature for power cutout
-    temp_core_shutdown_overspeed_threshold: 80.0, // Temp above which high speed is safe
-    pump_speed_overspeed_threshold: 80, // Pump speed causing shutdown at low temp
+    backup_generator_oil: 100.0,
+    pump_speed: 50,
+    temp_increase_rate: 0.1,
+    temp_cool_rate_multiplier: 0.05,
+    temp_meltdown_threshold: 200.0,
+    temp_power_cutout_threshold: 20.0,
+    temp_core_shutdown_overspeed_threshold: 80.0,
+    pump_speed_overspeed_threshold: 80,
 
-    // Door states
     doorState: {
-        door1: { state: "closed", durability: 100 },
-        door2: { state: "closed", durability: 100 }
+        door1: { state: 'closed', durability: 100 },
+        door2: { state: 'closed', durability: 100 }
     },
 
-    // Inventory items
     oilCans: 2,
     lubricantKits: 1,
-    rations: 0, // Assuming rations start at 0
-    coffeeTea: 0, // Assuming coffee/tea starts at 0
-    repairToolDurability: 100.0, // Starting repair tool durability
+    rations: 0,
+    coffeeTea: 0,
+    repairToolDurability: 100.0,
 
-    // Player-specific states - These are now moved INSIDE the player object
-    // hungerLevel: 0.0,
-    // insomniaLevel: 0.0,
-    // sanity: 100,
-    // caffeineEffectTimer: 0.0,
-    // caffeineCrashTimer: 0.0,
-    // caffeineOverdosed: false,
-    // hidingAbuseCounter: 0.0,
-    // isHiding: false,
-    // experimentEntryTimer: -1.0, // -1.0 if not in room
-    // doorBeingHeld: "none", // Tracks which door is being held ('door1', 'door2', or 'none')
-
-    // Camera system
     cameraState: {
-        camera1: { isDistorted: false },
-        camera2: { isDistorted: false }
+        "camera1": { isDistorted: false },
+        "camera2": { isDistorted: false }
     },
-    shadowVisible: false, // Track if the Shadow is currently visible on a camera
+    shadowVisible: false,
 
-    // Flags and states for specific conditions
-    gameFlags: {}, // Object to store boolean flags
-    recentHallwayMovement: false, // Track if there's been recent monster movement in hallways
+    gameFlags: {},
+    recentHallwayMovement: false,
 
-    // Ventilation System
-    ventilationStatus: "working", // 'working' or 'blocked'
-    ventilationBlockageLevel: 0, // 0-100, 100 is fully blocked
-    ventilationBlockedTimer: 0, // Tracks how long ventilation has been blocked
+    ventilationStatus: 'working',
+    ventilationBlockageLevel: 0,
+    ventilationBlockedTimer: 0,
 
-    // Control Archives and Panel Status
-    caPanelStatus: "working", // 'working' or 'broken'
+    caPanelStatus: 'working',
     roomPanelStatus: {
-        // Status for panels in specific rooms controlled by CA
-        RR: "working",
-        CP: "working",
-        BW: "working"
+        'RR': 'working',
+        'CP': 'working',
+        'BW': 'working'
     },
-    rebootAllCaCooldown: 0, // Cooldown timer for 'reboot ca all' command
+    rebootAllCaCooldown: 0,
     rebootRoomCaProgress: {
-        // Progress for individual room CA reboots
-        RR: 0,
-        CP: 0,
-        BW: 0
+        'RR': 0,
+        'CP': 0,
+        'BW': 0
     },
-    criticalReactorTempIncreaseRate: 0 // Increased temperature rate when critical panels are broken
+    criticalReactorTempIncreaseRate: 0
 };
 
 export { gameState };

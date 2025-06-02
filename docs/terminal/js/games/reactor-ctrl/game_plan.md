@@ -1,113 +1,107 @@
-# Ren'Py Reactor Control (FNAF-like) Game Plan
+# Reactor Control (Terminal-Based) Game Plan
 
-This document outlines the plan for developing a FNAF-like game in Ren'Py, blending elements of Iron Lung and a work simulation, set in an alternative Chernobyl universe.
+This document outlines the plan for developing a terminal-based game, blending elements of Iron Lung and a work simulation, set in an alternative Chernobyl universe.
 
 ## Core Concept and Setting
 
-*   **Concept:** Survive and manage a deteriorating nuclear reactor in a Chernobyl alternative universe while fending off mutated creatures that attempt to sabotage the operation. The reactor is on an inevitable path to meltdown; the goal is to last as long as possible against increasingly difficult odds.
-*   **Setting:** A claustrophobic and visually grim reactor control room. Multiple camera views will show different areas outside the control room where mutated creatures roam.
-*   **Art Style:** Dark, atmospheric, and gritty, drawing inspiration from the visual style of Iron Lung. Primarily uses static images for backgrounds and creature appearances.
+*   **Concept:** Survive and manage a deteriorating nuclear reactor facility under unusual circumstances. The reactor is on an inevitable path to meltdown; the goal is to last as long as possible against increasingly difficult odds. Players are a technician maintaining the facility.
+*   **Setting:** A text-based, terminal interface representing a claustrophobic reactor control room. The game relies on descriptive text and potentially ASCII art to convey the environment.
+*   **Art Style:** Primarily text-based, with potential use of ASCII art for visual representation of the reactor, creatures, and environment. Dark, atmospheric, and gritty descriptions will evoke a similar feel to Iron Lung.
 
-## Key Game Mechanics
+## Core Game Mechanics
 
 1.  **Reactor Management (Work Sim):**
-    *   **Functionality:** Monitor critical reactor parameters (e.g., temperature, pressure, coolant levels, radiation) displayed on UI elements.
-    *   **Interaction:** Use on-screen controls (buttons, sliders - simulated) to adjust parameters and counteract negative changes caused by time or creature actions.
+    *   **Functionality:** Monitor critical reactor parameters (e.g., temperature, pressure, coolant levels, radiation) displayed via the terminal.
+    *   **Interaction:** Use terminal commands to adjust parameters and counteract negative changes caused by time or external factors.  Commands like `set_pump_speed`, `restart_core`.
     *   **Deterioration:** Parameters naturally worsen over time, accelerating the meltdown process.
-2.  **Mutated Creature Mechanics (FNAF 1 Style Movement/Monitoring):**
-    *   **Movement:** Multiple mutated creatures move through predefined paths in areas viewable via cameras.
-    *   **Detection:** Player must use the camera system to track creature locations and predict their approach.
-    *   **Threats:** Creatures move towards the control room to directly attack the player or target specific reactor systems to sabotage them.
-3.  **Camera System (FNAF 1 Style):**
-    *   **Interface:** UI elements (buttons, map) to switch between different static camera views.
-    *   **Monitoring:** Display background images for each camera location and overlay creature images if a creature is present in that location.
-    *   **Limited Usage:** Potentially consumes power or has other limitations (e.g., distortion, delay).
-4.  **Door and Light Mechanics (FNAF 1 Style):**
-    *   **Functionality:** UI buttons to control doors and lights for adjacent areas or control room entrances.
-    *   **Defense:** Doors block creature entry but consume resources (power).
-    *   **Detection:** Lights briefly illuminate areas to check for creature presence, also consuming resources (power).
-5.  **Resource Management (Primarily Power, potentially others):**
-    *   **Power:** A core resource that constantly drains. Using lights, doors, and potentially some reactor controls accelerates power consumption. Running out of power is critical.
-    *   **Other Resources:** Could include coolant, repair parts, or other consumables needed for reactor maintenance.
-6.  **Meltdown Progression:**
+2.  **External Factors & Potential Creatures:**
+    *   **Threats:** System breakdowns potentially caused by external factors. An external threat (monsters, saboteurs) is intended to be the cause of some system breakdowns and add danger during the Survival phase. Their actions will interact with the facility systems and player survival.
+3.  **Backup Generator:**
+    *   **Functionality:** Provides power when the reactor is offline.
+    *   **Requirements:** Requires fuel (oil cans) and maintenance (lubricant kits, part replacement).
+    *   **Failure:** Can break down, especially after extended use or if parts are damaged/worn.
+4.  **System Breakdowns & Repair:**
+    *   **Occurrence:** Various parts of the facility (e.g., pipes, generator components) can break or be sabotaged.
+    *   **Repair:** Players use a repair tool (with durability) to fix them using the `repair` command. The Fixing Phase is the primary time for repairs using Action Points.
+5.  **Terminal Interface:**
+    *   **Primary Interaction:** The primary method of interaction for monitoring systems, controlling parameters, buying items, and receiving information/alerts.
+    *   **Commands:** Examples include `status`, `buy`, `use`, `repair`, `set_pump_speed`, `restart_core`, `help`, `look`, `go`, `inventory`, `examine`, `stat`.
+6.  **Survival Stats:**
+    *   **Hunger:**
+        *   Increases over time.
+        *   Reduced by consuming rations (`use rations`).
+        *   High hunger reduces Action Points in the Fixing Phase.
+    *   **Insomnia:**
+        *   Increases over time.
+        *   Reduced by using coffee/tea (`use coffee` or `use tea`) or resting (in the Rest phase).
+        *   High insomnia can cause visual/gameplay penalties.
+    *   **Sanity:**
+        *   Decreases due to certain events, high insomnia, or specific penalties.
+        *   Reaching zero sanity results in a game over (player goes insane).
+7.  **Resource Management:**
+    *   **Limited Resources:** Players must manage limited resources like oil cans, lubricant kits, rations, coffee/tea, money, and repair tool durability.
+8.  **Shop System:**
+    *   **Functionality:** Players can purchase resources and generator parts using money earned via the `buy` command.
+9.  **Ration Spoilage:**
+    *   **Mechanic:** Rations have a limited shelf life and will spoil over time (real-life or in-game minutes).
+    *   **Consequences:** Consuming spoiled rations could have negative effects on survival stats.
+10. **Caffeine Mechanic:**
+    *   **Functionality:** Coffee/tea reduces insomnia and provides a temporary alertness boost.
+11. **Caffeine Overdose:**
+    *   **Mechanic:** Using coffee/tea too frequently (consecutively) can lead to an overdose state.
+    *   **Consequences:** This causes in-game time dilation (time appears slower) and a reduction in sanity, alongside other potential penalties.
+12. **Wage System:**
+    *   **Functionality:** Players earn money based on the reactor's power output during the Rest and Payment Phase. This money is used to buy supplies.
+13. **Game Phases (Time-Based):**
+    *   **Survival Phase (00:00 - 06:00):** The most dangerous period. Focus on managing survival stats (hunger, insomnia, sanity). Random events and system failures are more likely. Real-time updates are crucial for stat degradation.
+    *   **Fixing Phase (06:00 - 13:00):** Time for maintenance and repairs. Player has a limited pool of Action Points (AP) to perform actions like repairing equipment. Hunger level negatively impacts the maximum available AP at the start of this phase. Less danger than the Survival phase.
+    *   **Rest and Payment Phase (13:00 - 00:00):** A relatively safe period for preparation and recovery. No major hostile events. Players receive their wage based on reactor performance. Allows for managing inventory and potentially recovering survival stats.
+14. **Meltdown Progression:**
     *   **Mechanism:** The game's progression is tied to the worsening state of the reactor parameters.
     *   **Sabotage Impact:** Creature actions directly and significantly worsen reactor parameters, accelerating the inevitable meltdown.
     *   **Game End:** The game ends when critical reactor parameters reach dangerous levels, resulting in a meltdown and an uncertain fate for the protagonist.
-7.  **Jump Scares:**
-    *   **Triggers:** Activated when a creature successfully reaches the player or a specific failure state is met.
-    *   **Execution:** Sudden, full-screen visual (image or short animation) accompanied by loud audio.
-8.  **Game Over Conditions:**
+15. **Game Over Conditions:**
     *   Reactor Meltdown (primary).
-    *   Creature successfully attacking the player.
+    *   Sanity Depletion (player goes insane).
 
-## Implementation Strategy (Using Ren'Py and Python)
+## JavaScript Implementation Structure
 
-*   **Core Logic:** Implement the majority of the game's mechanics (timers, creature AI movement, resource management, reactor parameter changes, win/loss conditions) using **Python** within `init python:` blocks and `python:` blocks in the Ren'Py script.
-*   **User Interface (UI):** Use **Ren'Py Screen Language** to create the control room interface, including:
-    *   Displaying reactor parameters.
-    *   Buttons for camera views, doors, lights, and reactor controls.
-    *   Resource meters (power).
-    *   Overlays for creature appearances on camera views.
-*   **Visuals and Audio:** Use standard Ren'Py statements (`image`, `scene`, `show`, `hide`, `play sound`, `play music`) to manage the display of static assets and playback audio.
-*   **Timing and Events:** Utilize `renpy.timeout()` for periodic events like power drain and creature movement ticks. Use Ren'Py labels and jumps to control game flow based on events and conditions.
+The game logic is structured across several JavaScript files:
+
+*   `reactorCtrlMain.js`: The main entry point and orchestrator of the game loop. Handles user input events and initiates the game.
+*   `reactorCtrlGameLogic.js`: Contains the core game update logic, including time progression, system state changes, and survival stat management.  Also includes command handlers.
+*   `reactorCtrlCommands.js`: Parses and processes player commands entered in the terminal, calling appropriate functions in `reactorCtrlGameLogic.js`.
+*   `reactorCtrlGameState.js`: Defines and manages the central `gameState` object, holding all dynamic information about the player, facility, and .
+*   `reactorCtrlGameSettings.js`: Stores static game data and configuration, such as location details, and game parameters.
+*   `../../ui.js`: Handles the terminal user interface, including displaying output and capturing player input.
 
 ## Development Phases
 
-1.  **Phase 1: Basic Structure and UI (Core Loop)**
-    *   Set up the Ren'Py project structure.
-    *   Create a basic control room screen with placeholders for key UI elements.
-    *   Implement a simple power variable and a timer to decrease it, displaying it on the UI.
-    *   Create a basic camera switching system between a few static backgrounds.
-2.  **Phase 2: Core Mechanics - Reactor and Creatures (Single)**
-    *   Implement basic Python variables for a couple of reactor parameters.
-    *   Add simple controls to affect these parameters.
-    *   Create Python logic for one creature with a basic path and timer-based movement.
-    *   Display the creature on camera views when it's in a visible location.
-3.  **Phase 3: Interaction and Consequences**
-    *   Implement door and light buttons and their visual changes.
-    *   Connect doors/lights to power consumption.
-    *   Implement basic creature interaction with doors (being blocked).
-    *   Add basic creature sabotage that affects a reactor parameter.
-4.  **Phase 4: Adding Complexity and Content**
-    *   Add more mutated creatures with different paths and behaviors.
-    *   Expand the reactor management with more parameters and interactions.
-    *   Implement different types of creature sabotage.
-    *   Create and integrate all necessary visual assets (backgrounds, creature states, jump scares).
-    *   Create and integrate audio assets (ambient, creature sounds, jump scare sounds).
-5.  **Phase 5: Game Over and Balancing**
-    *   Implement the meltdown game over condition based on reactor parameters.
-    *   Implement creature attack game over condition.
-    *   Implement jump scare triggers and execution.
-    *   Balance creature movement speeds, sabotage frequency, power consumption, and reactor parameter deterioration for desired difficulty.
+1.  **Phase 1: Core Mechanics and Terminal Interface**
+    *   Implement the core game loop and time progression.
+    *   Create the basic terminal interface for displaying information and accepting commands.
+    *   Implement the reactor parameter monitoring and basic deterioration.
+    *   Implement the survival stats (hunger, insomnia, sanity) and their basic degradation.
+2.  **Phase 2: Command Processing and Basic Interactions**
+    *   Implement the command parser and basic commands (`status`, `help`, `look`).
+    *   Implement the `set_pump_speed` command to control a reactor parameter.
+    *   Implement the `use` command for rations and coffee/tea.
+3.  **Phase 3: Resource Management and System Breakdowns**
+    *   Implement the resource management system (oil cans, lubricant kits, repair tool).
+    *   Implement the backup generator and its fuel/maintenance requirements.
+    *   Implement system breakdowns and the `repair` command.
+    *   Implement the shop system and the `buy` command.
+4.  **Phase 4: Game Phases and Wage System**
+    *   Implement the game phases (Survival, Fixing, Rest).
+    *   Implement the Action Point system for the Fixing phase.
+    *   Implement the wage system and its dependence on reactor performance.
+5.  **Phase 5: External Factors and Balancing**
+    *   Implement external factors that cause system breakdowns.
+    *   Balance the game difficulty by adjusting parameters such as resource costs, degradation rates, and breakdown frequency.
 6.  **Phase 6: Polish and Refinement**
-    *   Refine UI aesthetics and responsiveness.
-    *   Add visual effects and transitions.
-    *   Implement save/load functionality (if desired, though for this concept it might not be necessary if runs are short).
+    *   Refine the terminal interface and text descriptions.
+    *   Add ASCII art for visual elements.
+    *   Improve error handling and user feedback.
     *   Thoroughly test for bugs and gameplay issues.
 
-This plan provides a structured approach to building your game, starting with core mechanics and gradually adding complexity and content. Remember that iterative development and testing will be crucial for balancing the gameplay and ensuring everything works together smoothly.
-
-
-renpy
-screen game_ui():
-    # ... other UI elements ...
-
-    # Example button calling a door function
-    textbutton "Close Left Door":
-        xpos ... ypos ...
-        action Python("close_left_door()")
-
-    textbutton "Open Left Door":
-        xpos ... ypos ...
-        action Python("open_left_door()")
-
-    textbutton "Hold Left Door":
-        xpos ... ypos ...
-        action Python("hold_left_door()")
-
-    # Add buttons for the right door as well
-    textbutton "Close Right Door":
-        xpos ... ypos ...
-        action Python("close_right_door()")
-
-    # ... and so on for open_right_door and hold_right_door
+This plan provides a structured approach to building the game, starting with core mechanics and gradually adding complexity and content. Remember that iterative development and testing will be crucial for balancing the gameplay and ensuring everything works together smoothly.
