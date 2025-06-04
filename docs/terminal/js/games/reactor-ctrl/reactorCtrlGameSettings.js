@@ -3,7 +3,7 @@
  * This module defines the settings, constants, and data structures for the Reactor Control game.
  */
 
-import { parseMapString } from "./reactorCtrlGameLogic";
+import { parseMapString } from "./reactorCtrlGameLogic.js";
 
 /**
  * Facility map as a template string.
@@ -221,8 +221,7 @@ const adjacencyMatrix = {
  */
 const getExitsForLocation = locKey =>
     Object.fromEntries(
-        (adjacencyMatrix[locationKeyToMarker[locKey]] ?? [])
-            .filter(marker => markerToLocationKey[marker])
+        (adjacencyMatrix[locKey] ?? [])
             .map(marker => [markerToLocationKey[marker], markerToLocationKey[marker]])
     );
 
@@ -261,7 +260,7 @@ const locationDescriptors = [
  */
 const locations = Object.fromEntries(
     locationDescriptors.map(([key, name, marker, line, column, secLvl, creature, hazard]) => [
-        key,
+        marker,
         createLocation(
             name,
             `Description for ${name}.`,

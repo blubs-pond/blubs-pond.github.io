@@ -57,7 +57,6 @@ function initializeSettings() {
     updateGameUI('reactor-ctrl'); // Show game UI elements
 }
 
-
 // ==========================================================================
 // 2. MAIN GAME LOOP & CORE TIME/PHASE MANAGEMENT
 // ==========================================================================
@@ -239,8 +238,8 @@ function updateGame() {
 function handleMonsters() {
     for (const monsterName in gameState.monsters) {
         const monster = gameState.monsters[monsterName];
-        updateMonsterState(monster);
-        handleMonsterAction(monster);
+        updateMonsterState(monster, monsterName);
+        handleMonsterAction(monster, monsterName);
     }
 }
 
@@ -248,7 +247,7 @@ function handleMonsters() {
  * Updates the state of a monster.
  * @param {Object} monster - The monster object.
  */
-function updateMonsterState(monster) {
+function updateMonsterState(monster, monsterName) {
     // Placeholder logic
     if (monster.state === "dormant" && Math.random() < 0.01) {
         monster.state = "active";
@@ -260,7 +259,7 @@ function updateMonsterState(monster) {
  * Handles the action of a monster.
  * @param {Object} monster - The monster object.
  */
-function handleMonsterAction(monster) {
+function handleMonsterAction(monster, monsterName) {
     // Placeholder logic
     if (monster.isHostile && monster.state === "active") {
         // Example: Monster attacks the player
@@ -725,6 +724,28 @@ function parseMapString(mapString) {
  return {};
 }
 
+/**
+ * Initializes monster instances based on a configuration array and sets their initial locations.
+ * @param {Object} gameState - The current game state.
+ * @param {Object} locations - The locations data from game settings.
+ * @param {Array<Object>} monsterConfigs - An array of objects, each representing a monster instance with its initial attributes.
+ *                                         'location' can be a string key or null for random placement (excluding 'CR').
+ */
+function initializeMonsterLocations(gameState, locations, monsterConfigs) {
+    const possibleSpawnLocations = Object.keys(locations).filter(locKey => locKey !== "CR");
+    gameState.monsters = {}; // Clear existing monsters
+    monsterConfigs.forEach((config, index) => {
+        // Create a unique name for each monster instance
+        const monsterName = `${config.type}_${index}`;
+        // Create a basic monster object (you might want to extend this based on monster type)
+        const monster = { type: config.type, location: config.location, state: "dormant", isNearPlayer: false, isHostile: true, canNoClip: false, hp: 100, target: null, goal: [], path: [] };
+
+        if (monster.location === null) {
+            monster.location = possibleSpawnLocations[Math.floor(Math.random() * possibleSpawnLocations.length)];
+        }
+        gameState.monsters[monsterName] = monster;
+    });
+}
 // 7. EXPORTS (Preserved as original)
 // ==========================================================================
 export {
@@ -778,5 +799,6 @@ export {
     maybeMoveMonster,
     calculateCriticalTempIncreaseRate,
     handleHelp,
-    initializeSettings
+    initializeSettings,
+    initializeMonsterLocations // Export the new function
 };

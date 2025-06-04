@@ -56,7 +56,7 @@ function displayMap(gameState, gameSettings, state = 'default') {
         return;
     }
 
-    const mapLines = gameSettings.facilityMapString.split('\n');
+    const mapLines = gameSettings.facilityMapString.split('\n').map(line => line.trim());
     const finalMapLines = mapLines.map(line => line.split(''));
 
     const placeMarker = ({ line, column }, marker) => {

@@ -66,6 +66,8 @@
  * @property {Object} rebootRoomCaProgress - Progress for individual room CA reboots.
  * @property {number} criticalReactorTempIncreaseRate - Increased temperature rate when critical panels are broken.
  */
+import { locations } from "./reactorCtrlGameSettings.js";
+
 let gameState = {
     currentScene: 'start',
     gameTime: { hours: 0, minutes: 0 },
@@ -127,7 +129,6 @@ let gameState = {
 
     monsters: {
         "Template": {
-            location: null,
             state: "dormant",
             isNearPlayer: false,
             isHostile: true,
@@ -135,35 +136,22 @@ let gameState = {
             hp: 100,
             target: null,
             goal: [],
-            path: []
-        },
-
-        "Shadow": {
+            path: [],
             location: null,
+        },
+        "Shadow": {
             state: "dormant",
             isNearPlayer: false,
             isHostile: true,
             canNoClip: true,
             hp: 100,
             target: null,
-            goal: [],
-            path: []
+            goal: [], // Pathfinding goal (e.g., player location, specific room)
+            path: [], // Current path to goal
+            location: null, // Current location shorthand key
         },
-
         "Hide": {
             location: "BR",
-            state: "active",
-            isNearPlayer: false,
-            isHostile: false,
-            canNoClip: false,
-            hp: -1,
-            target: "BR",
-            goal: [],
-            path: []
-        },
-
-        "Experiment": {
-            location: "LAB",
             state: "dormant",
             isNearPlayer: false,
             isHostile: false,
@@ -172,8 +160,7 @@ let gameState = {
             target: null,
             goal: [],
             path: []
-        },
-
+    },
         "Abomination": {
             location: null,
             state: "active",
@@ -184,8 +171,7 @@ let gameState = {
             target: null,
             goal: [],
             path: []
-        },
-
+    },
         "Loss": {
             location: null,
             state: "active",
@@ -196,9 +182,8 @@ let gameState = {
             target: null,
             goal: [],
             path: []
-        }
-
-    },
+    }
+},
 
     backup_generator_oil: 100.0,
     pump_speed: 50,
@@ -248,4 +233,4 @@ let gameState = {
     criticalReactorTempIncreaseRate: 0
 };
 
-export { gameState };
+export { gameState};
