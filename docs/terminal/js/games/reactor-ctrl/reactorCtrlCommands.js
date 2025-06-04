@@ -1,4 +1,4 @@
-import { appendTerminalOutput, displayMap } from "../../terminal/js/ui.js";
+import { appendTerminalOutput, displayMap } from "../../ui.js";
 import { gameState } from "./reactorCtrlGameState.js"; // Import gameState
 import * as GameLogic from "./reactorCtrlGameLogic.js";
 import * as GameSettings from "./reactorCtrlGameSettings.js";

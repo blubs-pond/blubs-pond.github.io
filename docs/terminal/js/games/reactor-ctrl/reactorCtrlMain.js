@@ -2,11 +2,11 @@
 import { gameState } from './reactorCtrlGameState.js';
 import { reactorCtrlProcessCommand } from './reactorCtrlCommands.js';
 import { gameLoop } from './reactorCtrlGameLogic.js';
-import { displayMap } from '../../terminal/js/ui.js';
+import { displayMap } from '../../ui.js';
 import { locations, facilityMapString } from './reactorCtrlGameSettings.js';
 import * as GameLogic from "./reactorCtrlGameLogic.js";
 import * as GameSettings from "./reactorCtrlGameSettings.js";
-import { appendTerminalOutput } from '../../terminal/js/ui.js';
+import { appendTerminalOutput } from '../../ui.js';
 
 /**
  * Handles user commands entered in the terminal.

@@ -11,7 +11,7 @@ import {
     soundEnabled,
     musicEnabled
 } from './reactorCtrlGameSettings.js';
-import { appendTerminalOutput, displayMap, updateGameUI } from '../../terminal/js/ui.js';
+import { appendTerminalOutput, displayMap, updateGameUI } from '../../ui.js';
 
 /**
  * @module GameLogic
@@ -55,6 +55,38 @@ function initializeSettings() {
     settings.soundEnabled = soundEnabled;
     settings.musicEnabled = musicEnabled;
     updateGameUI('reactor-ctrl'); // Show game UI elements
+}
+
+// ==========================================================================
+// 6. UTILITY FUNCTIONS
+// ==========================================================================
+
+/**
+ * Gets the user-friendly name of a location.
+ * @param {string} locationCode - The location code.
+ * @returns {string} - The user-friendly name of the location.
+ */
+function getUserFriendlyLocationName(locationCode) {
+    return locations[locationCode]?.friendlyName || locationCode;
+}
+
+/**
+ * Capitalizes a string.
+ * @param {string} string - The string to capitalize.
+ * @returns {string} - The capitalized string.
+ */
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * Parses a map string.
+ * @param {string} mapString - The map string to parse.
+ * @returns {Object} - The parsed map.
+ */
+function parseMapString(mapString) {
+    // Placeholder logic
+ return {};
 }
 
 // ==========================================================================
@@ -591,19 +623,27 @@ function handleToggleSetting(settingName) {
 }
 
 /**
- * Handles the "clear" command.
+ * Handles the "upgrade" command.
+ * @param {string} component - The component to upgrade.
  */
-function handleClear() {
+function handleUpgrade(component) {
     // Placeholder logic
-    appendTerminalOutput("Clearing the terminal...");
+    appendTerminalOutput(`Upgrading ${component}...`);
 }
 
 /**
- * Handles the "about" command.
+ * Handles the "exit" command.
  */
-function handleAbout() {
-    appendTerminalOutput("Reactor Control: A text-based adventure game.");
-    appendTerminalOutput("Created by GitHub Copilot.");
+function handleExit() {
+    // Placeholder
+}
+
+/**
+ * Handles the exit confirmation response.
+ * @param {string} response - The user's response.
+ */
+function handleExitConfirmationResponse(response) {
+    // Placeholder
 }
 
 /**
@@ -616,46 +656,20 @@ function handleStart() {
 
 /**
  * Handles the "peak" command.
- */
+ */  
 function handlePeak() {
     // Placeholder logic
-    appendTerminalOutput("Peeking...");
+    appendTerminalOutput("Peak mode activated!");
 }
 
 /**
- * Handles the "exit" command.
+ * Handle the About Section
  */
-function handleExit() {
-    if (gameState.awaitingExitConfirmation) {
-        appendTerminalOutput("Please confirm you want to exit by typing 'yes' or 'no'.");
-        return;
-    }
-
-    appendTerminalOutput("Are you sure you want to exit? Type 'yes' to confirm or 'no' to cancel.");
-    gameState.awaitingExitConfirmation = true;
-}
-
-/**
- * Handles the exit confirmation response.
- * @param {string} response - The user's response.
- */
-function handleExitConfirmationResponse(response) {
-    gameState.awaitingExitConfirmation = false;
-    if (response.toLowerCase() === "yes") {
-        appendTerminalOutput("Exiting the game...");
-        gameState.game_over = true;
-    } else {
-        appendTerminalOutput("Exit cancelled.");
-    }
-}
-
-/**
- * Handles the "upgrade" command.
- * @param {string} component - The component to upgrade.
- */
-function handleUpgrade(component) {
-    // Placeholder logic
-    appendTerminalOutput(`Upgrading ${component}...`);
+function handleAbout() {
+    appendTerminalOutput(`
+        Created by CWP Studio & Blub's Moderators
+        Created exclusively for Blubby Blub Fish
+        `)
 }
 
 // ==========================================================================
@@ -710,39 +724,6 @@ function showRoomStatus(target) {
     appendTerminalOutput(`Room Status: ${target}`);
 }
 
-// ==========================================================================
-// 6. UTILITY FUNCTIONS
-// ==========================================================================
-
-/**
- * Gets the user-friendly name of a location.
- * @param {string} locationCode - The location code.
- * @returns {string} - The user-friendly name of the location.
- */
-function getUserFriendlyLocationName(locationCode) {
-    return locations[locationCode]?.friendlyName || locationCode;
-}
-
-/**
- * Capitalizes a string.
- * @param {string} string - The string to capitalize.
- * @returns {string} - The capitalized string.
- */
-function capitalize(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-/**
- * Parses a map string.
- * @param {string} mapString - The map string to parse.
- * @returns {Object} - The parsed map.
- */
-function parseMapString(mapString) {
-    // Placeholder logic
-    return {};
-}
-
-// ==========================================================================
 // 7. EXPORTS (Preserved as original)
 // ==========================================================================
 export {
@@ -782,7 +763,6 @@ export {
     handleStart,
     handlePeak,
     handleAbout,
-    handleClear,
     flushVentilation,
     setPumpSpeed,
     restartCore,
@@ -796,6 +776,6 @@ export {
     rebootCamera,
     maybeMoveMonster,
     calculateCriticalTempIncreaseRate,
-    handleHelp
-    // initializeSettings, // Added if it needs to be called from outside
+    handleHelp,
+    initializeSettings
 };
