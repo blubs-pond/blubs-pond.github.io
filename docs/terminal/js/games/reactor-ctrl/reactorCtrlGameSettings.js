@@ -3,6 +3,8 @@
  * This module defines the settings, constants, and data structures for the Reactor Control game.
  */
 
+import { parseMapString } from "./reactorCtrlGameLogic";
+
 /**
  * Facility map as a template string.
  * @type {string}

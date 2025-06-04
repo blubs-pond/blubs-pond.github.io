@@ -57,37 +57,6 @@ function initializeSettings() {
     updateGameUI('reactor-ctrl'); // Show game UI elements
 }
 
-// ==========================================================================
-// 6. UTILITY FUNCTIONS
-// ==========================================================================
-
-/**
- * Gets the user-friendly name of a location.
- * @param {string} locationCode - The location code.
- * @returns {string} - The user-friendly name of the location.
- */
-function getUserFriendlyLocationName(locationCode) {
-    return locations[locationCode]?.friendlyName || locationCode;
-}
-
-/**
- * Capitalizes a string.
- * @param {string} string - The string to capitalize.
- * @returns {string} - The capitalized string.
- */
-function capitalize(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-/**
- * Parses a map string.
- * @param {string} mapString - The map string to parse.
- * @returns {Object} - The parsed map.
- */
-function parseMapString(mapString) {
-    // Placeholder logic
- return {};
-}
 
 // ==========================================================================
 // 2. MAIN GAME LOOP & CORE TIME/PHASE MANAGEMENT
@@ -722,6 +691,38 @@ function showSectorStatus(target) {
 function showRoomStatus(target) {
     // Placeholder logic
     appendTerminalOutput(`Room Status: ${target}`);
+}
+
+// ==========================================================================
+// 6. UTILITY FUNCTIONS
+// ==========================================================================
+
+/**
+ * Gets the user-friendly name of a location.
+ * @param {string} locationCode - The location code.
+ * @returns {string} - The user-friendly name of the location.
+ */
+function getUserFriendlyLocationName(locationCode) {
+    return locations[locationCode]?.friendlyName || locationCode;
+}
+
+/**
+ * Capitalizes a string.
+ * @param {string} string - The string to capitalize.
+ * @returns {string} - The capitalized string.
+ */
+function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * Parses a map string.
+ * @param {string} mapString - The map string to parse.
+ * @returns {Object} - The parsed map.
+ */
+function parseMapString(mapString) {
+    // Placeholder logic
+ return {};
 }
 
 // 7. EXPORTS (Preserved as original)
