@@ -1,6 +1,6 @@
 /**
  * @module GameSettings
- * This module defines the settings, constants, and data structures for the Reactor Control game.
+ * @description This module defines the settings, constants, and data structures for the Reactor Control game.
  */
 
 import { parseMapString } from "./reactorCtrlGameLogic.js";
