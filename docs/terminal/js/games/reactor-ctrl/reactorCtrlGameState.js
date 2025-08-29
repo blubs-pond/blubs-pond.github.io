@@ -68,6 +68,7 @@
  */
 import { locations } from "./reactorCtrlGameSettings.js";
 
+
 let gameState = {
     currentScene: 'start',
     gameTime: { hours: 0, minutes: 0 },
@@ -137,7 +138,7 @@ let gameState = {
             target: null,
             goal: [],
             path: [],
-            location: null,
+            location: null
         },
         "Shadow": {
             state: "dormant",
@@ -148,7 +149,7 @@ let gameState = {
             target: null,
             goal: [], // Pathfinding goal (e.g., player location, specific room)
             path: [], // Current path to goal
-            location: null, // Current location shorthand key
+            location: null // Current location shorthand key
         },
         "Hide": {
             location: "BR",
