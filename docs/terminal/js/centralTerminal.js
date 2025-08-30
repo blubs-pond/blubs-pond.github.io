@@ -354,9 +354,6 @@ export class TerminalLib {
                 return;
             }
 
-            // --- DEBUGGING LINE ---
-            this.term.print(`DEBUG: Loading file with type '${file.type}' from path '${file.content}'`);
-
             switch (file.type) {
                 case 'text':
                     file.content.split('\n').forEach(line => this.term.print(line));
