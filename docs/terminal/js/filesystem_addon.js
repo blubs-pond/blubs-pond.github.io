@@ -1,74 +1,76 @@
 
 // =========================
 // filesystem_addon.js
-// Loads website-specific files and directories into the VirtualOS.
+// Loads the original file and directory structure from dir.js into the VirtualOS.
+// This version uses relative paths from cmd.html to ensure media is found.
 // =========================
 
 export function loadFileSystemAddon(vOS) {
-    // --- Create Website-Specific Directories ---
-    vOS.createDirectory('/pages');
-    vOS.createDirectory('/documents');
-    vOS.createDirectory('/pictures');
-    vOS.createDirectory('/pictures/fan-art');
-    vOS.createDirectory('/games');
+    // --- Create the directory structure ---
+    vOS.createDirectory('/C/Program Files/game/reactor-ctrl');
+    vOS.createDirectory('/C/Users/Blub/Homework');
+    vOS.createDirectory('/C/Users/CWPStudio');
+    vOS.createDirectory('/C/Users/ClassyDestroyer/Pictures');
+    vOS.createDirectory('/C/Users/Minty');
+    vOS.createDirectory('/C/Users/Rune');
+    vOS.createDirectory('/C/Users/Philo');
+    vOS.createDirectory('/D/Audio');
 
-    // --- Add Content Files ---
+    // --- Add files with their specific types and relative paths ---
 
-    // A readme file in the root
-    vOS.createFile('/readme.txt', `
-Welcome to Blub's Terminal!
+    // Reactor executable
+    vOS.createFile('/C/Program Files/game/reactor-ctrl/reactor.exe', 'reactor', 'exe');
 
-This is a simulated terminal environment running on my personal website.
-You can use BASH-like commands (ls, cd, cat, etc.) to explore the virtual file system.
+    // Blub's files
+    // Paths are relative to docs/terminal/cmd.html
+    vOS.createFile('/C/Users/Blub/Homework/secret.md', 'DO NOT OPEN 𓆏', 'text');
+    vOS.createFile('/C/Users/Blub/Homework/DoNotOpen.png', 'js/ref/Shiny_scared_blub.png', 'image');
+    vOS.createFile('/C/Users/Blub/Homework/TODO', `
+--- TODO ---
+Yearly Shower
 
-Try 'tree /' to see the whole directory structure.
-Try 'ls pages' to see available pages.
-Type 'open <page-name>' (e.g., 'open fan-art') to navigate to that page.
-`);
+Years   Status
+2020    Done
+2021    Done
+2022    Done
+2023    Pending
+2024    Pending
+2025    Not Started
+`, 'text');
 
-    // Page files - simple text representations of the main site pages
-    vOS.createFile('/pages/index.txt', 'The main page of the website. Contains the portal and latest updates.');
-    vOS.createFile('/pages/best-of-blub.txt', 'A collection of the best moments and highlights.');
-    vOS.createFile('/pages/fan-art.txt', 'A gallery of amazing fan art. Use 'ls /pictures/fan-art' to see the file list.');
-    vOS.createFile('/pages/commissions.txt', 'Information about my commissions. Use 'cat /documents/commissions-info.md' for pricing details.');
+    // ClassyDestroyer's files
+    vOS.createFile('/C/Users/ClassyDestroyer/Pictures/MnM.jpg', 'js/ref/MnM.jpg', 'image');
 
-    // Document files with more detailed content
-    vOS.createFile('/documents/commissions-info.md', `
-### Blub's Commissions Info
+    // README file
+    vOS.createFile('/C/README', `
+------------ Blubs Pond Terminal -------------
 
-**Pricing (USD)**
-*   Base price for a new render: $250
-*   Base price for a pre-made scene (YCH): $75
-*   Note: I can modify pre-made scenes for you within reason :3
+--------- About Blubs Pond Terminal ----------
+Started on 9 May 2025
 
-**Modifiers**
-*   If a license is required for your avatar's base model, 50% of the base cost will be added.
-*   Allowing the scene to be used for other people's renders gives a $50 discount.
+Created for twitch.tv/blubbyblubfish
+Created by CWP Studio & blubbyblubfish Mods
 
-To order, please fill out the ticket form. You can get a template with 'cat /documents/commission-ticket.md'.
-    `);
+=============================================
 
-    vOS.createFile('/documents/commission-ticket.md', `
---- Commission Ticket ---
+--- Contributors of Blubs Pond & Terminal ---
 
-**Fursona / Name:**
-**Discord UserName:**
+------------- Main Contributors -------------
+Commission Art      - Blubby Blub Fish
+Code & Moderating   - ClassyDestroyer
+Code & CLI + Game   - CWP Studio
+(1st) Fan Art       - Minty
 
-**Commission Type:** (New Render / Pre-made Scene)
-**Number of New Models (if applicable):**
-**I need a custom texture made (requires ref sheet):** (Yes/No)
-**Allow scene to be used for other people's renders (-$50):** (Yes/No)
+---------- Suggestion Contributors ----------
+"awa" button        - Rune
+Homework folder     - ClassyDestroyer
+bob the frog        - Blubby Blub Fish
+Blubs' TODO list    - Philo
+Terminal            - CWP Studio
+---------------------------------------------
+`, 'text');
 
-**Notes/Description:**
-`);
-
-    // Picture files - just file names for now
-    vOS.createFile('/pictures/fan-art/Minity_fanart.png', '');
-    vOS.createFile('/pictures/fan-art/Shiny_blub_by_Drakgaron.png', '');
-    vOS.createFile('/pictures/fan-art/Shiny_scared_blub_by_Drakgaron.png', '');
-    vOS.createFile('/pictures/JabulbaRender1.png', '');
-    
-    // --- Add Game Files ---
-    vOS.createFile('/games/reactor-ctrl.exe', 'Reactor Control Game Executable');
-
+    // Audio file
+    // Path is relative to docs/terminal/cmd.html, so we go up one level
+    vOS.createFile('/D/Audio/awa.wav', '../untitled.wav', 'audio');
 }
