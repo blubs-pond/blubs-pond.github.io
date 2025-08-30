@@ -45,28 +45,206 @@ export const map =`
 │             ├───────┤                                             │ │<4>│ │              │
 └─────────────┘       └─────────────────────────────────────────────┘ └───┘ └──────────────┘`;
 
+/**
+ * Locations preset
+ * @namespace loc
+ * @memberof module:reactor-ctrl
+ * @property {preset.room} CP Coolant Pump Station
+ * @property {preset.room} Vent Ventilation Systems
+ * @property {preset.room} LAB Laboratory
+ * @property {preset.room} PC Power Converter Room
+ * @property {preset.room} SF Spent Fuel Storage
+ * @property {preset.room} GR Generator Room
+ * @property {preset.room} RR Reactor Room
+ * @property {preset.room} CR Control Room
+ * @property {preset.room} DCR Decontamination Room
+ * @property {preset.room} TR Turbine Room
+ * @property {preset.room} SR Server Room
+ * @property {preset.room} BW Water Treatment Facility
+ * @property {preset.room} CA Control Archives
+ * @property {preset.room} ELE Electrical Switchyard
+ * @property {preset.hallway} A Hallway A
+ * @property {preset.hallway} B Hallway B
+ * @property {preset.hallway} C Hallway C
+ * @property {preset.hallway} D Hallway D
+ * @property {preset.hallway} E Hallway E
+ * @property {preset.hallway} DCR Decontamination Room
+ */
 export const loc = {
-    CP:     new preset.room("CoolantPumpStation",       "CP",   ["D"],              [0,0], [14,10]),
-    PC:     new preset.room("PowerConverterRoom",       "PC",   ["SF"],             [22,9], [30,17]),
-    SF:     new preset.room("SpentFuelStorage",         "SF",   ["RR", "PC"],       [0,0],  [0,0]),
-    RR:     new preset.room("ReactorRoom",              "RR",   ["TR", "SF","C"],   [0,0],  [0,0]),
-    TR:     new preset.room("TurbineRoom",              "TR",   ["RR"],             [0,0],  [0,0]),
-    BW:     new preset.room("WaterTreatmentFacility",   "BW",   ["E"],              [0,0],  [0,0]),
-    CA:     new preset.room("ControlArchives",          "CA",   ["E"],              [0,0],  [0,0]),
-    ELE:    new preset.room("ElectricalSwitchyard",     "ELE",  ["E"],              [0,0],  [0,0]),
-    SR:     new preset.room("ServerRoom",               "SR",   ["B"],              [0,0],  [0,0]),
-    CR:     new preset.room("ControlRoom",              "CR",   ["A", "B", "BU"],   [0,0],  [0,0]),
-    GR:     new preset.room("GeneratorRoom",            "GR",   ["A"],              [0,0],  [0,0]),
-    LAB:    new preset.room("Laboratory",               "LAB",  ["D", "DCR"],       [0,0],  [0,0]),
-    Vent:   new preset.room("VentilationSystems",       "Vent", ["D"],              [0,0],  [0,0]),
-    DCR:    new preset.room("DecontaminationRoom",      "DCR",  ["LAB", "BU"],      [0,0],  [0,0]),
-    BU:     new preset.room("Bunker",                   "BU",   ["DCR","CR"],       [0,0],  [0,0]),
-    A: new preset.hallway("HallwayA",   "A",    ["CR", "GR", "C"],              [0,0],  [0,0]),
-    B: new preset.hallway("HallwayB",   "B",    ["CR", "SR", "C"],              [0,0],  [0,0]),
-    C: new preset.hallway("HallwayC",   "C",    ["A", "B", "D", "E", "RR"],     [0,0],  [0,0]),
-    D: new preset.hallway("HallwayD",   "D",    ["C", "LAB", "Vent", "CP"],     [0,0],  [0,0]),
-    E: new preset.hallway("HallwayE",   "E",    ["C", "ELE", "CA", "BU"],       [0,0],  [0,0])
+    // Rooms
+    CP:     new preset.room(
+        "CoolantPumpStation",       
+        "CP",   
+        [0,0],      
+        [14,10],    
+        ["D"],                      
+        ["D","Vent"],              
+
+    ),      
+    Vent:   new preset.room(
+        "VentilationSystems",       
+        "Vent", 
+        [0,11],     
+        [14,17],    
+        ["D"],                      
+        ["D","CP","LAB"],          
+
+    ),          
+    LAB:    new preset.room(
+        "Laboratory",               
+        "LAB",  
+        [0,18],     
+        [14,36],    
+        ["D", "DCR"],               
+        ["D", "DCR"],              
+
+    ),
+    PC:     new preset.room(
+        "PowerConverterRoom",       
+        "PC",   
+        [22,0],     
+        [30,5],     
+        ["SF"],                     
+        ["SF"],                    
+
+    ),
+    SF:     new preset.room(
+        "SpentFuelStorage",         
+        "SF",   
+        [22,9],     
+        [30,17],    
+        ["RR", "PC"],               
+        ["RR", "PC"],              
+
+    ),
+    GR:     new preset.room(
+        "GeneratorRoom",            
+        "GR",   
+        [22,0],     
+        [30,31],    
+        ["A"],                      
+        ["A"],                     
+
+    ),
+    BU:     new preset.room(
+        "Bunker",                   
+        "BU",   
+        [22,0],     
+        [68,36],    
+        ["DCR","CR"],               
+        ["DCR","CR"],              
+
+    ),
+    RR:     new preset.room(
+        "ReactorRoom",              
+        "RR",   
+        [32,0],     
+        [58,14],    
+        ["TR", "SF","C"],           
+        ["TR", "SF","C"],          
+
+    ),
+    CR:     new preset.room(
+        "ControlRoom",              
+        "CR",   
+        [38,19],    
+        [52,30],    
+        ["A", "B", "BU"],           
+        ["A", "B", "BU"],          
+
+    ),
+    TR:     new preset.room(
+        "TurbineRoom",              
+        "TR",   
+        [60,0],     
+        [68,15],    
+        ["RR"],                     
+        ["RR"],                    
+
+    ),
+    SR:     new preset.room(
+        "ServerRoom",               
+        "SR",   
+        [60,19],    
+        [68,31],    
+        ["B"],                      
+        ["B"],                     
+
+    ),
+    BW:     new preset.room(
+        "WaterTreatmentFacility",   
+        "BW",   
+        [76,0],     
+        [91,11],    
+        ["E"],                      
+        ["E"],                     
+
+    ),
+    CA:     new preset.room(
+        "ControlArchives",          
+        "CA",   
+        [76,12],    
+        [91,23],    
+        ["E"],                      
+        ["E"],                     
+
+    ),
+    ELE:    new preset.room(
+        "ElectricalSwitchyard",     
+        "ELE",  
+        [76,24],    
+        [91,36],    
+        ["E"],                      
+        ["E"],                     
+
+    ),
+    // Hallways
+    A:  new preset.hallway( 
+        "HallwayA",                 
+        "A",    
+        [32,18],    
+        [36,31],    
+        ["CR", "GR", "C"],          
+        ["CR", "GR", "C"],         
+    ),
+    B:  new preset.hallway( 
+        "HallwayB",         
+        "B",    
+        [54,18],    
+        [58,31],    
+        ["CR", "SR", "C"],          
+        ["CR", "SR", "C"],         
+    ),
+    C:  new preset.hallway( 
+        "HallwayC",         
+        "C",    
+        [20,16],    
+        [70,18],    
+        ["A", "B", "D", "E", "RR"], 
+        ["A", "B", "D", "E", "RR"],),
+    D:  new preset.hallway( 
+        "HallwayD",         
+        "D",    
+        [16,0],     
+        [20,32],    
+        ["C", "LAB", "Vent", "CP"], 
+        ["C", "LAB", "Vent", "CP"],),
+    E:  new preset.hallway( 
+        "HallwayE",         
+        "E",    
+        [70,0],     
+        [74,36],    
+        ["C", "ELE", "CA", "BW"],   
+        ["C", "ELE", "CA", "BW"],  ),
+    DCR:new preset.hallway( 
+        "DecontaminationRoom",      
+        "DCR",  [14,33],    
+        [22,35],    
+        ["LAB", "BU"],              
+        ["LAB", "BU"],             
+    ),
 };
+
 
 
 // === setup ===

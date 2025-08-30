@@ -7,6 +7,16 @@ import * as persisted from './persisted.js';
 // ===== Class decoration =====
 
 // === obj item ===
+
+/**
+ * Base class for all things in the game
+ * @class thing
+ * @class item
+ * @class part
+ * @class fixture
+ * @class cam
+ * 
+ */
 export class thing{
     constructor(
         name = "_debug",
