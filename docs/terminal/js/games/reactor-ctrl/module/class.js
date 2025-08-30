@@ -42,9 +42,11 @@ export class part extends item {
         dmg = 0,
         maxLoad = 100,
         powerin = 0,
+        powerout = 0,
         lvl = 0,
-        isBroken = false,
-        isHaunted = false
+        isBLoken = false,
+        isHaunted = false,
+        subComponent = []
     ) {
         super(id);
         super(name);
@@ -53,9 +55,19 @@ export class part extends item {
         super(dmg);
         this.maxLoad = maxLoad;
         this.powerin = powerin;
+        this.powerout = powerout;
         this.lvl = lvl;
-        this.isBroken = isBroken;
+        this.isBLoken = isBLoken;
         this.isHaunted = isHaunted;
+        this.subComponent = subComponent;
+    }
+    reboot() {
+        if(this.isBLoken && this.duri != 0) {
+            this.isBLoken = false;
+        }
+    }
+    upgrade() {
+        this.lvl += 1;
     }
 }
 
@@ -63,58 +75,43 @@ export class fixture extends thing {
     constructor(
         name = "_debug",
         durability = 1000000000,
-        TL = (0,0),
-        BR = (0,0),
+        cord = [0,0],
         powerin = 0,
         powerout = 0,
         component = [
-            new part(1,"control panel", 1, 1000, 0, )
-        ]
+            new part(1,"control panel", 1, 1000, 0)
+        ],
+        isOn = true
     ) {
         super(name);
         super(durability);
-        this.TL = TL;
-        this.BR = BR;
-
+        this.cord = cord;
+        this.powerin = powerin;
+        this.powerout = powerout;
+        this.component = component;
+        this.isOn = isOn;
     }
 }
 
-// === monster ===
-export class monster{
+export class cam extends fixture {
     constructor(
-        id = 0,
-        state = "dormant",
-        isNearPlayer = false,
-        isHostile = true,
-        canNoClip = false,
-        hp = 100,
-        dmg = 1,
-        target = null,
-        goal = [],
-        path = [],
-        spawn = null,
-        location = null,
-        isImmune = {
-            holy_water:false,
-            hide:true,
-            physical:true
-        }
+        name = "cam",
+        durability = 100,
+        cord = [0,0],
+        powerin = 0,
+        powerout = 0,
+        component = [
+            new part(1,"control panel", 1, 1000, 0)
+        ],
+        isOn = true
     ) {
-        this.id = id;
-        this.state = state;
-        this.isNearPlayer = isNearPlayer;
-        this.isHostile = isHostile;
-        this.canNoClip = canNoClip;
-        this.hp = hp;
-        this.dmg = dmg;
-        this.target = target;
-        this.goal = goal;
-        this.path = path;
-        this.spawn = spawn;
-        this.location = location;
-        this.isImmune = isImmune;
-    }
-    move(location) {
+        super(name);
+        super(durability);
+        super(cord);
+        super(powerin);
+        super(powerout);
+        super(component);
+        super(isOn);
     }
 }
 
@@ -123,17 +120,23 @@ export class location{
     constructor(
         fullName,
         roomCode,
-        TL,
-        BR,
         adjacentTo,
-        connectedTo
+        connectedTo,
+        TR = [0,0],
+        BL = [0,0],
+        door = {
+            loc : [0,0]
+        },
+        camara = new cam()
     ) {
         this.fullName = fullName;
         this.roomCode = roomCode;
-        this.TL = TL;
-        this.BR = BR;
+        this.TR = TR;
+        this.BL = BL;
         this.adjacentTo = adjacentTo;
         this.connectedTo = connectedTo;
+        this.door = door;
+        this.cam = camara;
     }
 }
 
@@ -141,18 +144,23 @@ export class room extends location {
     constructor(
         fullName,
         roomCode,
-        TL,
-        BR,
+        TR,
+        BL,
         adjacentTo,
         connectedTo,
-
+        door,
+        cam,
+        poi
     ) {
         super(fullName);
         super(roomCode);
-        super(TL);
-        super(BR);
+        super(TR);
+        super(BL);
         super(adjacentTo);
         super(connectedTo);
+        super(door);
+        super(cam);
+        this.poi = poi;
     }
 }
 
@@ -160,18 +168,21 @@ export class hallway extends location {
     constructor(
         fullName,
         roomCode,
-        TL,
-        BR,
+        TR,
+        BL,
         adjacentTo,
         connectedTo,
-
+        door,
+        cam
     ) {
         super(fullName);
         super(roomCode);
-        super(TL);
-        super(BR);
+        super(TR);
+        super(BL);
         super(adjacentTo);
         super(connectedTo);
+        super(door);
+        super(cam);
     }
 }
 
@@ -183,6 +194,7 @@ export class player {
         loc =  persisted.loc.CR,
         inventory =  [],
         stats =  {
+            isAlive : true,
             hp : 1000,
             hunger :  0,
             insomnia :  0,
@@ -215,4 +227,76 @@ export class player {
     }
 }
 
+// === monster ===
+export class monster{
+    constructor(
+        id = 0,
+        state = 0,
+            // 0 = dormant
+            // 1 = roaming
+            // 2 = staking
+            // 3 = hunting
+            // 4 = searching
+            // 5 = haunting
+            // 6 = hiding
+            // 7 = seeking
+        isNearPlayer = false,
+        hostileLvl = 0,
+        canNoClip = false,
+        stats =  {
+            isAlive : true,
+            hp : 1000,
+            hunger :  0,
+            insomnia :  0,
+            sanity :  100
+        },
+        dps = {
+            physical : 1,
+            hunger : 0,
+            insomnia : 0,
+            sanity : 0
+        },
+        target = null,
+        goal = [],
+        spawn = null,
+        loc = new room("void","void",[],[]),
+        isImmune = {
+            holy_water:false,
+            hide:true,
+            physical:true
+        }
+    ) {
+        this.id = id;
+        this.state = state;
+        this.isNearPlayer = isNearPlayer;
+        this.hostileLvl = hostileLvl;
+        this.canNoClip = canNoClip;
+        this.stats = stats;
+        this.dps = dps;
+        this.target = target;
+        this.goal = goal;
+        this.path = [];
+        this.spawn = spawn;
+        this.loc = loc;
+        this.isImmune = isImmune;
+        this.spawntime = new Date.now() * 0.001;
+        this.alivelTimer = this.spawntime - persisted.setting.general.globalTimer;
+    }
+    move(location) {
+        if (this.state == (1 || 2 || 3 || 4 || 7)) {
+            if (this.canNoClip) {
+                this.loc = this.loc.adjacentTo.contains(location)? location : this.loc;
+            } else {
+                this.loc = this.loc.connectedTo.contains(location)? location : this.loc;
+            }
+        }
+    }
+    attack(target) {
+        this.target = target;
+        while(target.stats.isAlive && target.loc === this.loc) {
+        }
+    }
+    update() {
+    }
+}
 
