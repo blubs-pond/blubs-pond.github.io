@@ -1,0 +1,31 @@
+/* Styling for the game title */
+#game-title {
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    margin-bottom: 15px;
+    flex-shrink: 0; /* Prevent title from shrinking */
+}
+
+/* Styling for the stat bar */
+#stat-bar {
+    color: #00ff00;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    text-shadow: 0 0 3px #00ff00;
+    border-bottom: 1px dashed #00ff00; /* Separator line */
+    padding-bottom: 10px;
+    flex-shrink: 0; /* Prevent stat bar from shrinking */
+}
+
+/* Styling for the map area */
+#map-area {
+    color: #00ff00;
+    font-size: 0.8em; /* Smaller font for the map */
+    text-shadow: 0 0 3px #00ff00;
+    border: 1px solid green;
+    padding-bottom: 10px;
+    /* Allow map area to grow and enable vertical scrolling */
+    flex-grow: 1;
+    overflow-y: auto;
+}
