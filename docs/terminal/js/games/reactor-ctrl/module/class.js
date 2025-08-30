@@ -125,6 +125,32 @@ export class cam extends fixture {
     }
 }
 
+export class door extends fixture {
+    constructor(
+        name = "",
+        durability = 100,
+        cord = [0,0],
+        powerin = 0,
+        powerout = 0,
+        component = [
+            new part(1,"control panel", 1, 1000, 0)
+        ],
+        isOn = true,
+        islock = false,
+        isOpen = true
+    ) {
+        super(name);
+        super(durability);
+        super(cord);
+        super(powerin);
+        super(powerout);
+        super(component);
+        super(isOn);
+        this.islock = islock;
+        this.isOpen = isOpen;
+    }
+}
+
 // === location and structure ===
 export class location{
     constructor(
