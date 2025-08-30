@@ -2,7 +2,7 @@
 // =========================
 // filesystem_addon.js
 // Loads the original file and directory structure from dir.js into the VirtualOS.
-// This version uses relative paths from cmd.html to ensure media is found.
+// This version uses the correct relative paths for images based on the new file structure.
 // =========================
 
 export function loadFileSystemAddon(vOS) {
@@ -16,14 +16,14 @@ export function loadFileSystemAddon(vOS) {
     vOS.createDirectory('/C/Users/Philo');
     vOS.createDirectory('/D/Audio');
 
-    // --- Add files with their specific types and relative paths ---
+    // --- Add files with their specific types and corrected paths ---
 
     // Reactor executable
     vOS.createFile('/C/Program Files/game/reactor-ctrl/reactor.exe', 'reactor', 'exe');
 
     // Blub's files
-    // Paths are relative to docs/terminal/cmd.html
     vOS.createFile('/C/Users/Blub/Homework/secret.md', 'DO NOT OPEN 𓆏', 'text');
+    // Corrected path: relative from /terminal/index.html
     vOS.createFile('/C/Users/Blub/Homework/DoNotOpen.png', 'js/ref/Shiny_scared_blub.png', 'image');
     vOS.createFile('/C/Users/Blub/Homework/TODO', `
 --- TODO ---
@@ -39,6 +39,7 @@ Years   Status
 `, 'text');
 
     // ClassyDestroyer's files
+    // Corrected path: relative from /terminal/index.html
     vOS.createFile('/C/Users/ClassyDestroyer/Pictures/MnM.jpg', 'js/ref/MnM.jpg', 'image');
 
     // README file
@@ -70,7 +71,7 @@ Terminal            - CWP Studio
 ---------------------------------------------
 `, 'text');
 
-    // Audio file
-    // Path is relative to docs/terminal/cmd.html, so we go up one level
-    vOS.createFile('/D/Audio/awa.wav', '../untitled.wav', 'audio');
+    // Audio file path needs to go up from /docs/terminal/ to the root, then into /untitled.wav
+    // Let's assume untitled.wav is in the project root with docs. So we go up two levels.
+    vOS.createFile('/D/Audio/awa.wav', '../../untitled.wav', 'audio');
 }
