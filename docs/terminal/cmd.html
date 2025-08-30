@@ -1,93 +1,70 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Terminal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Linking the CSS files that define the terminal's appearance -->
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/cmd.css">
     <link rel="stylesheet" href="css/reactorCtrlStyle.css">
 </head>
 <body>
-
-    <!-- The main container for the entire terminal interface -->
     <div id="pseudo-terminal">
-
-        <!-- This area is for game-specific UI, like maps and status bars. Hidden by default. -->
         <div id="game-area-container" style="display: none;">
             <div id="stat-bar">
-                <!-- Game stats like time and money will be injected here by the UI logic -->
                 <p>Time: <span id="inGameTime">00:00</span> | Money: <span id="playerMoney">$0.00</span></p>
             </div>
-            <div id="map-area">
-                <!-- The game map will be rendered here -->
-            </div>
-            <div id="user-ui">
-                <!-- Other game UI elements can go here -->
-            </div>
+            <div id="map-area"></div>
+            <div id="user-ui"></div>
         </div>
-
-        <!-- The main terminal output area where command results are printed -->
         <div id="terminalOutput"></div>
-
-        <!-- The container for the command input line -->
         <div id="terminal-input-container">
-            <!-- The prompt symbol (e.g., '$') -->
             <span id="terminal-prompt">$</span>
-            <!-- The actual text input field for commands -->
             <input type="text" id="terminal-command-input" autocomplete="off" autofocus>
         </div>
-
     </div>
 
-    <!-- The main script that runs the terminal -->
     <script type="module">
-        // Import the necessary classes from our refactored JavaScript file
-        import { Terminal, TerminalLib, VirtualOS } from './js/centralTerminal.js';
-        import { loadFileSystemAddon } from './js/filesystem_addon.js';
+        import { Terminal, TerminalLib, VirtualOS, AddonExecutor } from './js/centralTerminal.js';
+        import { populateFileSystem } from './js/filesystem_addon.js';
+        // Import the fully refactored game addon
+        import { ReactorAddon } from './js/games/rctrl.js';
 
         // --- Initialization ---
-
-        // Get the key DOM elements that the terminal will interact with
         const outputDiv = document.getElementById('terminalOutput');
         const inputElement = document.getElementById('terminal-command-input');
-
-        // Create instances of our core classes
-        const term = new Terminal('main', outputDiv); // The Terminal class now manages the outputDiv
+        
+        const term = new Terminal('main', outputDiv);
         const vOS = new VirtualOS();
-        const termLib = new TerminalLib(term, vOS);
+        const addonExecutor = new AddonExecutor();
+        const termLib = new TerminalLib(term, vOS, addonExecutor);
 
-        // Load the extra directories and files into the virtual filesystem
-        loadFileSystemAddon(vOS);
+        // Register the self-contained reactor game addon
+        addonExecutor.registerAddon(new ReactorAddon());
 
-        // --- Event Listener for Command Input ---
+        // Populate the file system
+        populateFileSystem(vOS);
 
+        // --- Event Listener ---
         inputElement.addEventListener("keydown", e => {
             if (e.key === "Enter") {
                 const commandText = inputElement.value.trim();
                 if (commandText) {
-                    // Echo the command to the terminal output for history
                     term.print(`$ ${commandText}`);
-                    // Run the command through the library
                     termLib.runCommand(commandText);
-                    // Clear the input field for the next command
                     inputElement.value = "";
                 }
             }
         });
 
         // --- Initial Welcome Message ---
-        term.print("Welcome to the fully refactored terminal!");
-        term.print("Type 'help' to see the list of available commands.");
+        term.print("Welcome to the CWP Terminal.");
+        term.print("Type 'help' for a list of commands.");
+        term.print("Type 'run reactor' to start the game.");
 
-        // Ensure the input is focused when the page loads
         inputElement.focus();
-        document.body.addEventListener('click', function() {
-            inputElement.focus();
-        });
-
+        document.body.addEventListener('click', () => inputElement.focus());
     </script>
-
 </body>
 </html>

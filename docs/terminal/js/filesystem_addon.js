@@ -1,48 +1,27 @@
 
-// =========================
+// ==========================
 // filesystem_addon.js
-// Loads the original file and directory structure from dir.js into the VirtualOS.
-// This version uses the correct relative paths for images based on the new file structure.
-// =========================
+// Exports a function to populate the virtual file system.
+// ==========================
 
-export function loadFileSystemAddon(vOS) {
-    // --- Create the directory structure ---
+// This function takes a VirtualOS instance and populates it with the detailed file structure.
+export function populateFileSystem(vOS) {
+    // Program Files
+    vOS.createDirectory('/C/Program Files/game');
     vOS.createDirectory('/C/Program Files/game/reactor-ctrl');
+    vOS.createFile('/C/Program Files/game/reactor-ctrl/reactor.exe', 'reactor', 'exe');
+
+    // User Directories
+    vOS.createDirectory('/C/Users/Blub');
     vOS.createDirectory('/C/Users/Blub/Homework');
     vOS.createDirectory('/C/Users/CWPStudio');
+    vOS.createDirectory('/C/Users/ClassyDestroyer');
     vOS.createDirectory('/C/Users/ClassyDestroyer/Pictures');
     vOS.createDirectory('/C/Users/Minty');
     vOS.createDirectory('/C/Users/Rune');
     vOS.createDirectory('/C/Users/Philo');
-    vOS.createDirectory('/D/Audio');
 
-    // --- Add files with their specific types and corrected paths ---
-
-    // Reactor executable
-    vOS.createFile('/C/Program Files/game/reactor-ctrl/reactor.exe', 'reactor', 'exe');
-
-    // Blub's files
-    vOS.createFile('/C/Users/Blub/Homework/secret.md', 'DO NOT OPEN 𓆏', 'text');
-    // Corrected path: relative from /terminal/index.html
-    vOS.createFile('/C/Users/Blub/Homework/DoNotOpen.png', 'js/ref/Shiny_scared_blub.png', 'image');
-    vOS.createFile('/C/Users/Blub/Homework/TODO', `
---- TODO ---
-Yearly Shower
-
-Years   Status
-2020    Done
-2021    Done
-2022    Done
-2023    Pending
-2024    Pending
-2025    Not Started
-`, 'text');
-
-    // ClassyDestroyer's files
-    // Corrected path: relative from /terminal/index.html
-    vOS.createFile('/C/Users/ClassyDestroyer/Pictures/MnM.jpg', 'js/ref/MnM.jpg', 'image');
-
-    // README file
+    // User Files
     vOS.createFile('/C/README', `
 ------------ Blubs Pond Terminal -------------
 
@@ -69,9 +48,24 @@ bob the frog        - Blubby Blub Fish
 Blubs' TODO list    - Philo
 Terminal            - CWP Studio
 ---------------------------------------------
-`, 'text');
+`);
+    vOS.createFile('/C/Users/Blub/Homework/secret.md', 'DO NOT OPEN 𓆏', 'text');
+    vOS.createFile('/C/Users/Blub/Homework/DoNotOpen.png', './js/ref/Shiny_scared_blub.png', 'image');
+    vOS.createFile('/C/Users/Blub/Homework/TODO',`
+--- TODO ---
+Yearly Shower
 
-    // Audio file path needs to go up from /docs/terminal/ to the root, then into /untitled.wav
-    // Let's assume untitled.wav is in the project root with docs. So we go up two levels.
-    vOS.createFile('/D/Audio/awa.wav', '../../untitled.wav', 'audio');
+Years   Status
+2020    Done
+2021    Done
+2022    Done
+2023    Pending
+2024    Pending
+2025    Not Started
+`, 'text');
+    vOS.createFile('/C/Users/ClassyDestroyer/Pictures/MnM.jpg', './js/ref/MnM.jpg', 'image');
+
+    // Data Drive
+    vOS.createDirectory('/D/Audio');
+    vOS.createFile('/D/Audio/awa.wav', '../assets/awa.wav', 'audio');
 }
