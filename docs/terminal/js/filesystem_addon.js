@@ -51,6 +51,7 @@ Terminal            - CWP Studio
 `);
     vOS.createFile('/C/Users/Blub/Homework/secret.md', 'DO NOT OPEN 𓆏', 'text');
     vOS.createFile('/C/Users/Blub/Homework/DoNotOpen.png', './js/ref/Shiny_scared_blub.png', 'image');
+    vOS.createFile('/C/Users/Blub/Homework/QUOTE',`THAT NOT MY MANKINI (a big LIE)`, 'text');
     vOS.createFile('/C/Users/Blub/Homework/TODO',`
 --- TODO ---
 Yearly Shower
