@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/blubs-pond/blubs-pond.github.io/docs/index.html",
   "dependencies": {
+    "@clockworksproduction-studio/cwp-open-terminal-emulator": "^4.0.0",
     "js2flowchart": "^1.3.5",
     "serve": "^14.2.4"
   }

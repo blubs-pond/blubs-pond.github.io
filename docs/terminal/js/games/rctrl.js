@@ -1,19 +1,30 @@
 
 // =================================================================================
-//  REACTOR CONTROL ADDON (v3.0 - FINAL & COMPLETE)
+//  REACTOR CONTROL ADDON (v3.1 - FINAL & COMPLETE)
 //  Author: CWP
 //  Description: A complete, self-contained game addon for the terminal.
 //               All game logic, data, and classes are encapsulated here.
 // =================================================================================
 
-import { Addon } from '../centralTerminal.js';
+import { Addon } from '@clockworksproduction-studio/cwp-open-terminal-emulator';
 
 // =================================================================================
 //  SECTION 1: INTERNAL GAME CLASSES
 // =================================================================================
 
 class thing { constructor(name, durability=Infinity) { this.name=name; this.duri=durability; } }
-class item extends thing { constructor(id, name, amount, durability, dmg, effect) { super(name, durability); this.id=id; this.count=amount; this.dmg=dmg; this.effect=effect; } use(target){ /*...*/ } }
+class item extends thing { 
+    constructor(id, name, amount, durability, dmg, effect) { 
+        super(name, durability); 
+        this.id=id; 
+        this.count=amount; 
+        this.dmg=dmg; 
+        this.effect=effect; 
+    } 
+    use(target){ 
+        this.duri -= 1; 
+    } 
+}
 class part extends item { constructor(id, name, amount, durability, dmg, maxLoad, powerin, powerout, lvl, isBroken, isHaunted, sub) { super(id, name, amount, durability, dmg); this.maxLoad=maxLoad; this.powerin=powerin; this.powerout=powerout; this.lvl=lvl; this.isBroken=isBroken; this.isHaunted=isHaunted; this.subComponent=sub; } reboot() { if(this.isBroken) this.isBroken=false; } upgrade() { this.lvl++; } }
 class fixture extends thing { constructor(name, durability, cord, powerin, powerout, component, isOn) { super(name, durability); this.cord=cord; this.powerin=powerin; this.powerout=powerout; this.component=component; this.isOn=isOn; } }
 class cam extends fixture { constructor(name, duri, cord, powI, powO, comp, on) { super(name, duri, cord, powI, powO, comp, on); } }
@@ -40,7 +51,7 @@ export class ReactorAddon extends Addon {
     onStart(term, vOS) {
         this.term = term;
         this.vOS = vOS;
-        this.term.print("Initializing Reactor Control v3.0 (FINAL)...");
+        this.term.print("Initializing Reactor Control v3.1 (FINAL)...");
         this._initializeGameState();
         this._initializeGameCommands();
         this.term.showComponent('gameArea');
@@ -65,7 +76,22 @@ export class ReactorAddon extends Addon {
 
         gs.map = `...`; // Full map string here
 
-        gs.loc = { /* Full 'loc' object from backup, with 'new room(...)' etc. */ };
+        gs.loc = {
+            CR: new room("Control Room", "CR", {x: -3, y: -2}, {x: 3, y: 2}, ["H1"], ["H1"], [], ["cam_east", "cam_west"], {
+                cam_east: new cam("Camera East", 100, undefined, undefined, undefined, [], true),
+                cam_west: new cam("Camera West", 100, undefined, undefined, undefined, [], true),
+                controlPanel: new fixture("Control Panel", 100, undefined, undefined, undefined, [], false),
+                firesuppressionSystem: new fixture("Fire Suppression System", 100, undefined, undefined, undefined, [], false)
+            }),
+            RR: new room("Reactor Room", "RR", {x: 5, y: -2}, {x: 9, y: 2}, ["H1"], ["H1"], ["SF", "C"], ["cam"], {
+                SF: new door("SF", 100, undefined, undefined, undefined, [], false, false, false),
+                C: new door("C", 100, undefined, undefined, undefined, [], false, false, false),
+                cam: new cam("cam", 100, undefined, undefined, undefined, [], true),
+                reactorCore: new fixture("Reactor Core", 100, undefined, undefined, undefined, [], false)
+            }),
+            LAB: new room("Laboratory", "LAB", {x: -9, y: -2}, {x: -5, y: 2}, ["H1"], ["H1"], [], [], {}),
+            H1: new hallway("Hallway 1", "H1", {x: -2, y: -1}, {x: 4, y: 1}, ["CR", "RR", "LAB"], ["CR", "RR", "LAB"], [], [])
+        };
 
         gs.player = new player(gs.loc.CR, 
             [new item(1, "PPSH-41", 1, 100, {hp:25}), new item(2, "Mabaro Cigar", 10, 1, {hunger:5, sanity:-10})],
