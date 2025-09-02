@@ -1,141 +1,221 @@
 
-// =================================================================================
-//  REACTOR CONTROL ADDON (v3.1 - FINAL & COMPLETE)
-//  Author: CWP
-//  Description: A complete, self-contained game addon for the terminal.
-//               All game logic, data, and classes are encapsulated here.
-// =================================================================================
-
-import { Addon } from '@clockworksproduction-studio/cwp-open-terminal-emulator';
-
-// =================================================================================
-//  SECTION 1: INTERNAL GAME CLASSES
-// =================================================================================
-
-class thing { constructor(name, durability=Infinity) { this.name=name; this.duri=durability; } }
-class item extends thing { 
-    constructor(id, name, amount, durability, dmg, effect) { 
-        super(name, durability); 
-        this.id=id; 
-        this.count=amount; 
-        this.dmg=dmg; 
-        this.effect=effect; 
-    } 
-    use(target){ 
-        this.duri -= 1; 
-    } 
-}
-class part extends item { constructor(id, name, amount, durability, dmg, maxLoad, powerin, powerout, lvl, isBroken, isHaunted, sub) { super(id, name, amount, durability, dmg); this.maxLoad=maxLoad; this.powerin=powerin; this.powerout=powerout; this.lvl=lvl; this.isBroken=isBroken; this.isHaunted=isHaunted; this.subComponent=sub; } reboot() { if(this.isBroken) this.isBroken=false; } upgrade() { this.lvl++; } }
-class fixture extends thing { constructor(name, durability, cord, powerin, powerout, component, isOn) { super(name, durability); this.cord=cord; this.powerin=powerin; this.powerout=powerout; this.component=component; this.isOn=isOn; } }
-class cam extends fixture { constructor(name, duri, cord, powI, powO, comp, on) { super(name, duri, cord, powI, powO, comp, on); } }
-class door extends fixture { constructor(name, duri, cord, powI, powO, comp, on, islock, isOpen) { super(name, duri, cord, powI, powO, comp, on); this.islock=islock; this.isOpen=isOpen; } }
-class location { constructor(fullName, roomCode, tr, bl, adjacent, connected, doors, cams) { this.fullName=fullName; this.roomCode=roomCode; this.TR=tr; this.BL=bl; this.adjacentTo=adjacent; this.connectedTo=connected; this.door=doors; this.cam=cams; } }
-class room extends location { constructor(fullName, roomCode, tr, bl, adjacent, connected, doors, cams, poi) { super(fullName, roomCode, tr, bl, adjacent, connected, doors, cams); this.poi=poi; } }
-class hallway extends location { constructor(fullName, roomCode, tr, bl, adjacent, connected, doors, cams) { super(fullName, roomCode, tr, bl, adjacent, connected, doors, cams); } }
-class inventory { constructor(items=[]) { this.items=items; } add(item) { this.items.push(item); } remove(item) { const i=this.items.indexOf(item); if(i>-1) this.items.splice(i,1); } }
-class player { constructor(loc, inv, stats, isHiding=false, holdingDoor="none") { this.loc=loc; this.inv=new inventory(inv); this.stats=stats; this.isHiding=isHiding; this.doorBeingHeld=holdingDoor; } }
-class monster { constructor(id, state, isNear, hostile, noClip, stats, dps, target, goal, spawn, loc, isImmune) { Object.assign(this, { id, state, isNearPlayer: isNear, hostileLvl: hostile, canNoClip: noClip, stats, dps, target, goal, spawn, loc, isImmune }); } }
-class experiment extends monster { constructor(args) { super(args); } }
-class lost extends monster { constructor(args) { super(args); } }
-class hide extends monster { constructor(args) { super(args); } }
-class shadow extends monster { constructor(args) { super(args); } }
-class abomination extends monster { constructor(args) { super(args); } }
-
-// =================================================================================
-//  SECTION 2: THE REACTOR ADDON
-// =================================================================================
-
-export class ReactorAddon extends Addon {
-    constructor() { super("reactor"); }
-
-    onStart(term, vOS) {
-        this.term = term;
-        this.vOS = vOS;
-        this.term.print("Initializing Reactor Control v3.1 (FINAL)...");
-        this._initializeGameState();
-        this._initializeGameCommands();
-        this.term.showComponent('gameArea');
-        this.term.print("Reactor systems online. Type 'help' for a list of commands.");
-    }
-
-    onCommand(input) {
-        const [command, ...args] = input.trim().toLowerCase().split(' ');
-        const action = this.optcmd[command];
-        if (action) { action(...args); } 
-        else { this.term.print(`Unknown command: ${command}`); }
-    }
-
-    onStop() {
-        this.term.print("Shutting down Reactor Control...");
-        this.term.hideComponent('gameArea');
-    }
-
-    _initializeGameState() {
-        this.gameState = {};
-        const gs = this.gameState;
-
-        gs.map = `...`; // Full map string here
-
-        gs.loc = {
-            CR: new room("Control Room", "CR", {x: -3, y: -2}, {x: 3, y: 2}, ["H1"], ["H1"], [], ["cam_east", "cam_west"], {
-                cam_east: new cam("Camera East", 100, undefined, undefined, undefined, [], true),
-                cam_west: new cam("Camera West", 100, undefined, undefined, undefined, [], true),
-                controlPanel: new fixture("Control Panel", 100, undefined, undefined, undefined, [], false),
-                firesuppressionSystem: new fixture("Fire Suppression System", 100, undefined, undefined, undefined, [], false)
-            }),
-            RR: new room("Reactor Room", "RR", {x: 5, y: -2}, {x: 9, y: 2}, ["H1"], ["H1"], ["SF", "C"], ["cam"], {
-                SF: new door("SF", 100, undefined, undefined, undefined, [], false, false, false),
-                C: new door("C", 100, undefined, undefined, undefined, [], false, false, false),
-                cam: new cam("cam", 100, undefined, undefined, undefined, [], true),
-                reactorCore: new fixture("Reactor Core", 100, undefined, undefined, undefined, [], false)
-            }),
-            LAB: new room("Laboratory", "LAB", {x: -9, y: -2}, {x: -5, y: 2}, ["H1"], ["H1"], [], [], {}),
-            H1: new hallway("Hallway 1", "H1", {x: -2, y: -1}, {x: 4, y: 1}, ["CR", "RR", "LAB"], ["CR", "RR", "LAB"], [], [])
-        };
-
-        gs.player = new player(gs.loc.CR, 
-            [new item(1, "PPSH-41", 1, 100, {hp:25}), new item(2, "Mabaro Cigar", 10, 1, {hunger:5, sanity:-10})],
-            { isAlive: true, hp: 1000, hunger: 0, insomnia: 0, sanity: 100 }
-        );
-
-        gs.monsters = {
-            experiment: new experiment({id: 0, state: 0, isNear: false, hostile: 5, noClip: false, stats: {hp: 9999}, dps: {physical: 100}, spawn: gs.loc.LAB, loc: gs.loc.LAB, isImmune: {physical: true}}),
-            lost: new lost({id: 1, state: 0, isNear: false, hostile: 2, noClip: true, stats: {hp: 100}, dps: {sanity: 20}, spawn: gs.loc.RR, loc: gs.loc.RR, isImmune: {physical: true}}),
-        };
-        
-        gs.reactor = { integrity: 100, powerOutput: 0, temperature: 25, coolantLevel: 100 };
-    }
-
-    _initializeGameCommands() {
-        const gs = this.gameState;
-        const term = this.term;
-
-        this.optcmd = {
-            go: (locCode) => {
-                if (!locCode) { term.print("Go where?"); return; }
-                const targetRoom = Object.values(gs.loc).find(r => r.roomCode.toLowerCase() === locCode.toLowerCase());
-                if (targetRoom && gs.player.loc.connectedTo.includes(targetRoom.roomCode)) {
-                    gs.player.loc = targetRoom;
-                    term.print(`You are now in the ${targetRoom.fullName}.`);
-                } else {
-                    term.print(`Cannot go to ${locCode}.`);
+    go(args) {
+        const loc = args[0];
+        if (this.game.rooms[loc]) {
+            if (this.game.rooms[loc].status === "safe") {
+                this.game.player.loc = loc;
+                this.term.print(`You move to the ${loc}.`);
+                if (this.game.rooms[loc].items.length > 0) {
+                    this.term.print(`You see the following items: ${this.game.rooms[loc].items.map(i => i.name).join(", ")}.`);
                 }
-            },
-            look: () => {
-                const p = gs.player;
-                term.print(`You are in the ${p.loc.fullName}.`);
-                term.print(`Exits: ${p.loc.connectedTo.join(', ')}`);
-            },
-            inv: () => {
-                term.print("Inventory:\n" + (gs.player.inv.items.map(i => `${i.name} (x${i.count})`).join('\n') || "  Empty"));
-            },
-            stat: () => {
-                const s = gs.player.stats;
-                term.print(`HP: ${s.hp}/1000 | Sanity: ${s.sanity}/100`);
-            },
-            help: () => {
-                term.print(`Commands: ${Object.keys(this.optcmd).join(', ')}, exit`);
+                if (this.game.rooms[loc].fire && this.game.rooms[loc].fire.size > 0) {
+                    this.term.print(`There is a fire here! You need to put it out quickly!`);
+                    this.game.rooms[loc].status = "on fire";
+                }
+            } else if (this.game.rooms[loc].status === "on fire") {
+                this.term.print(`The ${loc} is on fire! You can't go there until the fire is out!`);
+            } else if (this.game.rooms[loc].status === "locked") {
+                this.term.print(`The ${loc} is locked! You can't go there until you unlock it!`);
+            } else {
+                this.term.print(`You can't go to the ${loc} right now.`);
             }
-        };
+        } else {
+            this.term.print(`There is no location named ${loc}.`);
+        }
     }
-}
+
+    get(args) {
+        const obj = args[0];
+        const amount = parseInt(args[1] || "1");
+        const itemIndex = this.game.rooms[this.game.player.loc].items.findIndex(i => i.name === obj);
+        if (itemIndex !== -1) {
+            const item = this.game.rooms[this.game.player.loc].items[itemIndex];
+            if (item.count >= amount) {
+                item.count -= amount;
+                const invItemIndex = this.game.player.inv.items.findIndex(i => i.name === obj);
+                if (invItemIndex !== -1) {
+                    this.game.player.inv.items[invItemIndex].count += amount;
+                } else {
+                    this.game.player.inv.add(new Item(item.id, item.name, amount, item.durability, item.dmg));
+                }
+                this.term.print(`You pick up ${amount} ${obj}(s).`);
+                if (item.count === 0) {
+                    this.game.rooms[this.game.player.loc].items.splice(itemIndex, 1);
+                }
+            } else {
+                this.term.print(`There are not enough ${obj}(s) here to pick up.`);
+            }
+        } else {
+            this.term.print(`There is no ${obj} here to pick up.`);
+        }
+    }
+
+    drop(args) {
+        const obj = args[0];
+        const amount = parseInt(args[1] || "1");
+        const invItemIndex = this.game.player.inv.items.findIndex(i => i.name === obj);
+        if (invItemIndex !== -1) {
+            const item = this.game.player.inv.items[invItemIndex];
+            if (item.count >= amount) {
+                item.count -= amount;
+                const roomItemIndex = this.game.rooms[this.game.player.loc].items.findIndex(i => i.name === obj);
+                if (roomItemIndex !== -1) {
+                    this.game.rooms[this.game.player.loc].items[roomItemIndex].count += amount;
+                } else {
+                    this.game.rooms[this.game.player.loc].items.push(new Item(item.id, item.name, amount, item.durability, item.dmg));
+                }
+                this.term.print(`You drop ${amount} ${obj}(s).`);
+                if (item.count === 0) {
+                    this.game.player.inv.items.splice(invItemIndex, 1);
+                }
+            } else {
+                this.term.print(`You don't have enough ${obj}(s) to drop.`);
+            }
+        } else {
+            this.term.print(`You don't have any ${obj} to drop.`);
+        }
+    }
+
+    use(args) {
+        const obj = args[0];
+        const target = args[1];
+        if (obj === "fire extinguisher" && target === "fire") {
+            if (this.game.rooms[this.game.player.loc].fire && this.game.rooms[this.game.player.loc].fire.size > 0) {
+                this.game.rooms[this.game.player.loc].fire.size -= 1;
+                this.term.print("You use the fire extinguisher to put out some of the fire.");
+                if (this.game.rooms[this.game.player.loc].fire.size === 0) {
+                    this.term.print("The fire is completely out.");
+                    this.game.rooms[this.game.player.loc].status = "safe";
+                }
+            } else {
+                this.term.print("There is no fire to put out.");
+            }
+        } else if (obj === "fire extinguisher" && target !== "fire") {
+            this.term.print("You can't use the fire extinguisher on that.");
+        } else {
+            this.term.print("You can't use that.");
+        }
+    }
+
+    look() {
+        const loc = this.game.player.loc;
+        this.term.print(`You are in the ${loc}.`);
+        this.term.print(this.game.rooms[loc].desc);
+        if (this.game.rooms[loc].items.length > 0) {
+            this.term.print(`You see the following items: ${this.game.rooms[loc].items.map(i => i.name).join(", ")}.`);
+        }
+        if (this.game.rooms[loc].fire && this.game.rooms[loc].fire.size > 0) {
+            this.term.print(`There is a fire here! You need to put it out quickly!`);
+            this.game.rooms[loc].status = "on fire";
+        }
+        if (this.game.rooms[loc].exits.length > 0) {
+            this.term.print(`Exits: ${this.game.rooms[loc].exits.join(", ")}.`);
+        }
+        if (this.game.rooms[loc].monsters.length > 0) {
+            this.term.print(`You see the following creatures: ${this.game.rooms[loc].monsters.map(m => m.name).join(", ")}.`);
+        }
+    }
+
+    inv() {
+        if (this.game.player.inv.items.length > 0) {
+            this.term.print(`You are carrying: ${this.game.player.inv.items.map(i => `${i.name} (x${i.count})`).join(", ")}.`);
+        } else {
+            this.term.print("You are not carrying anything.");
+        }
+    }
+
+    exam(args) {
+        this.term.print("You examine your surroundings carefully, but find nothing unusual.");
+    }
+
+    help(args) {
+        this.term.print("\n        TODO added the help text\n        ");
+    }
+
+    fix(args) {
+        const obj = args[0];
+        this.term.print(`You attempt to fix the ${obj}, but realize you need proper tools and knowledge to do so.`);
+    }
+
+    reboot(args) {
+        const obj = args[0];
+        this.term.print(`You attempt to reboot the ${obj}, but it seems to be functioning normally.`);
+    }
+
+    stat() {
+        this.term.print(`Player Stats:\nHP: ${this.game.player.stats.hp}\nHunger: ${this.game.player.stats.hunger}\nInsomnia: ${this.game.player.stats.insomnia}\nSanity: ${this.game.player.stats.sanity}`);
+    }
+
+    upgrade(args) {
+        this.term.print("You look around for upgrade options, but find none available at the moment.");
+    }
+
+    peak(args) {
+        const loc = args[0];
+        if (this.game.rooms[loc]) {
+            this.term.print(`You peek into the ${loc}.`);
+            this.term.print(this.game.rooms[loc].desc);
+            if (this.game.rooms[loc].items.length > 0) {
+                this.term.print(`You see the following items: ${this.game.rooms[loc].items.map(i => i.name).join(", ")}.`);
+            }
+            if (this.game.rooms[loc].fire && this.game.rooms[loc].fire.size > 0) {
+                this.term.print(`There is a fire there! You need to put it out quickly!`);
+                this.game.rooms[loc].status = "on fire";
+            }
+            if (this.game.rooms[loc].exits.length > 0) {
+                this.term.print(`Exits: ${this.game.rooms[loc].exits.join(", ")}.`);
+            }
+            if (this.game.rooms[loc].monsters.length > 0) {
+                this.term.print(`You see the following creatures: ${this.game.rooms[loc].monsters.map(m => m.name).join(", ")}.`);
+            }
+        } else {
+            this.term.print(`There is no location named ${loc}.`);
+        }
+    }
+
+    cam(args) {
+        const num = args[0];
+        if (this.game.cameras[num]) {
+            this.term.print(`You access camera ${num}.`);
+            this.term.print(this.game.cameras[num].desc);
+            if (this.game.cameras[num].status === "offline") {
+                this.term.print("The camera is currently offline.");
+            } else {
+                this.term.print("The camera feed is live.");
+            }
+        } else {
+            this.term.print(`There is no camera numbered ${num}.`);
+        }
+    }
+
+    about() {
+        this.term.print("Reactor Control Terminal v1.0. Manage the reactor and ensure safety protocols are followed.");
+    }
+
+    settings(args) {
+        const opt = args[0];
+        const arg = args.slice(1);
+        if (opt === "volume") {
+            const vol = parseInt(arg[0]);
+            if (!isNaN(vol) && vol >= 0 && vol <= 100) {
+                this.game.settings.volume = vol;
+                this.term.print(`Volume set to ${vol}%.`);
+            } else {
+                this.term.print("Invalid volume level. Please specify a value between 0 and 100.");
+            }
+        } else if (opt === "difficulty") {
+            const diff = arg[0].toLowerCase();
+            if (["easy", "normal", "hard"].includes(diff)) {
+                this.game.settings.difficulty = diff;
+                this.term.print(`Difficulty set to ${diff}.`);
+            } else {
+                this.term.print("Invalid difficulty level. Please choose 'easy', 'normal', or 'hard'.");
+            }
+        } else {
+            this.term.print("Unknown setting option.");
+        }
+    }
+
+    hide() {
+        this.term.print("You find a safe spot to hide and wait for any danger to pass.");
+    }
