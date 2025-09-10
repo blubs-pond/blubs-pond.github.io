@@ -13,51 +13,88 @@ function w3_close() {
   
 }
 
-// JavaScript to toggle between themes
-const themeStylesheet = document.getElementById('theme');
-let currentTheme = 'light'; // Default to light theme
+document.addEventListener('DOMContentLoaded', () => {
+  // JavaScript to toggle between themes
+  const themeStylesheet = document.getElementById('theme');
+  let currentTheme = 'light'; // Default to light theme
 
-function toggleTheme() {
-  const body = document.body;
-  const themeToggleButtons = document.querySelectorAll('#theme-toggle-nav, #theme-toggle-side');
-  
-    if (currentTheme === 'dark') {
-      themeStylesheet.href = 'light-theme.css';
-      body.style.backgroundColor = '#ffffff';
-      body.style.color = '#1e1e1e'; // Light mode background
-      currentTheme = 'light';
-    } else {
+  function toggleTheme() {
+    const body = document.body;
+    const themeToggleButtons = document.querySelectorAll('#theme-toggle-nav, #theme-toggle-side');
+    
+      if (currentTheme === 'dark') {
+        themeStylesheet.href = 'light-theme.css';
+        body.style.backgroundColor = '#ffffff';
+        body.style.color = '#1e1e1e'; // Light mode background
+        currentTheme = 'light';
+      } else {
+        themeStylesheet.href = 'dark-theme.css';
+        body.style.backgroundColor = '#1e1e1e';
+        body.style.color = '#ffffff'; // Dark mode background
+        currentTheme = 'dark';
+      }
+      themeToggleButtons.forEach(button => {
+        button.textContent = currentTheme === 'dark' ? 'LIGHT' : 'DARK'; // Update button text
+      });
+    }
+
+  // Function to set the theme
+  function setTheme(theme) {
+    const body = document.body;
+    if (theme === 'dark') {
       themeStylesheet.href = 'dark-theme.css';
       body.style.backgroundColor = '#1e1e1e';
       body.style.color = '#ffffff'; // Dark mode background
       currentTheme = 'dark';
+    } else {
+      themeStylesheet.href = 'light-theme.css';
+      body.style.backgroundColor = '#ffffff';
+      body.style.color = '#1e1e1e'; // Light mode background
+      currentTheme = 'light';
     }
-    themeToggleButtons.forEach(button => {
-      button.textContent = currentTheme === 'dark' ? 'LIGHT' : 'DARK'; // Update button text
+  }
+
+  // Set the initial theme on page load
+  if (themeStylesheet) {
+    setTheme(currentTheme);
+  }
+
+  // Make toggleTheme globally accessible if it's called from HTML
+  window.toggleTheme = toggleTheme;
+
+  // Load Twitch Embed
+  if (document.getElementById('twitch-embed')) {
+    new Twitch.Embed("twitch-embed", {
+      width: "100%",
+      height: 450,
+      channel: "blubbyblubfish"
     });
   }
 
-// Function to set the theme
-function setTheme(theme) {
-  const body = document.body;
-  if (theme === 'dark') {
-    themeStylesheet.href = 'dark-theme.css';
-    body.style.backgroundColor = '#1e1e1e';
-    body.style.color = '#ffffff'; // Dark mode background
-    currentTheme = 'dark';
-  } else {
-    themeStylesheet.href = 'light-theme.css';
-    body.style.backgroundColor = '#ffffff';
-    body.style.color = '#1e1e1e'; // Light mode background
-    currentTheme = 'light';
+  // Load Footer
+  if (document.getElementById('footer-placeholder')) {
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
   }
-}
 
-// Set the initial theme on page load
-document.addEventListener('DOMContentLoaded', () => {
-  setTheme(currentTheme); // Set the initial theme
+  // Load Nav
+  if (document.getElementById('nav-placeholder')) {
+    fetch('nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('nav-placeholder').innerHTML = data;
+      });
+  }
+
+  // Add awa event listener
+  const awaLink = document.getElementById('awa');
+  if (awaLink) {
+    awaLink.addEventListener('click', awa);
+  }
 });
-
 
 function awa() {
     const awa_sound = new Audio("untitled.wav");
